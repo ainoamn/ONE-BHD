@@ -1,0 +1,5 @@
+Contact: https://github.com/ainoamn
+Expires: 2027-08-16T00:00:00.000Z
+Preferred-Languages: ar, en
+Canonical: https://bhd-om.com/.well-known/security.txt
+Policy: https://bhd-om.com/security

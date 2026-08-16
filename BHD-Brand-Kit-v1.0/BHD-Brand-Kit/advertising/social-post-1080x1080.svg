@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect width="1080" height="1080" fill="#092D24"/><g fill="none" stroke="#B58D55" stroke-width="4.153846153846154" opacity="0.18">
+<path d="M-54.0 885.5999999999999 H378.0 V626.4 H734.4000000000001 V334.8 H1134.0"/>
+<path d="M-54.0 982.8000000000001 H464.4 V723.6 H820.8 V442.79999999999995 H1134.0"/>
+</g><rect width="259.2" height="8" fill="#C8102E"/><rect x="259.2" width="270.0" height="8" fill="#fff"/><rect x="529.2" width="550.8" height="8" fill="#0B6B45"/>
+<g transform="translate(86.4 86.4) scale(0.6109489051094891)">
+<path fill="#fff" d="M0 0h100c31 0 48 17 48 43 0 18-9 31-25 39 20 6 31 22 31 42 0 28-21 47-53 47H30v-28h70c16 0 26-8 26-20 0-13-11-22-29-22H0V74h97c15 0 24-8 24-21 0-15-10-25-25-25H28L0 0Z"/><path fill="#fff" d="M190 109l30-27h90V0h30v171h-30v-62h-90v62h-30v-62Z"/><path fill="#fff" d="M385 0h74c52 0 89 35 89 85 0 51-37 86-89 86h-74l28-28h46c36 0 61-23 61-58 0-34-25-57-61-57h-46L385 0Z"/>
+</g>
+<text x="86.4" y="583.2" fill="#B58D55" class="en" font-size="34.56" font-weight="800" letter-spacing="4.32">BHD · BRAND CAMPAIGN</text>
+<text x="993.6" y="712.8000000000001" text-anchor="end" fill="#fff" class="ar" font-size="76.67999999999999" font-weight="900">نبني · نرتقي · نحقق</text>
+<text x="993.6" y="799.2" text-anchor="end" fill="rgba(255,255,255,.64)" class="ar" font-size="28.08">ابنِ أحلامًا أكبر مع بن حمود للتطوير</text>
+<text x="86.4" y="982.8000000000001" fill="#fff" class="en" font-size="19.439999999999998" font-weight="700" letter-spacing="3.24">BHD · BIN HAMOOD DEVELOPMENT · MUSCAT, OMAN</text>
+</svg>

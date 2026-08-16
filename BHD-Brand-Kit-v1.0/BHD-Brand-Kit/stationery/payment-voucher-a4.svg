@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 2100 2970" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect width="2100" height="2970" fill="#fff"/><rect width="504.0" height="8" fill="#C8102E"/><rect x="504.0" width="525.0" height="8" fill="#fff"/><rect x="1029.0" width="1071.0" height="8" fill="#0B6B45"/><g transform="translate(295.0 90) scale(0.583941605839416)">
+<path fill="#08A39F" d="M0 0h100c31 0 48 17 48 43 0 18-9 31-25 39 20 6 31 22 31 42 0 28-21 47-53 47H30v-28h70c16 0 26-8 26-20 0-13-11-22-29-22H0V74h97c15 0 24-8 24-21 0-15-10-25-25-25H28L0 0Z"/><path fill="#174B70" d="M190 109l30-27h90V0h30v171h-30v-62h-90v62h-30v-62Z"/><path fill="#08A39F" d="M385 0h74c52 0 89 35 89 85 0 51-37 86-89 86h-74l28-28h46c36 0 61-23 61-58 0-34-25-57-61-57h-46L385 0Z"/>
+</g><text x="455.0" y="237.20000000000002" text-anchor="middle" fill="#174B70" class="en" font-size="43.52" font-weight="600" letter-spacing="2.56">BIN HAMOOD DEVELOPMENT</text>
+<text x="1960" y="330" text-anchor="end" fill="#092D24" class="ar" font-size="84" font-weight="900">سند صرف</text>
+<text x="1960" y="405" text-anchor="end" fill="#B58D55" class="en" font-size="28" font-weight="700" letter-spacing="4">BIN HAMOOD DEVELOPMENT</text>
+<rect x="110" y="500" width="1880" height="3" fill="#DFE6E2"/><rect x="110" y="580" width="1880" height="690" rx="28" fill="#FBFAF7" stroke="#DFE6E2"/><text x="1880" y="700" text-anchor="end" fill="#092D24" class="ar" font-size="34">صُرف إلى السيد / السادة: ______________________________________</text><text x="1880" y="825" text-anchor="end" fill="#092D24" class="ar" font-size="34">مبلغًا وقدره: _________________________________________________</text><text x="1880" y="950" text-anchor="end" fill="#092D24" class="ar" font-size="34">وذلك مقابل: _____________________________________________________</text><text x="1880" y="1075" text-anchor="end" fill="#092D24" class="ar" font-size="34">طريقة الدفع: نقدًا / تحويل / شيك رقم: ___________________________</text><text x="1880" y="1200" text-anchor="end" fill="#B58D55" class="ar" font-size="34" font-weight="700">المبلغ: OMR __________________</text>
+<line x1="110" y1="2760" x2="1990" y2="2760" stroke="#DFE6E2" stroke-width="3"/>
+<text x="1990" y="2830" text-anchor="end" fill="#66756F" class="ar" font-size="26">مسقط، سلطنة عُمان · hello@bhd-om.com · bhd-om.com</text>
+<text x="110" y="2830" fill="#B58D55" class="en" font-size="24" font-weight="800">BUILD HIGHER DREAMS</text>
+</svg>

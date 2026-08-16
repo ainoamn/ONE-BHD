@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="220" viewBox="0 0 1400 220" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect width="1400" height="220" fill="#FBFAF7"/><text x="700" y="135" text-anchor="middle" fill="#174B70" class="en" font-size="82" font-weight="600" letter-spacing="6">BIN HAMOOD DEVELOPMENT</text>
+</svg>

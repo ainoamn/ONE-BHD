@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="390" viewBox="0 0 1400 390" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect width="1400" height="390" fill="#FBFAF7"/><g transform="translate(80 90) scale(0.9854014598540146)">
+<path fill="#08A39F" d="M0 0h100c31 0 48 17 48 43 0 18-9 31-25 39 20 6 31 22 31 42 0 28-21 47-53 47H30v-28h70c16 0 26-8 26-20 0-13-11-22-29-22H0V74h97c15 0 24-8 24-21 0-15-10-25-25-25H28L0 0Z"/><path fill="#174B70" d="M190 109l30-27h90V0h30v171h-30v-62h-90v62h-30v-62Z"/><path fill="#08A39F" d="M385 0h74c52 0 89 35 89 85 0 51-37 86-89 86h-74l28-28h46c36 0 61-23 61-58 0-34-25-57-61-57h-46L385 0Z"/>
+</g><line x1="660" y1="70" x2="660" y2="300" stroke="#DFE6E2" stroke-width="3"/><text x="720" y="175" fill="#092D24" class="en" font-size="112" font-weight="900">STORE</text><text x="725" y="230" fill="#B58D55" class="en" font-size="26" font-weight="700" letter-spacing="6">A BHD PRODUCT</text><text x="725" y="282" fill="#66756F" class="ar" font-size="30">متجر بن حمود للتطوير</text>
+</svg>
