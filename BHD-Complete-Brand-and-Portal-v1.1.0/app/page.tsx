@@ -311,7 +311,8 @@ export default function Home() {
                 alt="هوية شركة بن حمود للتطوير المستوحاة من العمارة العُمانية"
                 width={1200}
                 height={630}
-                sizes="(max-width: 820px) 92vw, 520px"
+                sizes="(max-width: 820px) 96vw, 720px"
+                quality={90}
                 priority
               />
               <span className="hero-official-seal" aria-hidden="true">

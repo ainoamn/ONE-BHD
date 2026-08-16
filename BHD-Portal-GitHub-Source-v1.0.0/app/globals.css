@@ -2188,16 +2188,16 @@ h3 {
   inset: 52px 10px auto;
   margin: 0;
   overflow: hidden;
-  aspect-ratio: 1.62;
+  width: calc(100% - 20px);
+  aspect-ratio: 1200 / 630;
   border: 8px solid rgba(255, 255, 255, 0.72);
   border-radius: 32px;
-  background: var(--ink);
+  background: #f6f2ea;
   box-shadow: 0 46px 95px rgba(9, 45, 36, 0.22), 0 8px 22px rgba(9, 45, 36, 0.1);
-  transform: perspective(1000px) rotateY(-2deg) rotateX(1deg);
 }
 
 [dir="ltr"] .hero-brand-image {
-  transform: perspective(1000px) rotateY(2deg) rotateX(1deg);
+  transform: none;
 }
 
 .hero-brand-image::after {
@@ -2212,7 +2212,8 @@ h3 {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .brand-float {
