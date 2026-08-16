@@ -45,6 +45,13 @@ const copy = {
     accountLayer: "حساب BHD",
     portalLayer: "بوابة BHD",
     architectureNote: "تنقّل موحّد · دخول آمن · بيانات كل تطبيق تبقى مستقلة",
+    identityMeta: "دخول موحّد وآمن",
+    accountMeta: "الملف والأمان",
+    portalMeta: "بوابة الشركة",
+    accountBadge: "حساب BHD",
+    demoName: "عبد الحميد",
+    demoAccount: "حساب BHD الشخصي",
+    secureSession: "جلسة آمنة",
     accountEyebrow: "قريبًا · حساب BHD",
     accountTitle: "حساب واحد يرافقك بين كل المنتجات.",
     accountLead:
@@ -109,6 +116,13 @@ const copy = {
     accountLayer: "BHD Account",
     portalLayer: "BHD Portal",
     architectureNote: "Unified navigation · Secure sign-in · Independent product data",
+    identityMeta: "Unified secure sign-in",
+    accountMeta: "Profile and security",
+    portalMeta: "Company portal",
+    accountBadge: "BHD Account",
+    demoName: "Abdul Hamid",
+    demoAccount: "Personal BHD account",
+    secureSession: "Secure session",
     accountEyebrow: "Coming soon · BHD Account",
     accountTitle: "One account that moves with you.",
     accountLead:
@@ -127,7 +141,7 @@ const copy = {
       ["Secure by design", "Identity, data and permissions are separated so the ecosystem can grow with confidence."],
       ["Built to grow", "Every product is independent, scalable and free to evolve on its own path."],
     ],
-    companyEyebrow: "ONE NAME · ONE PROMISE",
+    companyEyebrow: "One name · one promise",
     companyTitle: "Bin Hamood Development is the name. Build Higher Dreams is the promise.",
     companyLead:
       "Build higher dreams with Bin Hamood Development — an Omani brand turning ideas into products, businesses and experiences designed to grow.",
@@ -417,10 +431,7 @@ export default function Home() {
                 </div>
                 <div className="product-number">0{index + 1}</div>
                 <p className="product-category">{isArabic ? product.categoryAr : product.categoryEn}</p>
-                <h3>
-                  {isArabic ? product.nameAr : product.name}
-                  <small>{isArabic ? product.name : product.nameAr}</small>
-                </h3>
+                <h3>{isArabic ? product.nameAr : product.name}</h3>
                 <p className="product-description">
                   {isArabic ? product.descriptionAr : product.descriptionEn}
                 </p>
@@ -449,12 +460,12 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="architecture-map" aria-label="BHD ecosystem architecture">
+          <div className="architecture-map" aria-label={isArabic ? "بنية منظومة BHD" : "BHD ecosystem architecture"}>
             <div className="map-apps">
               <small>{t.appLayer}</small>
               <div>
                 {products.slice(0, 5).map((product) => (
-                  <span key={product.name} style={{ "--app-color": product.accent } as React.CSSProperties}>
+                  <span key={product.name} title={isArabic ? product.nameAr : product.name} style={{ "--app-color": product.accent } as React.CSSProperties}>
                     {product.mark}
                   </span>
                 ))}
@@ -462,11 +473,11 @@ export default function Home() {
             </div>
             <i className="map-line" />
             <div className="map-middle">
-              <div><span>ID</span><strong>{t.identityLayer}</strong><small>OIDC · SSO</small></div>
-              <div><span>AC</span><strong>{t.accountLayer}</strong><small>PROFILE · SECURITY</small></div>
+              <div><span>{isArabic ? "هـ" : "ID"}</span><strong>{t.identityLayer}</strong><small>{t.identityMeta}</small></div>
+              <div><span>{isArabic ? "ح" : "AC"}</span><strong>{t.accountLayer}</strong><small>{t.accountMeta}</small></div>
             </div>
             <i className="map-line short" />
-            <div className="map-portal"><span>B</span><div><strong>{t.portalLayer}</strong><small>BHD-OM.COM</small></div></div>
+            <div className="map-portal"><span>{isArabic ? "ب" : "B"}</span><div><strong>{t.portalLayer}</strong><small>{t.portalMeta}</small></div></div>
           </div>
         </div>
       </section>
@@ -474,16 +485,16 @@ export default function Home() {
       <section className="account-section section-wrap">
         <div className="account-visual" aria-hidden="true">
           <div className="account-phone">
-            <div className="phone-top"><span>B</span><small>BHD ACCOUNT</small></div>
-            <div className="profile-ring">BH</div>
-            <strong>Abdul Hamid</strong>
-            <small>Personal BHD Account</small>
+            <div className="phone-top"><span>{isArabic ? "ب" : "B"}</span><small>{t.accountBadge}</small></div>
+            <div className="profile-ring">{isArabic ? "بح" : "BH"}</div>
+            <strong>{t.demoName}</strong>
+            <small>{t.demoAccount}</small>
             <div className="phone-apps">
               {products.slice(0, 4).map((product) => (
                 <span key={product.name} style={{ background: product.soft, color: product.accent }}>{product.mark}</span>
               ))}
             </div>
-            <div className="phone-secure"><i /> Secure session</div>
+            <div className="phone-secure"><i /> {t.secureSession}</div>
           </div>
           <div className="account-glow" />
         </div>

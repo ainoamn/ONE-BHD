@@ -1011,14 +1011,14 @@ h3 {
 .map-apps > small {
   display: block;
   margin-bottom: 16px;
-  color: rgba(255, 255, 255, 0.43);
-  font-size: 8px;
-  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 13px;
+  letter-spacing: 0;
 }
 
 .map-apps > div {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
 }
 
@@ -1028,10 +1028,13 @@ h3 {
   display: grid;
   place-items: center;
   aspect-ratio: 1;
+  min-width: 0;
   border-radius: 14px;
   background: color-mix(in srgb, var(--app-color) 30%, rgba(255, 255, 255, 0.06));
   color: #fff;
-  font-weight: 900;
+  font-size: clamp(14px, 1.6vw, 18px);
+  font-weight: 800;
+  line-height: 1;
 }
 
 .map-line {
@@ -1069,9 +1072,9 @@ h3 {
 }
 
 .map-middle strong,
-.map-portal strong { font-size: 11px; }
+.map-portal strong { font-size: 14px; font-weight: 700; }
 .map-middle small,
-.map-portal small { color: rgba(255, 255, 255, 0.35); font-size: 7px; letter-spacing: 0.11em; }
+.map-portal small { color: rgba(255, 255, 255, 0.86); font-size: 12px; letter-spacing: 0; line-height: 1.45; }
 
 .map-portal {
   display: flex;
@@ -1153,7 +1156,7 @@ h3 {
   font-family: var(--font-display);
 }
 
-.phone-top small { color: #7a8a83; font-size: 7px; letter-spacing: 0.12em; }
+.phone-top small { color: #3d5249; font-size: 12px; font-weight: 700; letter-spacing: 0; }
 
 .profile-ring {
   display: grid;
@@ -1170,8 +1173,8 @@ h3 {
   font-weight: 800;
 }
 
-.account-phone > strong { margin-top: 14px; font-size: 15px; }
-.account-phone > small { margin-top: 5px; color: #88968f; font-size: 8px; }
+.account-phone > strong { margin-top: 14px; font-size: 16px; }
+.account-phone > small { margin-top: 5px; color: #44554d; font-size: 13px; }
 
 .phone-apps {
   display: grid;
@@ -2941,7 +2944,7 @@ h3 {
 .brand-equation { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 13px; margin-top: 28px; padding: 17px; border: 1px solid #e0e6e2; border-radius: 18px; background: #fff; }
 .brand-equation span { display: grid; gap: 4px; }
 .brand-equation b { font-size: 24px; }
-.brand-equation small { color: #7b8982; font-size: 7px; letter-spacing: .08em; }
+.brand-equation small { color: #3f5249; font-size: 13px; font-weight: 600; letter-spacing: 0; line-height: 1.5; }
 .brand-equation i { color: #b58d55; font-style: normal; }
 
 .brand-build-section,
