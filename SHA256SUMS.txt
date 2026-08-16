@@ -2,6 +2,7 @@
 7ce6abb6741489fd240a417cbf9034ac680af9ebbbb3ffeae5dcc0899adc0da2  BHD-BRAND-IDENTITY-Arabic.md
 0358b36a970440d98ca1c8dac2f264d65a0bfd54ba24d7113437c783f80fe01a  BHD-Brand-Kit-v1.0.zip
 7a24f340bc741cf64dea83ad224c076830e738e2963f3c1377288fb00e75cd2a  BHD-Complete-Brand-and-Portal-v1.1.0.zip
+ed541866c89e47fda6cd363f74353d497e9024c0afd47894f97b4bf67dc44f65  BHD-Complete-Brand-and-Portal-v1.1.1.zip
 869364e4f794058a3ed568f7d7b0e3739555e2fabdfbf5ede5df4d7db04f89ce  BHD-Official-Logo-4096.png
 b0d0806712eba12ed5fa483458fdfc8f3f90bbd544b98be0d47c5e230ce6d208  BHD-Official-Logo-Vector.svg
 59f82467b852e61ab4204fe2b8f9822bbff6c98ff3465cabdd040721652a135d  BHD-Official-Symbol-2048.png

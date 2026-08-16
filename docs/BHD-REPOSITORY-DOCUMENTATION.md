@@ -63,6 +63,11 @@ ONE-BHD/
 ├── BHD-Portal-Documentation-Arabic.md
 ├── BHD-Visual-Identity-Guidelines.pdf
 ├── SHA256SUMS.txt
+├── BHD-Brand-Assets.zip
+├── BHD-Brand-Kit-v1.0.zip
+├── BHD-Portal-GitHub-Source-v1.0.0.zip
+├── BHD-Complete-Brand-and-Portal-v1.1.0.zip
+├── BHD-Complete-Brand-and-Portal-v1.1.1.zip   ← أحدث حزمة تسليم
 └── شعارات PNG/SVG الرسمية
 ```
 

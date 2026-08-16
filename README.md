@@ -52,7 +52,9 @@ npm test
 ## الهوية والأصول
 
 - شعارات رسمية في الجذر و`BHD-Brand-Assets`
-- حقيبة العلامة: `BHD-Brand-Kit-v1.0`
+- حقيبة العلامة: `BHD-Brand-Kit-v1.0` و`BHD-Brand-Kit-v1.0.zip`
+- حزم التسليم الأصلية: `BHD-Portal-GitHub-Source-v1.0.0.zip`، `BHD-Complete-Brand-and-Portal-v1.1.0.zip`، `BHD-Complete-Brand-and-Portal-v1.1.1.zip`، `BHD-Brand-Assets.zip`
+- بصمات الملفات: `SHA256SUMS.txt`
 - دليل الهوية: `BHD-BRAND-IDENTITY-Arabic.md`
 - دليل الهوية البصري PDF: `BHD-Visual-Identity-Guidelines.pdf`
 - وثيقة البوابة العربية: `BHD-Portal-Documentation-Arabic.md`
