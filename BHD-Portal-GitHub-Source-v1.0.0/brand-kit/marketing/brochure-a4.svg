@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 2100 2970" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect width="2100" height="2970" fill="#092D24"/><g fill="none" stroke="#B58D55" stroke-width="8.076923076923077" opacity="0.18">
+<path d="M-105.0 2435.3999999999996 H735.0 V1722.6 H1428.0 V920.7 H2205.0"/>
+<path d="M-105.0 2702.7000000000003 H903.0 V1989.9 H1596.0 V1217.6999999999998 H2205.0"/>
+</g><rect width="504.0" height="8" fill="#C8102E"/><rect x="504.0" width="525.0" height="8" fill="#fff"/><rect x="1029.0" width="1071.0" height="8" fill="#0B6B45"/>
+<g transform="translate(168.0 237.6) scale(1.187956204379562)">
+<path fill="#fff" d="M0 0h100c31 0 48 17 48 43 0 18-9 31-25 39 20 6 31 22 31 42 0 28-21 47-53 47H30v-28h70c16 0 26-8 26-20 0-13-11-22-29-22H0V74h97c15 0 24-8 24-21 0-15-10-25-25-25H28L0 0Z"/><path fill="#fff" d="M190 109l30-27h90V0h30v171h-30v-62h-90v62h-30v-62Z"/><path fill="#fff" d="M385 0h74c52 0 89 35 89 85 0 51-37 86-89 86h-74l28-28h46c36 0 61-23 61-58 0-34-25-57-61-57h-46L385 0Z"/>
+</g>
+<text x="168.0" y="1603.8000000000002" fill="#B58D55" class="en" font-size="67.2" font-weight="800" letter-spacing="8.4">BUILD HIGHER DREAMS</text>
+<text x="1932.0" y="1960.2" text-anchor="end" fill="#fff" class="ar" font-size="149.1" font-weight="900">من الفكرة إلى أثر حقيقي</text>
+<text x="1932.0" y="2197.8" text-anchor="end" fill="rgba(255,255,255,.64)" class="ar" font-size="54.599999999999994">تعرف على BHD ومنظومة منتجاتها</text>
+<text x="168.0" y="2702.7000000000003" fill="#fff" class="en" font-size="37.8" font-weight="700" letter-spacing="6.3">BHD · BIN HAMOOD DEVELOPMENT · MUSCAT, OMAN</text>
+</svg>

@@ -11,8 +11,8 @@ type Language = "ar" | "en";
 
 const copy = {
   ar: {
-    nav: ["الرئيسية", "المنتجات", "الفلسفة", "رؤيتنا", "الشركة"],
-    eyebrow: "BIN HAMOOD DEVELOPMENT · BUILD HIGHER DREAMS",
+    nav: ["الرئيسية", "المنتجات", "الفلسفة", "رؤيتنا", "الهوية", "الشركة"],
+    eyebrow: "بن حمود للتطوير · ابنِ أحلامًا أكبر",
     titleTop: "من عُمان، نبني",
     titleBottom: "المستقبل الرقمي للأفراد والأعمال.",
     lead:
@@ -75,7 +75,7 @@ const copy = {
     close: "إغلاق",
   },
   en: {
-    nav: ["Home", "Products", "Philosophy", "Vision", "Company"],
+    nav: ["Home", "Products", "Philosophy", "Vision", "Brand", "Company"],
     eyebrow: "BIN HAMOOD DEVELOPMENT · AN OMANI BRAND",
     titleTop: "From Oman, we build",
     titleBottom: "digital products for life and business.",
@@ -161,7 +161,7 @@ export default function Home() {
     return () => window.removeEventListener("pointerdown", onPointerDown);
   }, []);
 
-  const sectionLinks = ["/", "/products", "/#philosophy", "/#vision", "/about"];
+  const sectionLinks = ["/", "/products", "/#philosophy", "/#vision", "/brand", "/about"];
 
   return (
     <main id="main-content" className="site-shell" lang={language} dir={isArabic ? "rtl" : "ltr"} tabIndex={-1}>
@@ -265,11 +265,19 @@ export default function Home() {
         <div className="hero-inner section-wrap">
           <div className="hero-copy">
             <p className="eyebrow"><span />{t.eyebrow}</p>
-            <h1 className="brand-promise" aria-label="Build Higher Dreams">
-              <span><b>B</b>UILD.</span>
-              <span><b>H</b>IGHER.</span>
-              <span><b>D</b>REAMS.</span>
-            </h1>
+            {isArabic ? (
+              <h1 className="brand-promise brand-promise-ar" aria-label="ابْنِ أَحْلَامًا أَكْبَرَ">
+                <span><b>ا</b>بْنِ.</span>
+                <span><b>أَ</b>حْلَامًا.</span>
+                <span><b>أَ</b>كْبَرَ.</span>
+              </h1>
+            ) : (
+              <h1 className="brand-promise" aria-label="Build Higher Dreams">
+                <span><b>B</b>UILD.</span>
+                <span><b>H</b>IGHER.</span>
+                <span><b>D</b>REAMS.</span>
+              </h1>
+            )}
             <p className="promise-translation">
               {isArabic ? "ابنِ أحلامًا أكبر مع بن حمود للتطوير." : "Bin Hamood Development · One name, one promise."}
             </p>
@@ -347,6 +355,10 @@ export default function Home() {
             <blockquote>
               {isArabic ? "«لا نكتفي بتحقيق الحلم؛ نرفع سقف الحلم نفسه.»" : "“We do not only realize dreams. We raise the horizon of what can be dreamed.”"}
             </blockquote>
+            <InstantLink className="philosophy-brand-link" href="/brand">
+              {isArabic ? "استكشف دليل الهوية المتكامل" : "Explore the complete brand system"}
+              <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
+            </InstantLink>
           </div>
 
           <div className="philosophy-principles">
@@ -521,6 +533,7 @@ export default function Home() {
           <div className="footer-links">
             <InstantLink href="/products">{t.nav[1]}</InstantLink>
             <InstantLink href="/#vision">{t.nav[3]}</InstantLink>
+            <InstantLink href="/brand">{t.nav[4]}</InstantLink>
             <InstantLink href="/security">{isArabic ? "الأمان" : "Security"}</InstantLink>
             <a href="https://github.com/ainoamn" target="_blank" rel="noopener noreferrer">GitHub</a>
           </div>

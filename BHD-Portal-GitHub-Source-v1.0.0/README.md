@@ -12,12 +12,20 @@
 
 [`docs/BHD-PORTAL-DOCUMENTATION.md`](docs/BHD-PORTAL-DOCUMENTATION.md)
 
+ودليل العلامة والهوية التجارية والبصرية موجود في:
+
+[`docs/BHD-BRAND-IDENTITY.md`](docs/BHD-BRAND-IDENTITY.md)
+
+أما القوالب المتجهية القابلة للتحرير فتوجد في `brand-kit`، وتشمل الشعارات
+والمطبوعات والتسويق والإعلانات والهدايا والخلفيات.
+
 ## الصفحات
 
 - `/` الصفحة الرئيسية
 - `/products` دليل المنتجات
 - `/products/[slug]` صفحة كل منتج
 - `/about` الشركة والرؤية
+- `/brand` مركز الهوية وقصة الشعار والطموح وملفات التنزيل
 - `/technology` البنية التقنية
 - `/security` الأمان والثقة
 - `/privacy` الخصوصية
@@ -53,6 +61,8 @@ npm run dev
 npm test
 ```
 
+النشر على Vercel يستخدم مجلد `BHD-Complete-Brand-and-Portal-v1.1.0` كـ **Root Directory**. هذا المجلد يُحدَّث دائماً من أحدث إصدار (`v1.1.1`).
+
 `npm test` يبني نسخة الإنتاج، يختبر المسارات الأساسية، ويتحقق من سياسات الأمان.
 
 لإعادة إنتاج أصول العلامة والصورة المحسنة:
@@ -60,4 +70,7 @@ npm test
 ```bash
 python scripts/render_brand_assets.py
 python scripts/optimize_site_images.py
+python scripts/generate_brand_kit.py
+python scripts/create_brand_guide_pdf.py
+python scripts/package_brand_kit.py
 ```

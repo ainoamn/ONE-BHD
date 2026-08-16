@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { products } from "./lib/products";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = "https://bhd-om.com";
-  const staticPages = ["", "/products", "/about", "/technology", "/contact", "/privacy", "/terms", "/security", "/apps"];
+  const base = "https://one-bhd.vercel.app";
+  const staticPages = ["", "/products", "/about", "/brand", "/technology", "/contact", "/privacy", "/terms", "/security", "/apps"];
   return [
     ...staticPages.map((path) => ({
       url: `${base}${path}`,

@@ -1,0 +1,67 @@
+# ONE-BHD — بوابة Bin Hamood Development
+
+المستودع الرسمي لبوابة **BHD** وهويتها البصرية ومنظومة منتجاتها.
+
+- **العلامة:** Bin Hamood Development
+- **الوعد:** Build Higher Dreams — ابنِ أحلامًا أكبر
+- **الموقع الحي:** [https://one-bhd.vercel.app](https://one-bhd.vercel.app)
+- **GitHub:** [https://github.com/ainoamn/ONE-BHD](https://github.com/ainoamn/ONE-BHD)
+- **Vercel:** [https://vercel.com/bhdom89-8158s-projects/one-bhd](https://vercel.com/bhdom89-8158s-projects/one-bhd)
+
+التوثيق الكامل موجود في [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md).
+
+## الإصدار المعتمد للتشغيل والنشر
+
+دائماً يُدمَج **آخر إصدار** داخل الإصدارات السابقة ثم يُنشر منه.
+
+| الإصدار | المجلد | الدور |
+|---|---|---|
+| **v1.1.1 (الأحدث)** | `BHD-Complete-Brand-and-Portal-v1.1.1` | مصدر المحتوى الأحدث |
+| **v1.1.0 (النشر)** | `BHD-Complete-Brand-and-Portal-v1.1.0` | مجلد جذر Vercel — يضم أحدث المحتوى + Next.js |
+| v1.0.0 | `BHD-Portal-GitHub-Source-v1.0.0` | نسخة أقدم محدَّثة بنفس المحتوى وطبقة Next.js |
+
+**Root Directory في Vercel:** `BHD-Complete-Brand-and-Portal-v1.1.0`
+
+## التشغيل المحلي
+
+يتطلب Node.js `>=22.13.0`.
+
+```bash
+cd BHD-Complete-Brand-and-Portal-v1.1.0
+npm install
+npm run dev
+```
+
+ثم افتح [http://localhost:3000](http://localhost:3000).
+
+```bash
+npm run build
+npm test
+```
+
+## الصفحات
+
+- `/` الرئيسية
+- `/products` و `/products/[slug]` المنتجات
+- `/brand` مركز الهوية وملفات التنزيل
+- `/about` `/technology` `/security` `/privacy` `/terms` `/contact`
+- `/apps` مشغّل التطبيقات
+- `/login` تعريف الحساب الموحد المستقبلي
+- `/healthz` فحص الصحة
+
+## الهوية والأصول
+
+- شعارات رسمية في الجذر و`BHD-Brand-Assets`
+- حقيبة العلامة: `BHD-Brand-Kit-v1.0`
+- دليل الهوية: `BHD-BRAND-IDENTITY-Arabic.md`
+- دليل الهوية البصري PDF: `BHD-Visual-Identity-Guidelines.pdf`
+- وثيقة البوابة العربية: `BHD-Portal-Documentation-Arabic.md`
+
+## مبدأ الإصدارات
+
+عند وصول نسخة أحدث (مثل v1.1.1):
+
+1. تُنسخ تحسينات المحتوى إلى `v1.1.0` (مجلد النشر).
+2. تُنسخ نفسها إلى `v1.0.0` حتى لا تبقى النسخ القديمة متخلفة.
+3. تُحفظ طبقة Next.js ورؤوس الحماية و`/healthz` في كل نسخ البوابة.
+4. يُرفع المستودع بالكامل إلى GitHub ثم يُعاد نشر الإنتاج عند الحاجة.

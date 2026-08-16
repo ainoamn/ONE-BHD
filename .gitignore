@@ -1,1 +1,10 @@
 .vercel
+node_modules
+.next
+.wrangler
+.vinext
+dist
+.DS_Store
+*.pem
+.env*
+npm-debug.log*

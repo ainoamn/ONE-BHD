@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect width="1600" height="1000" fill="#092D24"/><g fill="none" stroke="#B58D55" stroke-width="12" opacity=".32"><path d="M-160 900 V420 Q-160 180 20 180 Q200 180 200 420 V900"/><path d="M240 900 V420 Q240 180 420 180 Q600 180 600 420 V900"/><path d="M640 900 V420 Q640 180 820 180 Q1000 180 1000 420 V900"/><path d="M1040 900 V420 Q1040 180 1220 180 Q1400 180 1400 420 V900"/><path d="M1440 900 V420 Q1440 180 1620 180 Q1800 180 1800 420 V900"/></g>
+</svg>

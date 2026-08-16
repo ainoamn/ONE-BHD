@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100" role="img">
+<style>
+  .ar { font-family: Tahoma, 'IBM Plex Sans Arabic', Arial, sans-serif; }
+  .en { font-family: Inter, Arial, sans-serif; }
+  .label { font-size: 20px; font-weight: 700; letter-spacing: 2px; }
+  .small { font-size: 16px; }
+</style><rect x="0" width="990" height="2100" fill="#FBFAF7"/><line x1="0" y1="0" x2="0" y2="2100" stroke="#DFE6E2" stroke-dasharray="10 10"/><rect x="990" width="990" height="2100" fill="#FFFFFF"/><line x1="990" y1="0" x2="990" y2="2100" stroke="#DFE6E2" stroke-dasharray="10 10"/><rect x="1980" width="990" height="2100" fill="#F4F0E8"/><line x1="1980" y1="0" x2="1980" y2="2100" stroke="#DFE6E2" stroke-dasharray="10 10"/><rect width="712.8" height="8" fill="#C8102E"/><rect x="712.8" width="742.5" height="8" fill="#fff"/><rect x="1455.3" width="1514.7" height="8" fill="#0B6B45"/><g transform="translate(2020 140) scale(1.313868613138686)">
+<path fill="#08A39F" d="M0 0h100c31 0 48 17 48 43 0 18-9 31-25 39 20 6 31 22 31 42 0 28-21 47-53 47H30v-28h70c16 0 26-8 26-20 0-13-11-22-29-22H0V74h97c15 0 24-8 24-21 0-15-10-25-25-25H28L0 0Z"/><path fill="#174B70" d="M190 109l30-27h90V0h30v171h-30v-62h-90v62h-30v-62Z"/><path fill="#08A39F" d="M385 0h74c52 0 89 35 89 85 0 51-37 86-89 86h-74l28-28h46c36 0 61-23 61-58 0-34-25-57-61-57h-46L385 0Z"/>
+</g><text x="2760" y="760" text-anchor="end" fill="#092D24" class="ar" font-size="112" font-weight="900">ابنِ أحلامًا أكبر</text><text x="2760" y="860" text-anchor="end" fill="#66756F" class="ar" font-size="42">بن حمود للتطوير</text><text x="1880" y="250" text-anchor="end" fill="#B58D55" class="ar" font-size="36" font-weight="800">من نحن</text><text x="1880" y="330" text-anchor="end" fill="#092D24" class="ar" font-size="55" font-weight="800">علامة واحدة، منظومة من الفرص</text><text x="890" y="250" text-anchor="end" fill="#B58D55" class="ar" font-size="36" font-weight="800">منتجاتنا</text><text x="890" y="370" text-anchor="end" fill="#092D24" class="ar" font-size="48">WAZEN · HISAB · NASAB</text><text x="890" y="450" text-anchor="end" fill="#092D24" class="ar" font-size="48">AIN OMAN · BHD STORE</text>
+</svg>
