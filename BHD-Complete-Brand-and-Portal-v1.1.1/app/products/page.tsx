@@ -13,7 +13,7 @@ export default function ProductsPage() {
     <InnerPageShell
       eyebrow="منظومة المنتجات"
       title="منتجات مستقلة تبني أحلامًا أكبر."
-      lead="كل منتج يحوّل طموحًا حقيقيًا إلى أداة عملية، وجميعها تحمل وعدًا واحدًا: BHD — Build Higher Dreams."
+      lead="كل منتج يحوّل طموحًا حقيقيًا إلى أداة عملية، وجميعها تحمل وعدًا واحدًا: ابنِ أحلامًا أكبر."
     >
       <section className="catalog-grid" aria-label="قائمة منتجات BHD">
         {products.map((product, index) => (
@@ -27,7 +27,7 @@ export default function ProductsPage() {
               <span className="product-status"><i />{product.statusAr}</span>
             </div>
             <small>0{index + 1} · {product.categoryAr}</small>
-            <h2>{product.nameAr}<span>{product.name}</span></h2>
+            <h2>{product.nameAr}</h2>
             <p>{product.descriptionAr}</p>
             <InstantLink href={`/products/${product.slug}`}>تفاصيل المنتج <span aria-hidden="true">←</span></InstantLink>
           </article>

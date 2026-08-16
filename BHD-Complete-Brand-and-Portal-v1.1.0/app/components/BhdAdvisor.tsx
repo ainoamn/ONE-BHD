@@ -94,7 +94,7 @@ export function BhdAdvisor() {
         aria-label="فتح دليل منتجات BHD الذكي"
       >
         <span className="advisor-trigger-logo"><BrandLogo kind="mark" tone="light" /></span>
-        <div><strong>دليل BHD الذكي</strong><small>BUILD HIGHER DREAMS</small></div>
+        <div><strong>دليل BHD الذكي</strong><small>ابنِ أحلامًا أكبر</small></div>
         <i aria-hidden="true">+</i>
       </button>
 
@@ -110,10 +110,10 @@ export function BhdAdvisor() {
             aria-describedby="advisor-intro"
           >
             <div className="advisor-head">
-              <div className="advisor-brand"><span><BrandLogo kind="mark" tone="light" /></span><small>BUILD HIGHER DREAMS</small></div>
+              <div className="advisor-brand"><span><BrandLogo kind="mark" tone="light" /></span><small>ابنِ أحلامًا أكبر</small></div>
               <button type="button" onClick={() => setOpen(false)} aria-label="إغلاق">×</button>
             </div>
-            <p className="section-kicker">BHD INTELLIGENCE · PRIVACY-FIRST</p>
+            <p className="section-kicker">دليل ذكي · يعمل داخل المتصفح</p>
             <h2 id="advisor-title">ما الذي تريد إنجازه؟</h2>
             <p className="advisor-intro" id="advisor-intro">اكتب احتياجك وسنرشح لك المنتج الأقرب فورًا.</p>
 

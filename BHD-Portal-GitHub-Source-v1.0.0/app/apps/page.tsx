@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "تطبيقات BHD" };
 export default function AppsPage() {
   return (
     <InnerPageShell
-      eyebrow="BHD App Launcher"
+      eyebrow="مشغّل تطبيقات BHD"
       title="كل منتجات BHD في مكان واحد."
       lead="اختر التطبيق الذي تريد فتحه. المنتجات التجريبية والمشاريع قيد التطوير موضحة بحالتها الحالية."
     >
@@ -21,7 +21,7 @@ export default function AppsPage() {
             style={{ "--accent": product.accent, "--soft": product.soft } as React.CSSProperties}
           >
             <span>{product.mark}</span>
-            <div><h2>{product.nameAr}</h2><small>{product.name} · {product.statusAr}</small></div>
+            <div><h2>{product.nameAr}</h2><small>{product.nameAr} · {product.statusAr}</small></div>
             <b aria-hidden="true">←</b>
           </a>
         ))}

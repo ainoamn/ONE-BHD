@@ -34,7 +34,7 @@ test("keeps the future login surface private and non-cacheable", async () => {
   ]);
   assert.match(config, /noindex, noarchive/);
   assert.match(config, /private, no-store/);
-  assert.match(login, /OpenID Connect|الحساب الموحد/);
+  assert.match(login, /الهوية المفتوحة|الحساب الموحد/);
 });
 
 test("provides a minimal non-cacheable health endpoint", async () => {

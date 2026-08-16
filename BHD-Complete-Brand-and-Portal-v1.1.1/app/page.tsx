@@ -26,17 +26,17 @@ const copy = {
     oneAccount: "حساب واحد",
     everyProduct: "لكل منتجات BHD",
     connected: "متصلة عبر هوية BHD",
-    statProducts: "BUILD · نبني",
-    statIdentity: "HIGHER · نرتقي",
-    statDirection: "DREAMS · نحقق",
+    statProducts: "نبني",
+    statIdentity: "نرتقي",
+    statDirection: "نحقق",
     productsEyebrow: "منتجاتنا الرقمية",
     productsTitle: "كل منتج يبدأ بحلم يستحق البناء.",
     productsLead:
-      "من المال والأعمال إلى العائلة والعقار والتجارة؛ نحول الطموحات اليومية إلى منتجات مستقلة تحمل وعد BHD: Build Higher Dreams.",
+      "من المال والأعمال إلى العائلة والعقار والتجارة؛ نحول الطموحات اليومية إلى منتجات مستقلة تحمل وعد BHD: ابنِ أحلامًا أكبر.",
     open: "فتح المنتج",
     explore: "استكشف المشروع",
-    bhdProduct: "A BHD Product",
-    architectureEyebrow: "BHD Ecosystem",
+    bhdProduct: "منتج من منظومة BHD",
+    architectureEyebrow: "منظومة BHD",
     architectureTitle: "منفصلة هندسيًا، موحّدة في التجربة.",
     architectureLead:
       "كل تطبيق يملك مستودعه ونشره وبياناته، بينما تجمعها هوية BHD ومشغّل تطبيقات واحد. هذا يمنح كل منتج حرية التطور دون أن يفقد المستخدم إحساس المنظومة.",
@@ -45,12 +45,12 @@ const copy = {
     accountLayer: "حساب BHD",
     portalLayer: "بوابة BHD",
     architectureNote: "تنقّل موحّد · دخول آمن · بيانات كل تطبيق تبقى مستقلة",
-    accountEyebrow: "قريبًا · BHD Account",
+    accountEyebrow: "قريبًا · حساب BHD",
     accountTitle: "حساب واحد يرافقك بين كل المنتجات.",
     accountLead:
       "سجّل الدخول مرة واحدة، ثم افتح وازن أو حسابي أو نَسَب دون تكرار خطوات الدخول — مع جلسة آمنة ومستقلة داخل كل تطبيق.",
     accountPoints: [
-      "هوية مركزية بمعيار OpenID Connect",
+      "هوية مركزية بمعيار الهوية المفتوحة",
       "لا مشاركة لقواعد البيانات بين التطبيقات",
       "الصلاحيات التشغيلية تبقى داخل كل منتج",
     ],
@@ -63,12 +63,12 @@ const copy = {
       ["الأمان من البداية", "نفصل الهوية والبيانات والصلاحيات كي تنمو المنظومة بثقة."],
       ["نبني للنمو", "كل منتج مستقل، قابل للتوسع، وقادر على التطور في مساره الخاص."],
     ],
-    companyEyebrow: "ONE NAME · ONE PROMISE",
-    companyTitle: "Bin Hamood Development هو الاسم. Build Higher Dreams هو الوعد.",
+    companyEyebrow: "اسم واحد · وعد واحد",
+    companyTitle: "بن حمود للتطوير هو الاسم. ابنِ أحلامًا أكبر هو الوعد.",
     companyLead:
       "ابنِ أحلامًا أكبر مع بن حمود للتطوير؛ علامة عُمانية تحوّل الأفكار إلى منتجات وأعمال وتجارب قادرة على النمو.",
     companyCta: "تعرّف على مشاريعنا",
-    footerLine: "BUILD HIGHER DREAMS · ابنِ أحلامًا أكبر.",
+    footerLine: "ابنِ أحلامًا أكبر.",
     rights: "شركة بن حمود للتطوير. جميع الحقوق محفوظة.",
     apps: "تطبيقات BHD",
     menu: "القائمة",
@@ -149,6 +149,11 @@ export default function Home() {
   const isArabic = language === "ar";
 
   useEffect(() => {
+    document.documentElement.lang = language;
+    document.documentElement.dir = isArabic ? "rtl" : "ltr";
+  }, [language, isArabic]);
+
+  useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
       if (
         launcherRef.current &&
@@ -168,11 +173,11 @@ export default function Home() {
       <div className="flag-line" aria-hidden="true" />
 
       <header className="site-header">
-        <InstantLink className="brand" href="/" aria-label="BHD home">
+        <InstantLink className="brand" href="/" aria-label="العودة إلى الرئيسية">
           <BrandLogo className="header-official-logo" />
         </InstantLink>
 
-        <nav className="desktop-nav" aria-label="Primary navigation">
+        <nav className="desktop-nav" aria-label="التنقل الرئيسي">
           {t.nav.map((item, index) => (
             <InstantLink key={item} href={sectionLinks[index]}>
               {item}
@@ -184,7 +189,7 @@ export default function Home() {
           <button
             className="language-button"
             onClick={() => setLanguage(isArabic ? "en" : "ar")}
-            aria-label={isArabic ? "Switch to English" : "التبديل إلى العربية"}
+            aria-label={isArabic ? "التبديل إلى الإنجليزية" : "التبديل إلى العربية"}
           >
             {isArabic ? "EN" : "عربي"}
           </button>
@@ -344,7 +349,7 @@ export default function Home() {
             <h2>{isArabic ? "علامة واحدة. معنيان يصنعان قصة واحدة." : "One brand. Two meanings. One story."}</h2>
             <p>
               {isArabic
-                ? "BHD هو اسمنا المؤسسي ووعدنا الإنساني في الوقت نفسه. بن حمود للتطوير هي الجهة التي تبني، وBuild Higher Dreams هو السبب الذي نبني من أجله."
+                ? "BHD هو اسمنا المؤسسي ووعدنا الإنساني في الوقت نفسه. بن حمود للتطوير هي الجهة التي تبني، وابنِ أحلامًا أكبر هو السبب الذي نبني من أجله."
                 : "BHD is both our corporate name and our human promise. Bin Hamood Development is who builds; Build Higher Dreams is why we build."}
             </p>
             <div className="dual-meaning" dir="ltr">
@@ -364,15 +369,15 @@ export default function Home() {
           <div className="philosophy-principles">
             <article>
               <span>B</span>
-              <div><small>BUILD · نبني</small><h3>{isArabic ? "نحوّل الفكرة إلى شيء حقيقي." : "Turn ideas into something real."}</h3><p>{isArabic ? "نبني المنتجات والأعمال والفرص بتصميم واضح وهندسة قابلة للنمو." : "We build products, businesses and opportunities with clear design and scalable engineering."}</p></div>
+              <div><small>نبني</small><h3>{isArabic ? "نحوّل الفكرة إلى شيء حقيقي." : "Turn ideas into something real."}</h3><p>{isArabic ? "نبني المنتجات والأعمال والفرص بتصميم واضح وهندسة قابلة للنمو." : "We build products, businesses and opportunities with clear design and scalable engineering."}</p></div>
             </article>
             <article>
               <span>H</span>
-              <div><small>HIGHER · نرتقي</small><h3>{isArabic ? "نرفع المعيار في كل مرة." : "Raise the standard every time."}</h3><p>{isArabic ? "نطمح إلى تقنية أفضل، وخدمة أرقى، وتجربة أوضح، ونتائج أبعد." : "We aim for better technology, finer service, clearer experiences and greater outcomes."}</p></div>
+              <div><small>نرتقي</small><h3>{isArabic ? "نرفع المعيار في كل مرة." : "Raise the standard every time."}</h3><p>{isArabic ? "نطمح إلى تقنية أفضل، وخدمة أرقى، وتجربة أوضح، ونتائج أبعد." : "We aim for better technology, finer service, clearer experiences and greater outcomes."}</p></div>
             </article>
             <article>
               <span>D</span>
-              <div><small>DREAMS · الأحلام</small><h3>{isArabic ? "نمنح الطموح طريقًا إلى الواقع." : "Give ambition a path to reality."}</h3><p>{isArabic ? "للأفراد والعائلات والشركات والمجتمع؛ كل حلم جاد يستحق فرصة أن يُبنى." : "For people, families, businesses and society — every serious dream deserves the chance to be built."}</p></div>
+              <div><small>الأحلام</small><h3>{isArabic ? "نمنح الطموح طريقًا إلى الواقع." : "Give ambition a path to reality."}</h3><p>{isArabic ? "للأفراد والعائلات والشركات والمجتمع؛ كل حلم جاد يستحق فرصة أن يُبنى." : "For people, families, businesses and society — every serious dream deserves the chance to be built."}</p></div>
             </article>
           </div>
         </div>

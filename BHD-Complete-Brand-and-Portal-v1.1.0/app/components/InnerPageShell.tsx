@@ -68,7 +68,7 @@ export function InnerPageShell({ eyebrow, title, lead, children }: InnerPageShel
           <div className="footer-brand">
             <BrandLogo tone="light" className="footer-official-logo" />
           </div>
-          <p>BUILD HIGHER DREAMS · ابنِ أحلامًا أكبر.</p>
+          <p>ابنِ أحلامًا أكبر.</p>
           <div className="footer-links">
             <InstantLink href="/privacy">الخصوصية</InstantLink>
             <InstantLink href="/terms">الشروط</InstantLink>
@@ -78,7 +78,7 @@ export function InnerPageShell({ eyebrow, title, lead, children }: InnerPageShel
         </div>
         <div className="section-wrap footer-bottom">
           <span>© 2026 شركة بن حمود للتطوير. جميع الحقوق محفوظة.</span>
-          <span>Muscat · Sultanate of Oman</span>
+          <span>مسقط · سلطنة عُمان</span>
         </div>
       </footer>
     </main>

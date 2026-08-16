@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const product = getProduct(slug);
   if (!product) return {};
   return {
-    title: `${product.nameAr} — ${product.name}`,
+    title: product.nameAr,
     description: product.descriptionAr,
   };
 }
@@ -26,8 +26,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   return (
     <InnerPageShell
-      eyebrow={`${product.categoryAr} · A BHD Product`}
-      title={`${product.nameAr} — ${product.name}`}
+      eyebrow={`${product.categoryAr} · منتج من منظومة BHD`}
+      title={product.nameAr}
       lead={product.descriptionAr}
     >
       <section
@@ -51,7 +51,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               فتح المنتج <span aria-hidden="true">←</span>
             </a>
             <a className="text-button" href={product.repository} target="_blank" rel="noopener noreferrer">
-              مستودع GitHub
+              مستودع المشروع
             </a>
           </div>
         </div>

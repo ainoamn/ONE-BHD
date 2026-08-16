@@ -1,7 +1,22 @@
 import type { Metadata, Viewport } from "next";
+import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { NavigationWarmup } from "./components/NavigationWarmup";
 import "./globals.css";
+
+const plexArabic = IBM_Plex_Sans_Arabic({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-plex-arabic",
+  display: "swap",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 const description =
   "BHD — Build Higher Dreams. ابنِ أحلامًا أكبر مع بن حمود للتطوير؛ منتجات وأعمال وتجارب رقمية من عُمان إلى المنطقة.";
@@ -61,6 +76,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
+  viewportFit: "cover",
   themeColor: "#092d24",
   colorScheme: "light",
 };
@@ -93,12 +109,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   };
 
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" className={`${plexArabic.variable} ${inter.variable}`}>
       <head>
         <link rel="preload" href="/images/bhd-philosophy-hero.webp" as="image" type="image/webp" />
         <link rel="preload" href="/brand/bhd-logo.svg" as="image" type="image/svg+xml" />
       </head>
-      <body>
+      <body className={plexArabic.className}>
         <a className="skip-link" href="#main-content">انتقل إلى المحتوى الرئيسي</a>
         <NavigationWarmup />
         {children}

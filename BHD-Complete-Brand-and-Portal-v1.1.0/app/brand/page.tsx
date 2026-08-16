@@ -30,15 +30,15 @@ const systemItems = [
 export default function BrandPage() {
   return (
     <InnerPageShell
-      eyebrow="BHD BRAND SYSTEM · BUILD HIGHER DREAMS"
+      eyebrow="نظام هوية BHD · ابنِ أحلامًا أكبر"
       title="هوية عُمانية تبني أحلامًا أكبر."
       lead="نظام متكامل يحوّل BHD من شعار إلى وعد واضح، ولغة بصرية، وصوت مؤسسي، وقوالب قابلة للتطبيق على كل منتج ونقطة تواصل."
     >
       <section className="brand-guide-intro">
         <article className="brand-guide-logo-card">
-          <Image src="/brand/bhd-logo.svg" alt="شعار Bin Hamood Development" width={1200} height={390} priority />
-          <div><span>الاسم المؤسسي</span><b>Bin Hamood Development</b></div>
-          <div><span>وعد العلامة</span><b>Build Higher Dreams</b></div>
+          <Image src="/brand/bhd-logo.svg" alt="شعار بن حمود للتطوير" width={1200} height={390} priority />
+          <div><span>الاسم المؤسسي</span><b>بن حمود للتطوير</b></div>
+          <div><span>وعد العلامة</span><b>ابنِ أحلامًا أكبر</b></div>
         </article>
         <article className="brand-guide-copy">
           <p className="section-kicker">شرح الشعار</p>
@@ -58,9 +58,9 @@ export default function BrandPage() {
           <h2>معادلة واحدة تجمع المؤسسة والطموح والإنسان.</h2>
         </div>
         <div className="brand-build-grid">
-          <article><span>B</span><small>BUILD · نبني</small><h3>بنية هندسية ثابتة</h3><p>حواف واضحة ووحدات قابلة للقياس تعكس بناء المنتجات والأعمال على أساس يمكن الوثوق به.</p></article>
-          <article><span>H</span><small>HIGHER · نرتقي</small><h3>أفق مفتوح وصاعد</h3><p>المسار الأفقي المفتوح يرمز إلى رفع المعيار وتجاوز الحل المعتاد نحو قيمة أكبر.</p></article>
-          <article><span>D</span><small>DREAMS · نحلم</small><h3>مساحة للإمكان</h3><p>الحرف المفتوح لا يغلق الفكرة؛ يترك للحلم طريقًا كي يتحول إلى منتج وتجربة وأثر.</p></article>
+          <article><span>B</span><small>نبني</small><h3>بنية هندسية ثابتة</h3><p>حواف واضحة ووحدات قابلة للقياس تعكس بناء المنتجات والأعمال على أساس يمكن الوثوق به.</p></article>
+          <article><span>H</span><small>نرتقي</small><h3>أفق مفتوح وصاعد</h3><p>المسار الأفقي المفتوح يرمز إلى رفع المعيار وتجاوز الحل المعتاد نحو قيمة أكبر.</p></article>
+          <article><span>D</span><small>نحلم</small><h3>مساحة للإمكان</h3><p>الحرف المفتوح لا يغلق الفكرة؛ يترك للحلم طريقًا كي يتحول إلى منتج وتجربة وأثر.</p></article>
         </div>
       </section>
 
@@ -92,7 +92,7 @@ export default function BrandPage() {
         <div><p className="section-kicker light">طموح الموقع والمنظومة</p><h2>من بوابة تعريفية إلى طبقة الثقة والهوية لمنظومة BHD.</h2></div>
         <div className="brand-ambition-grid">
           <article><span>الآن</span><h3>علامة ومنتجات</h3><p>تقديم الشركة، توحيد القصة، وتوجيه المستخدم إلى المنتج الصحيح بأداء سريع وتجربة عربية.</p></article>
-          <article><span>التالي</span><h3>هوية ودخول موحد</h3><p>BHD Identity وفق OpenID Connect، مع جلسات مستقلة، MFA، وعدم خلط قواعد بيانات المنتجات.</p></article>
+          <article><span>التالي</span><h3>هوية ودخول موحد</h3><p>هوية BHD وفق معيار الهوية المفتوحة، مع جلسات مستقلة، وتحقق متعدد العوامل، وعدم خلط قواعد بيانات المنتجات.</p></article>
           <article><span>الطموح</span><h3>منصة وتحكم موثوق</h3><p>سجل خدمات، صحة وإصدارات، تحكم مركزي مضبوط بالصلاحيات، ومساعد ذكي يحترم الخصوصية.</p></article>
         </div>
       </section>

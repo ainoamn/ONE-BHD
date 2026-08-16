@@ -8,9 +8,9 @@ export const metadata: Metadata = {
 
 const layers = [
   ["01", "بوابة BHD", "تعرض المنتجات وتربط المستخدم بالمنظومة دون تخزين بياناتها التشغيلية."],
-  ["02", "BHD Identity", "خدمة هوية مستقلة مستقبلًا مبنية على OpenID Connect وOAuth 2.0."],
+  ["02", "هوية BHD", "خدمة هوية مستقلة مستقبلًا مبنية على معيار الهوية المفتوحة وتفويض التطبيقات."],
   ["03", "تطبيقات مستقلة", "لكل منتج مستودع ونشر وقاعدة بيانات وصلاحيات محلية مستقلة."],
-  ["04", "واجهات موثقة", "التكامل المستقبلي يتم عبر APIs محددة، وليس عبر قراءة قواعد بيانات التطبيقات."],
+  ["04", "واجهات موثقة", "التكامل المستقبلي يتم عبر واجهات برمجية محددة، وليس عبر قراءة قواعد بيانات التطبيقات."],
 ];
 
 export default function TechnologyPage() {
@@ -35,7 +35,7 @@ export default function TechnologyPage() {
       </section>
       <section className="ai-foundation" aria-labelledby="ai-foundation-title">
         <div className="ai-foundation-heading">
-          <small>BHD INTELLIGENCE LAYER</small>
+          <small>طبقة الذكاء في BHD</small>
           <h2 id="ai-foundation-title">ذكاء مفيد، داخل حدود واضحة.</h2>
           <p>نبدأ بمطابقة محلية سريعة داخل المتصفح، ونجهّز المنظومة لربط نماذج الذكاء الاصطناعي مستقبلًا عبر بوابة خادمة آمنة بدل كشف المفاتيح أو البيانات للمستخدم.</p>
         </div>
