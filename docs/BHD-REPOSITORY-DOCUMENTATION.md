@@ -196,10 +196,10 @@ npm start
 يُفحص الإنتاج على:
 
 - `GET /` يجب أن يعيد `200` وHTML
-- `GET /brand` يجب أن يعيد `200`
+- `GET /brand` `/products` `/about` `/apps` `/login` `/technology` `/security` `/contact` يجب أن تعيد `200`
 - `GET /healthz` يجب أن يعيد JSON مع `Cache-Control: no-store`
 - رؤوس CSP وHSTS و`X-Frame-Options` موجودة
-- البناء يولّد كل المسارات أعلاه دون أخطاء TypeScript
+- البناء يولّد المسارات دون أخطاء TypeScript
 
 ---
 
@@ -207,13 +207,52 @@ npm start
 
 البوابة تعرض المنتجات وتربط إلى مواقعها أو مستودعاتها. البيانات التشغيلية تبقى خارج البوابة.
 
-أمثلة موثّقة في الكود: WAZEN، HISAB، AIN OMAN، NASAB، BHD STORE.
+أمثلة في الواجهة العربية: وازن، حسابي، عين عُمان، نَسَب، متجر BHD، مكتب BHD.
+
+روابطها في الكود ما زالت تشير إلى المستودعات والمواقع المستقلة (مثل [وازن](https://wazen-roan.vercel.app/) و[مستودع وازن](https://github.com/ainoamn/WAZEN)).
 
 ---
 
-## 12. السجلات المرجعية الأخرى داخل المستودع
+## 13. سجل العمل في 16 أغسطس 2026
+
+| الخطوة | النتيجة |
+|---|---|
+| رفع المجلد الأول إلى GitHub | مستودع `ainoamn/ONE-BHD` على `main` |
+| تثبيت التشغيل المحلي | `npm install` و`npm run dev` على المنفذ 3000 |
+| 404 على Vercel | لا نشر إنتاج + vinext غير مدعوم + التطبيق في مجلد فرعي |
+| التحويل إلى Next.js 16 | مجلد النشر `BHD-Complete-Brand-and-Portal-v1.1.0` |
+| Root Directory في Vercel | نفس المجلد أعلاه |
+| دمج v1.1.1 في v1.1.0 وv1.0.0 | سياسة «الأحدث يدخل الأقدم» |
+| حزم Codex الأصلية | ZIP + `SHA256SUMS.txt` مطابق للمخرجات |
+| خط وازن | IBM Plex Sans Arabic + Inter |
+| تعريب الواجهة | أسماء المنتجات، مخطط المنظومة، معاينة الحساب، التذييل |
+| صورة البطل | `object-fit: contain` بنسبة الملف الأصلية |
+| وضوح النص | إصلاح تكسير الحروف العربية ورفع التباين من 6px باهت |
+
+## 14. قرارات الواجهة المعتمدة
+
+- الصفحات الداخلية عربية فقط.
+- الرئيسية عربية افتراضياً مع مفتاح إنجليزي.
+- معادلة العلامة في العربية: **BHD = بن حمود للتطوير / ابنِ أحلامًا أكبر**.
+- لا تُعرض الأسماء الإنجليزية للمنتجات (WAZEN، HISAB…) بجانب الاسم العربي في الوضع العربي.
+- مخطط المنظومة بالعربية: دخول موحّد، الملف والأمان، بوابة الشركة.
+- معاينة الحساب: حساب BHD، عبد الحميد، جلسة آمنة.
+
+## 15. مرجع الخط (مثل وازن)
+
+المصدر المعتمد: مستودع [WAZEN](https://github.com/ainoamn/WAZEN) وموقع [wazen-roan.vercel.app](https://wazen-roan.vercel.app/).
+
+في `app/layout.tsx`:
+
+- `IBM_Plex_Sans_Arabic` → `--font-plex-arabic`
+- `Inter` → `--font-inter`
+
+في `app/globals.css`: `--font-sans` يجمع الخطّين. الوضع الإنجليزي يستخدم Inter أولاً.
+
+## 16. السجلات المرجعية الأخرى داخل المستودع
 
 - `BHD-Portal-Documentation-Arabic.md` — وثيقة البوابة الهندسية العربية
 - `BHD-Complete-Brand-and-Portal-v1.1.0/docs/BHD-PORTAL-DOCUMENTATION.md` — المرجع التقني المفصّل
-- `BHD-BRAND-IDENTITY-Arabic.md` و`docs/BHD-BRAND-IDENTITY.md` — الهوية
-- `SHA256SUMS.txt` — بصمات الملفات المسلَّمة
+- `BHD-BRAND-IDENTITY-Arabic.md` وملفات `docs/BHD-BRAND-IDENTITY.md` داخل نسخ البوابة — الهوية
+- `SHA256SUMS.txt` — بصمات حزم التسليم الأصلية
+- هذا الملف — تشغيل المستودع والنشر والتعريب
