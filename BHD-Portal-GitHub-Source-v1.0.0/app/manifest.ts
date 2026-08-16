@@ -16,7 +16,7 @@ export default function manifest(): MetadataRoute.Manifest {
         src: "/brand/bhd-mark-2048.png",
         sizes: "2048x2048",
         type: "image/png",
-        purpose: "any maskable",
+        purpose: "maskable",
       },
     ],
   };

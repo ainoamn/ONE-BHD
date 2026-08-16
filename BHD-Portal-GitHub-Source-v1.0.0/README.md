@@ -53,6 +53,12 @@ npm run dev
 npm test
 ```
 
+النشر على Vercel يجب أن يستخدم مجلد التطبيق:
+
+`BHD-Portal-GitHub-Source-v1.0.0`
+
+في إعدادات المشروع: **Root Directory** = `BHD-Portal-GitHub-Source-v1.0.0`، والإطار **Next.js**.
+
 `npm test` يبني نسخة الإنتاج، يختبر المسارات الأساسية، ويتحقق من سياسات الأمان.
 
 لإعادة إنتاج أصول العلامة والصورة المحسنة:
