@@ -271,10 +271,10 @@ export default function Home() {
           <div className="hero-copy">
             <p className="eyebrow"><span />{t.eyebrow}</p>
             {isArabic ? (
-              <h1 className="brand-promise brand-promise-ar" aria-label="ابْنِ أَحْلَامًا أَكْبَرَ">
-                <span><b>ا</b>بْنِ.</span>
-                <span><b>أَ</b>حْلَامًا.</span>
-                <span><b>أَ</b>كْبَرَ.</span>
+              <h1 className="brand-promise brand-promise-ar">
+                <span>ابنِ</span>
+                <span>أحلامًا</span>
+                <span>أكبر</span>
               </h1>
             ) : (
               <h1 className="brand-promise" aria-label="Build Higher Dreams">
@@ -325,11 +325,11 @@ export default function Home() {
             </div>
             <div className="brand-float brand-float-location">
               <i aria-hidden="true" />
-              <span>MUSCAT · OMAN</span>
+              <span>{isArabic ? "مسقط · عُمان" : "Muscat · Oman"}</span>
             </div>
             <div className="brand-stage-caption">
               <BrandLogo kind="mark" tone="ink" />
-              <p>{t.ecosystem}<small>ONE FAMILY · ONE STANDARD</small></p>
+              <p>{t.ecosystem}<small>{isArabic ? "منظومة واحدة · معيار واحد" : "ONE FAMILY · ONE STANDARD"}</small></p>
             </div>
           </div>
         </div>
@@ -346,17 +346,23 @@ export default function Home() {
       <section className="brand-philosophy" id="philosophy">
         <div className="section-wrap philosophy-grid">
           <div className="philosophy-manifesto">
-            <p className="section-kicker light">BHD BRAND PHILOSOPHY</p>
+            <p className="section-kicker light">{isArabic ? "فلسفة علامة BHD" : "BHD brand philosophy"}</p>
             <h2>{isArabic ? "علامة واحدة. معنيان يصنعان قصة واحدة." : "One brand. Two meanings. One story."}</h2>
             <p>
               {isArabic
                 ? "BHD هو اسمنا المؤسسي ووعدنا الإنساني في الوقت نفسه. بن حمود للتطوير هي الجهة التي تبني، وابنِ أحلامًا أكبر هو السبب الذي نبني من أجله."
                 : "BHD is both our corporate name and our human promise. Bin Hamood Development is who builds; Build Higher Dreams is why we build."}
             </p>
-            <div className="dual-meaning" dir="ltr">
-              <span><b>BHD</b><small>BIN HAMOOD DEVELOPMENT</small></span>
+            <div className="dual-meaning" dir={isArabic ? "rtl" : "ltr"}>
+              <span>
+                <b>BHD</b>
+                <small>{isArabic ? "بن حمود للتطوير" : "BIN HAMOOD DEVELOPMENT"}</small>
+              </span>
               <i aria-hidden="true">=</i>
-              <span><b>BHD</b><small>BUILD HIGHER DREAMS</small></span>
+              <span>
+                <b>BHD</b>
+                <small>{isArabic ? "ابنِ أحلامًا أكبر" : "BUILD HIGHER DREAMS"}</small>
+              </span>
             </div>
             <blockquote>
               {isArabic ? "«لا نكتفي بتحقيق الحلم؛ نرفع سقف الحلم نفسه.»" : "“We do not only realize dreams. We raise the horizon of what can be dreamed.”"}
@@ -541,12 +547,12 @@ export default function Home() {
             <InstantLink href="/#vision">{t.nav[3]}</InstantLink>
             <InstantLink href="/brand">{t.nav[4]}</InstantLink>
             <InstantLink href="/security">{isArabic ? "الأمان" : "Security"}</InstantLink>
-            <a href="https://github.com/ainoamn" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://github.com/ainoamn" target="_blank" rel="noopener noreferrer">{isArabic ? "المستودع" : "GitHub"}</a>
           </div>
         </div>
         <div className="section-wrap footer-bottom">
           <span>© 2026 {t.rights}</span>
-          <span>Muscat · Sultanate of Oman</span>
+          <span>{isArabic ? "مسقط · سلطنة عُمان" : "Muscat · Sultanate of Oman"}</span>
         </div>
       </footer>
       <BhdAdvisor />

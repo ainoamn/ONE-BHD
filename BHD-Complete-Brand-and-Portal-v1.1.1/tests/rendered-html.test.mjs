@@ -62,7 +62,7 @@ test("uses the official BHD logo assets across the portal", async () => {
   assert.match(brandLogo, /official-logo/);
   assert.match(home, /BrandLogo/);
   assert.match(home, /BUILD[\s\S]*HIGHER[\s\S]*DREAMS/);
-  assert.match(home, /ابْنِ[\s\S]*أَحْلَامًا[\s\S]*أَكْبَرَ/);
+  assert.match(home, /ابنِ[\s\S]*أحلامًا[\s\S]*أكبر/);
   await access(new URL("public/brand/bhd-logo.svg", root));
   await access(new URL("public/brand/bhd-mark.svg", root));
   await access(new URL("public/brand/bhd-logo-4096.png", root));
