@@ -1,0 +1,76 @@
+import { SignJWT, jwtVerify } from "jose";
+import { cookies } from "next/headers";
+import {
+  SESSION_COOKIE,
+  SESSION_ISSUER,
+  SESSION_MAX_AGE_SEC,
+  authSecret,
+} from "./config";
+
+export type PortalSession = {
+  sub: string;
+  email: string;
+  name: string;
+  picture: string | null;
+};
+
+function secretKey() {
+  const secret = authSecret();
+  if (!secret) {
+    throw new Error("AUTH_SECRET is not configured");
+  }
+  return new TextEncoder().encode(secret);
+}
+
+export async function createSessionToken(session: PortalSession): Promise<string> {
+  return new SignJWT({
+    email: session.email,
+    name: session.name,
+    picture: session.picture,
+  })
+    .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+    .setSubject(session.sub)
+    .setIssuer(SESSION_ISSUER)
+    .setAudience(SESSION_ISSUER)
+    .setIssuedAt()
+    .setExpirationTime(`${SESSION_MAX_AGE_SEC}s`)
+    .sign(secretKey());
+}
+
+export async function readSessionToken(token: string): Promise<PortalSession | null> {
+  try {
+    const { payload } = await jwtVerify(token, secretKey(), {
+      issuer: SESSION_ISSUER,
+      audience: SESSION_ISSUER,
+    });
+    const email = typeof payload.email === "string" ? payload.email : "";
+    const sub = typeof payload.sub === "string" ? payload.sub : "";
+    if (!email || !sub) return null;
+    return {
+      sub,
+      email,
+      name: typeof payload.name === "string" ? payload.name : email,
+      picture: typeof payload.picture === "string" ? payload.picture : null,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export function sessionCookieOptions() {
+  const secure = process.env.NODE_ENV === "production";
+  return {
+    httpOnly: true,
+    secure,
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: SESSION_MAX_AGE_SEC,
+  };
+}
+
+export async function getCurrentSession(): Promise<PortalSession | null> {
+  const jar = await cookies();
+  const token = jar.get(SESSION_COOKIE)?.value;
+  if (!token) return null;
+  return readSessionToken(token);
+}

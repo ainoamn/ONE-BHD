@@ -12,7 +12,7 @@
 
 | الوثيقة | المحتوى |
 |---|---|
-| [`docs/BHD-PORTAL-FULL-AUDIT.md`](docs/BHD-PORTAL-FULL-AUDIT.md) | المراجعة الشاملة: الفوائد، الخصائص، البناء، الإيجابيات والسلبيات، الأمان والتشفير، النواقص، المخاطر، طريقة العمل، الربط، والترقية |
+| [`docs/BHD-UNIFIED-GOOGLE-AUTH.md`](docs/BHD-UNIFIED-GOOGLE-AUTH.md) | دخول Google الموحّد: الفكرة، ما ثُبّت على البوابة، وتعليمات تطبيقه على كل المواقع |
 | [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، الإصدارات، التشغيل، النشر، والتحقق |
 | [`BHD-Portal-Documentation-Arabic.md`](BHD-Portal-Documentation-Arabic.md) | المرجع الهندسي العربي للبوابة |
 | [`BHD-BRAND-IDENTITY-Arabic.md`](BHD-BRAND-IDENTITY-Arabic.md) | دليل الهوية البصرية |
@@ -53,7 +53,7 @@ npm test
 - `/brand` مركز الهوية وملفات التنزيل
 - `/about` `/technology` `/security` `/privacy` `/terms` `/contact`
 - `/apps` مشغّل التطبيقات
-- `/login` تعريف الحساب الموحد المستقبلي
+- `/login` دخول Google التجريبي (حساب BHD)
 - `/healthz` فحص الصحة
 
 ## الهوية والأصول

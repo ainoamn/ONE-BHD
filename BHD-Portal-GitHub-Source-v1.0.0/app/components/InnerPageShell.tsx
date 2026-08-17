@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { BrandLogo } from "./BrandLogo";
 import { InstantLink } from "./InstantLink";
+import { SessionMenu } from "./auth/SessionMenu";
 
 type InnerPageShellProps = {
   eyebrow: string;
@@ -43,12 +44,15 @@ export function InnerPageShell({ eyebrow, title, lead, children }: InnerPageShel
             ))}
           </div>
         </details>
-        <InstantLink className="inner-apps-button" href="/apps">
-          <span className="grid-icon" aria-hidden="true">
-            {Array.from({ length: 9 }).map((_, index) => <i key={index} />)}
-          </span>
-          تطبيقات BHD
-        </InstantLink>
+        <div className="inner-header-end">
+          <SessionMenu signInLabel="دخول" signOutLabel="خروج" />
+          <InstantLink className="inner-apps-button" href="/apps">
+            <span className="grid-icon" aria-hidden="true">
+              {Array.from({ length: 9 }).map((_, index) => <i key={index} />)}
+            </span>
+            تطبيقات BHD
+          </InstantLink>
+        </div>
       </header>
 
       <section className="inner-hero">

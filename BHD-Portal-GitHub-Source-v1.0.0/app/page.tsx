@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { BhdAdvisor } from "./components/BhdAdvisor";
 import { BrandLogo } from "./components/BrandLogo";
 import { InstantLink } from "./components/InstantLink";
+import { SessionMenu } from "./components/auth/SessionMenu";
 import { products } from "./lib/products";
 
 type Language = "ar" | "en";
@@ -200,6 +201,10 @@ export default function Home() {
         </nav>
 
         <div className="header-actions">
+          <SessionMenu
+            signInLabel={isArabic ? "دخول" : "Sign in"}
+            signOutLabel={isArabic ? "خروج" : "Sign out"}
+          />
           <button
             className="language-button"
             onClick={() => setLanguage(isArabic ? "en" : "ar")}

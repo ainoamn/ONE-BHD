@@ -1581,6 +1581,13 @@ h3 {
   color: var(--ink);
 }
 
+.inner-header-end {
+  display: flex;
+  align-items: center;
+  justify-self: end;
+  gap: 10px;
+}
+
 .inner-mobile-nav { display: none; position: relative; justify-self: end; }
 .inner-mobile-nav summary {
   display: inline-flex;
@@ -2129,6 +2136,77 @@ h3 {
 
 .login-notice h2 { margin-top: 12px; }
 .login-notice a { display: inline-flex; gap: 15px; margin-top: 25px; color: var(--emerald); font-size: 11px; font-weight: 900; }
+
+.google-signin {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.login-status,
+.login-setup-note {
+  margin: 12px 0 0;
+  color: #3f5b51;
+  font-size: 13px;
+}
+
+.login-error {
+  margin: 0;
+  color: #9b2c2c;
+  font-size: 13px;
+}
+
+.session-signin,
+.session-signout {
+  border: 1px solid rgba(9, 45, 36, 0.14);
+  border-radius: 11px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 38px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.session-menu {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+}
+
+.session-menu img,
+.session-initial {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.session-initial {
+  display: grid;
+  place-items: center;
+  background: #092d24;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.session-name {
+  overflow: hidden;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.session-menu-loading {
+  width: 72px;
+  height: 38px;
+}
 
 @media (max-width: 960px) {
   .inner-header { grid-template-columns: 1fr auto auto; gap: 10px; }

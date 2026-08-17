@@ -147,7 +147,7 @@ npm start
 | `/terms` | الشروط |
 | `/contact` | التواصل |
 | `/apps` | مشغّل التطبيقات |
-| `/login` | شرح الحساب الموحد المستقبلي (بدون جمع بيانات) |
+| `/login` | دخول Google التجريبي (حساب BHD) |
 | `/healthz` | `{ "status": "ok", "service": "bhd-portal" }` |
 | `/sitemap.xml` | خريطة الموقع |
 | `/robots.txt` | قواعد الأرشفة |
@@ -165,13 +165,12 @@ npm start
 - HSTS، `X-Frame-Options: DENY`، `X-Content-Type-Options: nosniff`
 - Permissions-Policy تعطّل الكاميرا والميكروفون والموقع والدفع
 - صفحة `/login` : `noindex, noarchive` و`Cache-Control: private, no-store`
-- لا نماذج تجمع بيانات شخصية في النسخة الحالية
+- دخول Google التجريبي: التحقق من ID Token على الخادم وكوكي `bhd_portal` — التفاصيل في [`BHD-UNIFIED-GOOGLE-AUTH.md`](BHD-UNIFIED-GOOGLE-AUTH.md)
 - لا قاعدة بيانات تشغيلية للبوابة
 
 ما لم يُنفَّذ بعد (مقصود):
 
-- BHD Identity / OpenID Connect
-- الدخول الموحد بين المنتجات
+- BHD Identity / OpenID Connect وجلسة واحدة عبر كل المنتجات
 - لوحة إدارة مركزية
 
 ---
@@ -245,7 +244,8 @@ npm start
 | تعريب الواجهة | أسماء المنتجات، مخطط المنظومة، معاينة الحساب، التذييل |
 | صورة البطل | `object-fit: contain` بنسبة الملف الأصلية |
 | وضوح النص | إصلاح تكسير الحروف العربية ورفع التباين من 6px باهت |
-| وعد الرئيسية العربي | نفس آلية الإنجليزية: ثلاث كلمات بنقاط، النقطة ذهبية، والكلمة الوسطى فيروزية |
+| وعد الرئيسية العربي | نفس آلية الإنجليزية: ثلاث كلمات بنقاط، الحرف الأول ذهبي والنقطة بلون الكلمة |
+| دخول Google على البوابة | نسخ آلية حسابي: ID Token + تحقق خادم + كوكي HttpOnly — انظر `docs/BHD-UNIFIED-GOOGLE-AUTH.md` |
 | مراجعة شاملة 17 أغسطس | تقرير `docs/BHD-PORTAL-FULL-AUDIT.md` وربطه من README |
 
 ## 14. قرارات الواجهة المعتمدة
@@ -270,6 +270,7 @@ npm start
 
 ## 16. السجلات المرجعية الأخرى داخل المستودع
 
+- `docs/BHD-UNIFIED-GOOGLE-AUTH.md` — دخول Google الموحّد وتعليمات تطبيقه على كل المواقع
 - `docs/BHD-PORTAL-FULL-AUDIT.md` — مراجعة الإنتاج: البناء، الأمان، التشفير، النواقص، الترقية
 - `BHD-Portal-Documentation-Arabic.md` — وثيقة البوابة الهندسية العربية
 - `BHD-Complete-Brand-and-Portal-v1.1.0/docs/BHD-PORTAL-DOCUMENTATION.md` — المرجع التقني المفصّل
