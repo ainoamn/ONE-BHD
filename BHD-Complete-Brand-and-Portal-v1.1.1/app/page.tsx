@@ -12,7 +12,7 @@ type Language = "ar" | "en";
 const copy = {
   ar: {
     nav: ["الرئيسية", "المنتجات", "الفلسفة", "رؤيتنا", "الهوية", "الشركة"],
-    eyebrow: "بن حمود للتطوير · ابنِ أحلامًا أكبر",
+    eyebrow: "بن حمود للتطوير - ابنِ أحلامًا أكبر",
     titleTop: "من عُمان، نبني",
     titleBottom: "المستقبل الرقمي للأفراد والأعمال.",
     lead:
@@ -283,40 +283,23 @@ export default function Home() {
         <div className="hero-wash" aria-hidden="true" />
         <div className="hero-inner section-wrap">
           <div className="hero-copy">
+            <p className="eyebrow"><span />{t.eyebrow}</p>
             {isArabic ? (
-              <div className="hero-poster">
-                <p className="hero-poster-kicker">
-                  <span>بن حمود للتطوير - ابنِ أحلامًا أكبر</span>
-                </p>
-                <div className="hero-poster-stage">
-                  <h1 className="brand-promise brand-promise-ar">
-                    <span>ابْنِ.</span>
-                    <span>أَحْلَامًا.</span>
-                    <span>أَكْبَر.</span>
-                  </h1>
-                  <div className="hero-poster-rail" aria-hidden="true">
-                    <span>ابْنِ</span>
-                    <i />
-                    <span>ابْنِ</span>
-                    <i />
-                    <span>ابْنِ</span>
-                  </div>
-                </div>
-                <p className="hero-poster-foot">
-                  <span>ابنِ أحلامًا أكبر مع بن حمود للتطوير.</span>
-                </p>
-              </div>
+              <h1 className="brand-promise brand-promise-ar">
+                <span>ابنِ<b>.</b></span>
+                <span>أحلامًا<b>.</b></span>
+                <span>أكبر<b>.</b></span>
+              </h1>
             ) : (
-              <>
-                <p className="eyebrow"><span />{t.eyebrow}</p>
-                <h1 className="brand-promise" aria-label="Build Higher Dreams">
-                  <span><b>B</b>UILD.</span>
-                  <span><b>H</b>IGHER.</span>
-                  <span><b>D</b>REAMS.</span>
-                </h1>
-                <p className="promise-translation">Bin Hamood Development · One name, one promise.</p>
-              </>
+              <h1 className="brand-promise" aria-label="Build Higher Dreams">
+                <span><b>B</b>UILD.</span>
+                <span><b>H</b>IGHER.</span>
+                <span><b>D</b>REAMS.</span>
+              </h1>
             )}
+            <p className="promise-translation">
+              {isArabic ? "ابنِ أحلامًا أكبر مع بن حمود للتطوير." : "Bin Hamood Development · One name, one promise."}
+            </p>
             <p className="hero-lead">{t.lead}</p>
             <div className="hero-actions">
               <InstantLink className="primary-button" href="/#philosophy">
