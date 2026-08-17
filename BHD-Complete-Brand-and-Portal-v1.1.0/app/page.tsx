@@ -286,9 +286,9 @@ export default function Home() {
             <p className="eyebrow"><span />{t.eyebrow}</p>
             {isArabic ? (
               <h1 className="brand-promise brand-promise-ar">
-                <span>ابنِ<b>.</b></span>
-                <span>أحلامًا<b>.</b></span>
-                <span>أكبر<b>.</b></span>
+                <span><b>ا</b>بنِ.</span>
+                <span><b>أ</b>حلامًا.</span>
+                <span><b>أ</b>كبر.</span>
               </h1>
             ) : (
               <h1 className="brand-promise" aria-label="Build Higher Dreams">
