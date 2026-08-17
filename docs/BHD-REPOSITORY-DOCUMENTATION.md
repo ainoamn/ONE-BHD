@@ -1,7 +1,7 @@
 # وثيقة مستودع ONE-BHD
 
 > **المشروع:** بوابة Bin Hamood Development وهويتها البصرية  
-> **التاريخ:** 16 أغسطس 2026  
+> **التاريخ:** 16–17 أغسطس 2026  
 > **الموقع الحي:** https://one-bhd.vercel.app  
 > **المستودع:** https://github.com/ainoamn/ONE-BHD  
 > **منصة النشر:** Vercel — مشروع `one-bhd`  
@@ -54,6 +54,7 @@ ONE-BHD هو المستودع الأم لـ:
 ONE-BHD/
 ├── README.md
 ├── docs/BHD-REPOSITORY-DOCUMENTATION.md   ← هذه الوثيقة
+├── docs/BHD-PORTAL-FULL-AUDIT.md          ← المراجعة الشاملة للأمان والبناء والترقية
 ├── BHD-Complete-Brand-and-Portal-v1.1.1   ← أحدث مصدر محتوى
 ├── BHD-Complete-Brand-and-Portal-v1.1.0   ← نسخة النشر على Vercel
 ├── BHD-Portal-GitHub-Source-v1.0.0        ← النسخة الأولى بعد دمج اللاحق فيها
@@ -156,6 +157,8 @@ npm start
 
 ## 8. الأمان الحالي
 
+المراجعة التفصيلية (فوائد، ثغرات، تشفير، نواقص، ترقية) في [`BHD-PORTAL-FULL-AUDIT.md`](BHD-PORTAL-FULL-AUDIT.md).
+
 مطبق عبر `next.config.ts`:
 
 - Content-Security-Policy: `default-src 'self'` و`frame-ancestors 'none'`
@@ -213,7 +216,21 @@ npm start
 
 ---
 
-## 13. سجل العمل في 16 أغسطس 2026
+## 12. المراجعة الشاملة (17 أغسطس 2026)
+
+أُنجزت مراجعة للكود المنشور وللموقع الحي. الخلاصة:
+
+- البوابة واجهة علامة ودليل منتجات، ليست هوية موحّدة ولا قاعدة بيانات مركزية.
+- الأمان الحالي يناسب موقعاً بلا حسابات: TLS/HSTS، رؤوس متصفح، وعدم جمع بيانات.
+- لا تشفير عند التخزين لأنه لا تُخزَّن بيانات مستخدم.
+- النواقص: تناقض `bhd-om.com` في robots/security.txt مع النطاق الحي، CSP فيها `unsafe-inline`، بقايا vinext وchatgpt-auth.
+- مسار الترقية: ضبط النطاق والإفصاح، ثم النطاق الرسمي، ثم خدمة هوية مستقلة (OIDC) دون خلط قواعد بيانات المنتجات.
+
+التقرير الكامل: [`BHD-PORTAL-FULL-AUDIT.md`](BHD-PORTAL-FULL-AUDIT.md).
+
+---
+
+## 13. سجل العمل في 16–17 أغسطس 2026
 
 | الخطوة | النتيجة |
 |---|---|
@@ -228,6 +245,7 @@ npm start
 | تعريب الواجهة | أسماء المنتجات، مخطط المنظومة، معاينة الحساب، التذييل |
 | صورة البطل | `object-fit: contain` بنسبة الملف الأصلية |
 | وضوح النص | إصلاح تكسير الحروف العربية ورفع التباين من 6px باهت |
+| مراجعة شاملة 17 أغسطس | تقرير `docs/BHD-PORTAL-FULL-AUDIT.md` وربطه من README |
 
 ## 14. قرارات الواجهة المعتمدة
 
@@ -251,6 +269,7 @@ npm start
 
 ## 16. السجلات المرجعية الأخرى داخل المستودع
 
+- `docs/BHD-PORTAL-FULL-AUDIT.md` — مراجعة الإنتاج: البناء، الأمان، التشفير، النواقص، الترقية
 - `BHD-Portal-Documentation-Arabic.md` — وثيقة البوابة الهندسية العربية
 - `BHD-Complete-Brand-and-Portal-v1.1.0/docs/BHD-PORTAL-DOCUMENTATION.md` — المرجع التقني المفصّل
 - `BHD-BRAND-IDENTITY-Arabic.md` وملفات `docs/BHD-BRAND-IDENTITY.md` داخل نسخ البوابة — الهوية

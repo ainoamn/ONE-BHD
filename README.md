@@ -8,7 +8,14 @@
 - **GitHub:** [https://github.com/ainoamn/ONE-BHD](https://github.com/ainoamn/ONE-BHD)
 - **Vercel:** [https://vercel.com/bhdom89-8158s-projects/one-bhd](https://vercel.com/bhdom89-8158s-projects/one-bhd)
 
-التوثيق الكامل موجود في [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md).
+## التوثيق
+
+| الوثيقة | المحتوى |
+|---|---|
+| [`docs/BHD-PORTAL-FULL-AUDIT.md`](docs/BHD-PORTAL-FULL-AUDIT.md) | المراجعة الشاملة: الفوائد، الخصائص، البناء، الإيجابيات والسلبيات، الأمان والتشفير، النواقص، المخاطر، طريقة العمل، الربط، والترقية |
+| [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، الإصدارات، التشغيل، النشر، والتحقق |
+| [`BHD-Portal-Documentation-Arabic.md`](BHD-Portal-Documentation-Arabic.md) | المرجع الهندسي العربي للبوابة |
+| [`BHD-BRAND-IDENTITY-Arabic.md`](BHD-BRAND-IDENTITY-Arabic.md) | دليل الهوية البصرية |
 
 ## الإصدار المعتمد للتشغيل والنشر
 
