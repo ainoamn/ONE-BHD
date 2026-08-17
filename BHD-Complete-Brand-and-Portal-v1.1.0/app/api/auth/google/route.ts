@@ -1,15 +1,28 @@
 import { NextResponse } from "next/server";
-import { googleClientId, isGoogleAuthConfigured, SESSION_COOKIE } from "../../../lib/auth/config";
+import {
+  googleClientId,
+  isGoogleAuthConfigured,
+  SESSION_COOKIE,
+  authSecret,
+} from "../../../lib/auth/config";
 import { verifyGoogleIdToken } from "../../../lib/auth/google";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
 import { createSessionToken, sessionCookieOptions } from "../../../lib/auth/session";
+import { loginOrRegisterWithGoogle } from "../../../lib/auth/users";
+import { isDatabaseConfigured } from "../../../../db";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
-  if (!isGoogleAuthConfigured()) {
+  if (!isGoogleAuthConfigured() || !authSecret()) {
     return NextResponse.json(
       { message: "تسجيل الدخول عبر Google غير مُعدّ على الخادم." },
+      { status: 503 },
+    );
+  }
+  if (!isDatabaseConfigured()) {
+    return NextResponse.json(
+      { message: "قاعدة البيانات غير مربوطة. أضف DATABASE_URL من Neon." },
       { status: 503 },
     );
   }
@@ -31,25 +44,35 @@ export async function POST(request: Request) {
   }
 
   try {
-    const session = await verifyGoogleIdToken(idToken);
-    const token = await createSessionToken(session);
-    const response = NextResponse.json({
-      user: {
-        email: session.email,
-        name: session.name,
-        picture: session.picture,
-      },
+    const google = await verifyGoogleIdToken(idToken);
+    const user = await loginOrRegisterWithGoogle({
+      googleId: google.sub,
+      email: google.email,
+      name: google.name,
+      picture: google.picture,
     });
+    const token = await createSessionToken({
+      sub: user.id,
+      email: user.email,
+      name: user.name,
+      picture: user.picture,
+    });
+    const response = NextResponse.json({ user });
     response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
     return response;
-  } catch {
+  } catch (error) {
+    const code = error instanceof Error ? error.message : "";
+    if (code === "ACCOUNT_LOCKED" || code === "ACCOUNT_DISABLED") {
+      return NextResponse.json({ message: "هذا الحساب غير متاح للدخول." }, { status: 403 });
+    }
     return NextResponse.json({ message: "تعذّر التحقق من حساب Google." }, { status: 401 });
   }
 }
 
 export function GET() {
   return NextResponse.json({
-    configured: Boolean(googleClientId()),
+    configured: Boolean(googleClientId()) && isDatabaseConfigured(),
     provider: "google",
+    database: isDatabaseConfigured(),
   });
 }

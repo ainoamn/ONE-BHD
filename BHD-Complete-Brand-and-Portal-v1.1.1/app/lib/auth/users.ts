@@ -1,0 +1,335 @@
+import { and, eq, or, sql } from "drizzle-orm";
+import { getDb, isDatabaseConfigured } from "../../../db";
+import { contacts, users, type BhdContact, type BhdUser } from "../../../db/schema";
+import { hashPassword, isStrongPassword, verifyPassword } from "./passwords";
+
+const MAX_ATTEMPTS = 5;
+const LOCK_MINUTES = 15;
+
+export type PublicUser = {
+  id: string;
+  name: string;
+  email: string;
+  username: string | null;
+  phone: string | null;
+  picture: string | null;
+  emailVerified: boolean;
+  mustCompleteProfile: boolean;
+};
+
+export type RegisterInput = {
+  name: string;
+  email: string;
+  username?: string;
+  password: string;
+  phone?: string;
+  phone2?: string;
+  whatsapp?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  zipCode?: string;
+};
+
+export function requireDatabase() {
+  if (!isDatabaseConfigured()) {
+    throw new Error("DATABASE_URL_MISSING");
+  }
+}
+
+export function toPublicUser(user: BhdUser): PublicUser {
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    username: user.username,
+    phone: user.phone,
+    picture: user.avatar,
+    emailVerified: user.emailVerified,
+    mustCompleteProfile: user.mustCompleteProfile,
+  };
+}
+
+function normalizeEmail(email: string) {
+  return email.trim().toLowerCase();
+}
+
+function normalizeUsername(username?: string) {
+  const value = username?.trim().toLowerCase() || "";
+  return value || null;
+}
+
+function assertUnlocked(user: BhdUser) {
+  if (user.lockedUntil && user.lockedUntil > new Date()) {
+    throw new Error("ACCOUNT_LOCKED");
+  }
+  if (!user.isActive) {
+    throw new Error("ACCOUNT_DISABLED");
+  }
+}
+
+async function findUserByEmailOrUsername(emailOrUsername: string): Promise<BhdUser | undefined> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(users)
+    .where(or(eq(users.email, emailOrUsername), eq(users.username, emailOrUsername)))
+    .limit(1);
+  return rows[0];
+}
+
+async function findUserByGoogleOrEmail(googleId: string, email: string): Promise<BhdUser | undefined> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(users)
+    .where(or(eq(users.googleId, googleId), eq(users.email, email)))
+    .limit(1);
+  return rows[0];
+}
+
+async function ensureSelfContact(
+  ownerUserId: string,
+  data: {
+    name: string;
+    email: string;
+    phone?: string | null;
+    phone2?: string | null;
+    whatsapp?: string | null;
+    address?: string | null;
+    city?: string | null;
+    country?: string | null;
+    zipCode?: string | null;
+  },
+): Promise<BhdContact> {
+  const db = getDb();
+  const existingRows = await db
+    .select()
+    .from(contacts)
+    .where(and(eq(contacts.ownerUserId, ownerUserId), eq(contacts.type, "SELF")))
+    .limit(1);
+  const existing = existingRows[0];
+
+  if (existing) {
+    const [updated] = await db
+      .update(contacts)
+      .set({
+        name: data.name,
+        email: data.email,
+        phone: data.phone ?? existing.phone,
+        phone2: data.phone2 ?? existing.phone2,
+        whatsapp: data.whatsapp ?? existing.whatsapp,
+        address: data.address ?? existing.address,
+        city: data.city ?? existing.city,
+        country: data.country || existing.country || "OM",
+        zipCode: data.zipCode ?? existing.zipCode,
+        updatedAt: new Date(),
+      })
+      .where(eq(contacts.id, existing.id))
+      .returning();
+    return updated;
+  }
+
+  const [created] = await db
+    .insert(contacts)
+    .values({
+      ownerUserId,
+      type: "SELF",
+      name: data.name,
+      email: data.email,
+      phone: data.phone || null,
+      phone2: data.phone2 || null,
+      whatsapp: data.whatsapp || null,
+      address: data.address || null,
+      city: data.city || null,
+      country: data.country || "OM",
+      zipCode: data.zipCode || null,
+    })
+    .returning();
+  return created;
+}
+
+export async function registerWithPassword(input: RegisterInput): Promise<PublicUser> {
+  requireDatabase();
+  const email = normalizeEmail(input.email);
+  const username = normalizeUsername(input.username);
+  const name = input.name.trim();
+
+  if (!name || !email || !input.password) {
+    throw new Error("INVALID_INPUT");
+  }
+  if (!isStrongPassword(input.password)) {
+    throw new Error("WEAK_PASSWORD");
+  }
+  if (username && !/^[a-z0-9._-]{3,32}$/.test(username)) {
+    throw new Error("INVALID_USERNAME");
+  }
+
+  const db = getDb();
+  const existing = username
+    ? await findUserByEmailOrUsername(email).then(
+        async (byEmail) => byEmail ?? (await findUserByEmailOrUsername(username)),
+      )
+    : await findUserByEmailOrUsername(email);
+  if (existing) {
+    throw new Error("EMAIL_OR_USERNAME_TAKEN");
+  }
+
+  const passwordHash = await hashPassword(input.password);
+  const [user] = await db
+    .insert(users)
+    .values({
+      name,
+      email,
+      username,
+      passwordHash,
+      phone: input.phone?.trim() || null,
+      emailVerified: false,
+      mustCompleteProfile: !(input.phone && input.city),
+      lastLoginAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .returning();
+
+  await ensureSelfContact(user.id, {
+    name,
+    email,
+    phone: input.phone,
+    phone2: input.phone2,
+    whatsapp: input.whatsapp,
+    address: input.address,
+    city: input.city,
+    country: input.country || "OM",
+    zipCode: input.zipCode,
+  });
+
+  return toPublicUser(user);
+}
+
+export async function loginWithPassword(identifier: string, password: string): Promise<PublicUser> {
+  requireDatabase();
+  const raw = identifier.trim().toLowerCase();
+  if (!raw || !password) throw new Error("INVALID_INPUT");
+
+  const db = getDb();
+  const user = await findUserByEmailOrUsername(raw);
+  if (!user || !user.passwordHash) {
+    throw new Error("INVALID_CREDENTIALS");
+  }
+
+  assertUnlocked(user);
+
+  const ok = await verifyPassword(password, user.passwordHash);
+  if (!ok) {
+    const attempts = user.loginAttempts + 1;
+    const lockedUntil =
+      attempts >= MAX_ATTEMPTS ? new Date(Date.now() + LOCK_MINUTES * 60_000) : null;
+    await db
+      .update(users)
+      .set({
+        loginAttempts: attempts,
+        lockedUntil,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id));
+    throw new Error(lockedUntil ? "ACCOUNT_LOCKED" : "INVALID_CREDENTIALS");
+  }
+
+  const [updated] = await db
+    .update(users)
+    .set({
+      loginAttempts: 0,
+      lockedUntil: null,
+      lastLoginAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id))
+    .returning();
+
+  return toPublicUser(updated);
+}
+
+export async function loginOrRegisterWithGoogle(input: {
+  googleId: string;
+  email: string;
+  name: string;
+  picture: string | null;
+}): Promise<PublicUser> {
+  requireDatabase();
+  const email = normalizeEmail(input.email);
+  const db = getDb();
+
+  let user = await findUserByGoogleOrEmail(input.googleId, email);
+
+  if (user) {
+    assertUnlocked(user);
+    const [updated] = await db
+      .update(users)
+      .set({
+        googleId: input.googleId,
+        name: input.name || user.name,
+        avatar: input.picture || user.avatar,
+        emailVerified: true,
+        loginAttempts: 0,
+        lockedUntil: null,
+        lastLoginAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+    user = updated;
+  } else {
+    const [created] = await db
+      .insert(users)
+      .values({
+        name: input.name,
+        email,
+        googleId: input.googleId,
+        avatar: input.picture,
+        emailVerified: true,
+        mustCompleteProfile: true,
+        lastLoginAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    user = created;
+  }
+
+  await ensureSelfContact(user.id, {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+  });
+
+  return toPublicUser(user);
+}
+
+export async function getUserById(id: string): Promise<PublicUser | null> {
+  if (!isDatabaseConfigured()) return null;
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return rows[0] ? toPublicUser(rows[0]) : null;
+}
+
+export async function getSelfContact(userId: string): Promise<BhdContact | null> {
+  if (!isDatabaseConfigured()) return null;
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(contacts)
+    .where(and(eq(contacts.ownerUserId, userId), eq(contacts.type, "SELF")))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function databaseHealth(): Promise<{ ok: boolean; users?: number }> {
+  if (!isDatabaseConfigured()) return { ok: false };
+  try {
+    const db = getDb();
+    const result = await db.execute(sql`select count(*)::int as count from bhd_users`);
+    const rows = result as unknown as Array<{ count: number }>;
+    return { ok: true, users: Number(rows[0]?.count ?? 0) };
+  } catch {
+    return { ok: false };
+  }
+}

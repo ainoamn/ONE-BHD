@@ -27,19 +27,23 @@ test("applies production browser security headers", async () => {
   assert.match(config, /max-age=31536000/);
 });
 
-test("keeps the login surface private and wires Google sign-in like HISAB", async () => {
-  const [config, login, googleRoute] = await Promise.all([
+test("keeps the login surface private and wires identity APIs", async () => {
+  const [config, login, googleRoute, schema] = await Promise.all([
     readFile(new URL("next.config.ts", root), "utf8"),
     readFile(new URL("app/login/page.tsx", root), "utf8"),
     readFile(new URL("app/api/auth/google/route.ts", root), "utf8"),
+    readFile(new URL("db/schema.ts", root), "utf8"),
   ]);
   assert.match(config, /noindex, noarchive/);
   assert.match(config, /private, no-store/);
   assert.match(config, /accounts\.google\.com/);
-  assert.match(config, /same-origin-allow-popups/);
-  assert.match(login, /GoogleSignInButton|LoginPanel/);
-  assert.match(googleRoute, /verifyGoogleIdToken/);
+  assert.match(login, /LoginForm/);
+  assert.match(googleRoute, /loginOrRegisterWithGoogle/);
+  assert.match(schema, /bhd_users/);
+  assert.match(schema, /bhd_contacts/);
   await access(new URL(".env.example", root));
+  await access(new URL("app/api/auth/login/route.ts", root));
+  await access(new URL("app/api/auth/register/route.ts", root));
 });
 
 test("provides a minimal non-cacheable health endpoint", async () => {

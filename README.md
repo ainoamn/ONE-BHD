@@ -12,7 +12,7 @@
 
 | الوثيقة | المحتوى |
 |---|---|
-| [`docs/BHD-UNIFIED-GOOGLE-AUTH.md`](docs/BHD-UNIFIED-GOOGLE-AUTH.md) | دخول Google الموحّد: الفكرة، ما ثُبّت على البوابة، وتعليمات تطبيقه على كل المواقع |
+| [`docs/BHD-NEON-DATABASE.md`](docs/BHD-NEON-DATABASE.md) | ربط Neon: الجداول، المتغيرات، و`drizzle-kit push` |
 | [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، الإصدارات، التشغيل، النشر، والتحقق |
 | [`BHD-Portal-Documentation-Arabic.md`](BHD-Portal-Documentation-Arabic.md) | المرجع الهندسي العربي للبوابة |
 | [`BHD-BRAND-IDENTITY-Arabic.md`](BHD-BRAND-IDENTITY-Arabic.md) | دليل الهوية البصرية |
