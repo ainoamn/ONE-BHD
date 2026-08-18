@@ -1,4 +1,5 @@
 export const SESSION_COOKIE = "bhd_portal";
+export const IDENTITY_SESSION_COOKIE = "bhd_id";
 export const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 7;
 export const SESSION_ISSUER = "bhd-portal";
 

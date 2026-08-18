@@ -48,7 +48,14 @@ const nextConfig: NextConfig = {
         ],
       },
       {
-        source: "/login/:path*",
+        source: "/oauth/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, noarchive" },
+          { key: "Cache-Control", value: "private, no-store" },
+        ],
+      },
+      {
+        source: "/.well-known/openid-configuration",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, noarchive" },
           { key: "Cache-Control", value: "private, no-store" },

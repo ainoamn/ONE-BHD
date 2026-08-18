@@ -4,7 +4,8 @@
 
 - **العلامة:** Bin Hamood Development
 - **الوعد:** Build Higher Dreams — ابنِ أحلامًا أكبر
-- **الموقع الحي:** [https://one-bhd.vercel.app](https://one-bhd.vercel.app)
+- **الموقع الحي:** [https://one-bhd.vercel.app](https://one-bhd.vercel.app) — النطاق الرسمي [https://www.bhd-om.com](https://www.bhd-om.com)
+- **اكتشاف الهوية:** [https://one-bhd.vercel.app/.well-known/openid-configuration](https://one-bhd.vercel.app/.well-known/openid-configuration)
 - **GitHub:** [https://github.com/ainoamn/ONE-BHD](https://github.com/ainoamn/ONE-BHD)
 - **Vercel:** [https://vercel.com/bhdom89-8158s-projects/one-bhd](https://vercel.com/bhdom89-8158s-projects/one-bhd)
 
@@ -12,6 +13,7 @@
 
 | الوثيقة | المحتوى |
 |---|---|
+| [`docs/BHD-IDENTITY-SSO.md`](docs/BHD-IDENTITY-SSO.md) | **هوية BHD الموحّدة** — مواصفة OIDC للتنفيذ كما هي في كل المواقع |
 | [`docs/BHD-NEON-DATABASE.md`](docs/BHD-NEON-DATABASE.md) | ربط Neon: الجداول، المتغيرات، و`drizzle-kit push` |
 | [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، الإصدارات، التشغيل، النشر، والتحقق |
 | [`BHD-Portal-Documentation-Arabic.md`](BHD-Portal-Documentation-Arabic.md) | المرجع الهندسي العربي للبوابة |
@@ -53,7 +55,8 @@ npm test
 - `/brand` مركز الهوية وملفات التنزيل
 - `/about` `/technology` `/security` `/privacy` `/terms` `/contact`
 - `/apps` مشغّل التطبيقات
-- `/login` دخول Google التجريبي (حساب BHD)
+- `/login` دخول حساب BHD (هوية المنظومة)
+- `/.well-known/openid-configuration` اكتشاف OIDC للمواقع الأخرى
 - `/healthz` فحص الصحة
 
 ## الهوية والأصول

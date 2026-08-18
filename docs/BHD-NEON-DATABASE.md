@@ -2,7 +2,8 @@
 
 > **لوحة Neon:** [console.neon.tech — org projects](https://console.neon.tech/app/org-broad-surf-16375800/projects)  
 > **الموقع:** https://one-bhd.vercel.app  
-> **الجداول:** `bhd_users` و`bhd_contacts` (مثل مستخدمي ودفتر عناوين حسابي)
+> **الجداول:** `bhd_users` و`bhd_contacts` (مثل مستخدمي ودفتر عناوين حسابي)  
+> **الهوية الموحّدة:** الاسم المعتمد لمشروع Neon هو `bhd-identity` — التفاصيل في [BHD-IDENTITY-SSO.md](BHD-IDENTITY-SSO.md)
 
 ---
 

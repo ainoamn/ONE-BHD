@@ -28,11 +28,12 @@ test("applies production browser security headers", async () => {
 });
 
 test("keeps the login surface private and wires identity APIs", async () => {
-  const [config, login, googleRoute, schema] = await Promise.all([
+  const [config, login, googleRoute, schema, discovery] = await Promise.all([
     readFile(new URL("next.config.ts", root), "utf8"),
     readFile(new URL("app/login/page.tsx", root), "utf8"),
     readFile(new URL("app/api/auth/google/route.ts", root), "utf8"),
     readFile(new URL("db/schema.ts", root), "utf8"),
+    readFile(new URL("app/.well-known/openid-configuration/route.ts", root), "utf8"),
   ]);
   assert.match(config, /noindex, noarchive/);
   assert.match(config, /private, no-store/);
@@ -41,9 +42,16 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
   assert.match(schema, /bhd_users/);
   assert.match(schema, /bhd_contacts/);
+  assert.match(schema, /bhd_oauth_tickets/);
+  assert.match(discovery, /authorization_endpoint/);
+  assert.match(discovery, /bhd-identity\.v1/);
   await access(new URL(".env.example", root));
   await access(new URL("app/api/auth/login/route.ts", root));
   await access(new URL("app/api/auth/register/route.ts", root));
+  await access(new URL("app/oauth/authorize/route.ts", root));
+  await access(new URL("app/oauth/token/route.ts", root));
+  await access(new URL("app/api/auth/bhd/start/route.ts", root));
+  await access(new URL("app/api/auth/bhd/callback/route.ts", root));
 });
 
 test("provides a minimal non-cacheable health endpoint", async () => {

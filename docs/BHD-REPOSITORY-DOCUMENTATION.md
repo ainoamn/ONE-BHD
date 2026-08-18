@@ -54,6 +54,7 @@ ONE-BHD هو المستودع الأم لـ:
 ONE-BHD/
 ├── README.md
 ├── docs/BHD-REPOSITORY-DOCUMENTATION.md   ← هذه الوثيقة
+├── docs/BHD-IDENTITY-SSO.md               ← مواصفة الهوية الموحّدة (تُنسخ لبقية المواقع)
 ├── docs/BHD-PORTAL-FULL-AUDIT.md          ← المراجعة الشاملة للأمان والبناء والترقية
 ├── BHD-Complete-Brand-and-Portal-v1.1.1   ← أحدث مصدر محتوى
 ├── BHD-Complete-Brand-and-Portal-v1.1.0   ← نسخة النشر على Vercel

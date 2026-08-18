@@ -3,13 +3,15 @@
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
 
 type Mode = "login" | "register";
 
 export function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const nextPath = searchParams.get("next");
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,7 +31,8 @@ export function LoginForm() {
   const [zipCode, setZipCode] = useState("");
 
   async function finishOk() {
-    router.push("/");
+    const next = nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/";
+    router.push(next);
     router.refresh();
   }
 
@@ -80,10 +83,10 @@ export function LoginForm() {
             <BrandLogo kind="full" tone="light" className="login-brand-logo" />
           </InstantLink>
           <p className="login-brand-kicker">حساب BHD</p>
-          <h1>دخول واحد لكل منظومة بن حمود للتطوير.</h1>
+          <h1>دخول حساب BHD — بوابة الهوية.</h1>
           <p>
-            المستخدمون يُوثَّقون في قاعدة Neon مع دفتر عناوين (إيميل، هاتف، عنوان…) بنفس أسلوب حسابي.
-            Google جاهز للربط بعد ضبط Client ID والدومين.
+            هذا هو الدخول الرسمي لمنظومة بن حمود للتطوير. المواقع الأخرى (وازن، حسابي، نَسَب…)
+            تُحوِّل إلى هنا ثم تتعرّف عليك بنفس الحساب.
           </p>
           <ul>
             <li>إيميل أو اسم مستخدم + كلمة مرور</li>

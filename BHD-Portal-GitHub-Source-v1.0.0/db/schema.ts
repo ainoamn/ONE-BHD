@@ -65,7 +65,22 @@ export const contacts = pgTable("bhd_contacts", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** One-time OAuth codes and refresh tickets (jti), hashed/consumed in identity. */
+export const oauthTickets = pgTable("bhd_oauth_tickets", {
+  jti: text("jti").primaryKey(),
+  kind: text("kind").notNull(),
+  clientId: text("client_id").notNull(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  consumedAt: timestamp("consumed_at", { withTimezone: true }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  payload: text("payload").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type BhdUser = typeof users.$inferSelect;
 export type NewBhdUser = typeof users.$inferInsert;
 export type BhdContact = typeof contacts.$inferSelect;
 export type NewBhdContact = typeof contacts.$inferInsert;
+export type BhdOauthTicket = typeof oauthTickets.$inferSelect;

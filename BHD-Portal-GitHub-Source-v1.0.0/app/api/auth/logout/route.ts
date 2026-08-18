@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
-import { SESSION_COOKIE } from "../../../lib/auth/config";
-import { sessionCookieOptions } from "../../../lib/auth/session";
+import { clearSessionCookies } from "../../../lib/auth/session";
 
 export const runtime = "nodejs";
 
 export async function POST() {
   const response = NextResponse.json({ ok: true });
-  response.cookies.set(SESSION_COOKIE, "", { ...sessionCookieOptions(), maxAge: 0 });
+  clearSessionCookies(response.cookies);
   return response;
 }

@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 import {
+  IDENTITY_SESSION_COOKIE,
   SESSION_COOKIE,
   SESSION_ISSUER,
   SESSION_MAX_AGE_SEC,
@@ -70,7 +71,24 @@ export function sessionCookieOptions() {
 
 export async function getCurrentSession(): Promise<PortalSession | null> {
   const jar = await cookies();
-  const token = jar.get(SESSION_COOKIE)?.value;
+  const token = jar.get(IDENTITY_SESSION_COOKIE)?.value || jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   return readSessionToken(token);
+}
+
+export function applySessionCookies(
+  store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
+  token: string,
+) {
+  const options = sessionCookieOptions();
+  store.set(SESSION_COOKIE, token, options);
+  store.set(IDENTITY_SESSION_COOKIE, token, options);
+}
+
+export function clearSessionCookies(
+  store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
+) {
+  const options = { ...sessionCookieOptions(), maxAge: 0 };
+  store.set(SESSION_COOKIE, "", options);
+  store.set(IDENTITY_SESSION_COOKIE, "", options);
 }

@@ -1,0 +1,90 @@
+export type IdentityClient = {
+  clientId: string;
+  name: string;
+  secretEnv: string;
+  redirectUris: string[];
+  postLogoutRedirectUris: string[];
+};
+
+export const IDENTITY_CLIENTS: IdentityClient[] = [
+  {
+    clientId: "bhd-portal",
+    name: "BHD Portal",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_PORTAL",
+    redirectUris: [
+      "https://www.bhd-om.com/api/auth/bhd/callback",
+      "https://bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://www.bhd-om.com/", "https://bhd-om.com/", "http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-wazen",
+    name: "WAZEN",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_WAZEN",
+    redirectUris: [
+      "https://wazen.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+      "http://localhost:3001/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://wazen.bhd-om.com/", "http://localhost:3000/", "http://localhost:3001/"],
+  },
+  {
+    clientId: "bhd-hisaby",
+    name: "HISAB",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_HISABY",
+    redirectUris: [
+      "https://www.hisaby.pro/api/auth/bhd/callback",
+      "https://hisaby.pro/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://www.hisaby.pro/", "https://hisaby.pro/", "http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-nasab",
+    name: "NASAB",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_NASAB",
+    redirectUris: [
+      "https://nasab-mu.vercel.app/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://nasab-mu.vercel.app/", "http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-store",
+    name: "BHD Store",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_STORE",
+    redirectUris: ["http://localhost:3000/api/auth/bhd/callback"],
+    postLogoutRedirectUris: ["http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-office",
+    name: "BHD Office",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_OFFICE",
+    redirectUris: ["http://localhost:3000/api/auth/bhd/callback"],
+    postLogoutRedirectUris: ["http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-ain-oman",
+    name: "AIN OMAN",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_AIN_OMAN",
+    redirectUris: ["http://localhost:3000/api/auth/bhd/callback"],
+    postLogoutRedirectUris: ["http://localhost:3000/"],
+  },
+];
+
+export function getIdentityClient(clientId: string): IdentityClient | undefined {
+  return IDENTITY_CLIENTS.find((client) => client.clientId === clientId);
+}
+
+export function isAllowedRedirect(client: IdentityClient, redirectUri: string, requestOrigin?: string): boolean {
+  if (client.redirectUris.includes(redirectUri)) return true;
+  if (client.clientId === "bhd-portal" && requestOrigin && redirectUri === `${requestOrigin}/api/auth/bhd/callback`) {
+    return true;
+  }
+  return false;
+}
+
+export function isAllowedLogoutRedirect(client: IdentityClient, uri: string): boolean {
+  return client.postLogoutRedirectUris.includes(uri);
+}

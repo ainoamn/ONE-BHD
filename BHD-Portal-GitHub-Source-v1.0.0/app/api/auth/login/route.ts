@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
-import { authSecret, SESSION_COOKIE } from "../../../lib/auth/config";
+import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
-import { createSessionToken, sessionCookieOptions } from "../../../lib/auth/session";
+import { applySessionCookies, createSessionToken } from "../../../lib/auth/session";
 import { loginWithPassword } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
       picture: user.picture,
     });
     const response = NextResponse.json({ user });
-    response.cookies.set(SESSION_COOKIE, token, sessionCookieOptions());
+    applySessionCookies(response.cookies, token);
     return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
