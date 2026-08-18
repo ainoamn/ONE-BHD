@@ -45,13 +45,7 @@ export function InnerPageShell({ eyebrow, title, lead, children }: InnerPageShel
           </div>
         </details>
         <div className="inner-header-end">
-          <SessionMenu signInLabel="دخول" signOutLabel="خروج" />
-          <InstantLink className="inner-apps-button" href="/apps">
-            <span className="grid-icon" aria-hidden="true">
-              {Array.from({ length: 9 }).map((_, index) => <i key={index} />)}
-            </span>
-            تطبيقات BHD
-          </InstantLink>
+          <SessionMenu signInLabel="دخول" />
         </div>
       </header>
 

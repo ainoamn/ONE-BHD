@@ -90,6 +90,19 @@ test("points live BHD products at official bhd-om.com hosts", async () => {
   assert.doesNotMatch(products, /nasab-mu\.vercel\.app/);
 });
 
+test("ships the frozen BHD app switcher beside the signed-in account", async () => {
+  const [apps, switcher, session] = await Promise.all([
+    readFile(new URL("app/lib/bhd/apps.ts", root), "utf8"),
+    readFile(new URL("app/components/bhd/BhdAppSwitcher.tsx", root), "utf8"),
+    readFile(new URL("app/components/auth/SessionMenu.tsx", root), "utf8"),
+  ]);
+  assert.match(apps, /bhd-appswitcher\.v1/);
+  assert.match(apps, /https:\/\/bhdstor\.bhd-om\.com/);
+  assert.match(switcher, /تطبيقات BHD/);
+  assert.match(session, /BhdAppSwitcher/);
+  await access(new URL("docs/BHD-APP-SWITCHER.md", root));
+});
+
 test("uses the official BHD logo assets across the portal", async () => {
   const [brandLogo, home] = await Promise.all([
     readFile(new URL("app/components/BrandLogo.tsx", root), "utf8"),

@@ -159,6 +159,7 @@ export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [signedIn, setSignedIn] = useState(false);
   const launcherRef = useRef<HTMLDivElement>(null);
   const t = copy[language];
   const isArabic = language === "ar";
@@ -167,6 +168,13 @@ export default function Home() {
     document.documentElement.lang = language;
     document.documentElement.dir = isArabic ? "rtl" : "ltr";
   }, [language, isArabic]);
+
+  useEffect(() => {
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data: { user?: unknown }) => setSignedIn(Boolean(data.user)))
+      .catch(() => setSignedIn(false));
+  }, []);
 
   useEffect(() => {
     const onPointerDown = (event: PointerEvent) => {
@@ -203,7 +211,6 @@ export default function Home() {
         <div className="header-actions">
           <SessionMenu
             signInLabel={isArabic ? "دخول" : "Sign in"}
-            signOutLabel={isArabic ? "خروج" : "Sign out"}
           />
           <button
             className="language-button"
@@ -213,6 +220,7 @@ export default function Home() {
             {isArabic ? "EN" : "عربي"}
           </button>
 
+          {!signedIn ? (
           <div className="app-launcher-wrap" ref={launcherRef}>
             <button
               className="launcher-button"
@@ -260,6 +268,7 @@ export default function Home() {
               </div>
             )}
           </div>
+          ) : null}
 
           <button
             className="mobile-menu-button"

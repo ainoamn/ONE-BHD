@@ -147,7 +147,7 @@ npm start
 | `/privacy` | الخصوصية |
 | `/terms` | الشروط |
 | `/contact` | التواصل |
-| `/apps` | مشغّل التطبيقات |
+| `/apps` | دليل تطبيقات للزائر (تسويقي) |
 | `/login` | دخول حساب BHD (بريد/اسم مستخدم + Google) على الهوية |
 | `/admin` | لوحة تحكم الهوية — مدراء المنصة فقط (`BHD_PLATFORM_ADMIN_EMAILS`) |
 | `/healthz` | `{ "status": "ok", "service": "bhd-portal" }` |
@@ -169,12 +169,14 @@ npm start
 - صفحة `/login` و`/admin` و`/oauth/*`: `noindex, noarchive` و`Cache-Control: private, no-store`
 - هوية BHD (OIDC) على `https://id.bhd-om.com` — المواصفة: [`BHD-IDENTITY-SSO.md`](BHD-IDENTITY-SSO.md)
 - لوحة الإدارة: `https://id.bhd-om.com/admin` (نفس المسار على `www.bhd-om.com/admin`)
+- مشغّل التطبيقات بعد الدخول: تسع نقاط بجانب صورة الحساب — المواصفة [`BHD-APP-SWITCHER.md`](BHD-APP-SWITCHER.md)
 - Neon `bhd-identity` عبر `DATABASE_URL` — لا تُشارك مع وازن أو حسابي
 
 ما يبقى لكل منتج (مقصود):
 
 - أدوار المدير داخل كل تطبيق، لا من الهوية
-- ربط SSO في وازن ثم حسابي ثم نَسَب وبيتك (القسم 6 من مواصفة الهوية)
+- ربط SSO في وازن ثم حسابي ثم نَسَب وبيتك والمتجر (القسم 6 من مواصفة الهوية)
+- نسخ مشغّل التطبيقات (`BhdAppSwitcher` + `lib/bhd/apps.ts`) إلى تلك المواقع بعد SSO
 
 ---
 

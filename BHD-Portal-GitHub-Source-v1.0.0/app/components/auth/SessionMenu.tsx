@@ -1,6 +1,7 @@
 "use client";
 
 import { InstantLink } from "../InstantLink";
+import { BhdAppSwitcher } from "../bhd/BhdAppSwitcher";
 import { useCallback, useEffect, useState } from "react";
 
 type User = {
@@ -16,10 +17,10 @@ type MeResponse = {
 
 type Props = {
   signInLabel: string;
-  signOutLabel: string;
+  signOutLabel?: string;
 };
 
-export function SessionMenu({ signInLabel, signOutLabel }: Props) {
+export function SessionMenu({ signInLabel }: Props) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [platformAdmin, setPlatformAdmin] = useState(false);
 
@@ -43,8 +44,11 @@ export function SessionMenu({ signInLabel, signOutLabel }: Props) {
 
   const signOut = useCallback(async () => {
     await fetch("/api/auth/logout", { method: "POST" });
-    setUser(null);
-    window.location.reload();
+    const post = `${window.location.origin}/`;
+    const end = new URL("/oauth/end-session", window.location.origin);
+    end.searchParams.set("client_id", "bhd-portal");
+    end.searchParams.set("post_logout_redirect_uri", post);
+    window.location.assign(end.toString());
   }, []);
 
   if (user === undefined) {
@@ -59,22 +63,5 @@ export function SessionMenu({ signInLabel, signOutLabel }: Props) {
     );
   }
 
-  return (
-    <div className="session-menu">
-      {user.picture ? (
-        <img src={user.picture} alt="" width={28} height={28} />
-      ) : (
-        <span className="session-initial">{user.name.slice(0, 1)}</span>
-      )}
-      <span className="session-name">{user.name}</span>
-      {platformAdmin ? (
-        <InstantLink className="session-signin" href="/admin">
-          الإدارة
-        </InstantLink>
-      ) : null}
-      <button type="button" className="session-signout" onClick={() => void signOut()}>
-        {signOutLabel}
-      </button>
-    </div>
-  );
+  return <BhdAppSwitcher user={user} platformAdmin={platformAdmin} onSignOut={signOut} />;
 }

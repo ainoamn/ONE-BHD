@@ -26,7 +26,7 @@
 5. المعرّف المشترك الوحيد هو مطالبة JWT: **`sub`** = UUID المستخدم في جداول الهوية (`bhd_users.id`).
 6. كل منتج يخزّن `bhd_sub` (نفس قيمة `sub`) ويربط حسابه المحلي به.
 7. بروتوكول الربط: **OAuth 2.0 Authorization Code + PKCE (S256)** مع **OpenID Connect**.
-8. إن تعارض هذا الملف مع `docs/BHD-UNIFIED-GOOGLE-AUTH.md` فهذه المواصفة هي المرجع لـ SSO. وثيقة جوجل تصف المرحلة 0 فقط (دخول محلي بنفس Client ID).
+9. مشغّل التطبيقات بعد الدخول مواصفته [`BHD-APP-SWITCHER.md`](BHD-APP-SWITCHER.md). لا تُبتكر قائمة تطبيقات محلية.
 
 ---
 
@@ -580,4 +580,5 @@ bhd_oauth_consents
 Issuer: https://id.bhd-om.com
 لا تشارك قواعد البيانات. نفّذ القسم 6 وبطاقة المنتج في القسم 12.
 client_id ثابت من جدول 2.1.
+مشغّل التطبيقات: https://github.com/ainoamn/ONE-BHD/blob/main/docs/BHD-APP-SWITCHER.md
 ```
