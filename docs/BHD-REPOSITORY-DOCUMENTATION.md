@@ -218,7 +218,8 @@ npm start
 | حسابي | https://hisaby.bhd-om.com |
 | نَسَب | https://nasab.bhd-om.com |
 | بيتك (العقار، كان عين عُمان) | https://baitak.bhd-om.com |
-| متجر BHD / مكتب BHD | عند الإطلاق |
+| متجر BHD | https://bhdstor.bhd-om.com |
+| مكتب BHD | عند الإطلاق |
 
 CNAME لكل نطاق فرعي من عُمان: `cname.vercel-dns.com` (ليس `vercel-dns-017`).
 

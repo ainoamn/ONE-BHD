@@ -111,10 +111,10 @@ export const products: Product[] = [
       "سوق رقمي متعدد البائعين، مصمم للتجارة العُمانية والخليجية.",
     descriptionEn:
       "A multi-vendor digital marketplace designed for Omani and Gulf commerce.",
-    href: "https://github.com/ainoamn/BHD-STOR",
+    href: "https://bhdstor.bhd-om.com/",
     repository: "https://github.com/ainoamn/BHD-STOR",
-    statusAr: "قيد التطوير",
-    statusEn: "In development",
+    statusAr: "متاح الآن",
+    statusEn: "Available now",
     mark: "م",
     accent: "#315d89",
     soft: "#e9f0f7",

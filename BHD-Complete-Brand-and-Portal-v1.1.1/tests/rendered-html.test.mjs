@@ -75,12 +75,13 @@ test("warms internal routes and keeps the smart guide private by design", async 
   assert.match(advisor, /يعمل هذا الدليل محليًا/);
 });
 
-test("points WAZEN HISAB NASAB and BAITAK at official bhd-om.com hosts", async () => {
+test("points live BHD products at official bhd-om.com hosts", async () => {
   const products = await readFile(new URL("app/lib/products.ts", root), "utf8");
   assert.match(products, /https:\/\/wazen\.bhd-om\.com\//);
   assert.match(products, /https:\/\/hisaby\.bhd-om\.com\//);
   assert.match(products, /https:\/\/nasab\.bhd-om\.com\//);
   assert.match(products, /https:\/\/baitak\.bhd-om\.com\//);
+  assert.match(products, /https:\/\/bhdstor\.bhd-om\.com\//);
   assert.match(products, /nameAr: "بيتك"/);
   assert.doesNotMatch(products, /عين عُمان/);
   assert.doesNotMatch(products, /AIN OMAN/);

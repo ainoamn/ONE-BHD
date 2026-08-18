@@ -68,12 +68,14 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     name: "BHD Store",
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_STORE",
     redirectUris: [
+      "https://bhdstor.bhd-om.com/api/auth/bhd/callback",
       "https://store.bhd-om.com/api/auth/bhd/callback",
       "https://bhd-stor-x7dc.vercel.app/api/auth/bhd/callback",
       "http://localhost:3000/api/auth/bhd/callback",
       "http://127.0.0.1:3000/api/auth/bhd/callback",
     ],
     postLogoutRedirectUris: [
+      "https://bhdstor.bhd-om.com/",
       "https://store.bhd-om.com/",
       "https://bhd-stor-x7dc.vercel.app/",
       "http://localhost:3000/",

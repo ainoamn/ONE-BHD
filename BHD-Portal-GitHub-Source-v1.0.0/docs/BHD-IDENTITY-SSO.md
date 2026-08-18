@@ -93,7 +93,7 @@ sequenceDiagram
 | وازن | `bhd-wazen` | `https://wazen.bhd-om.com` | `https://wazen.bhd-om.com/api/auth/bhd/callback` |
 | حسابي | `bhd-hisaby` | `https://hisaby.bhd-om.com` (و`hisaby.pro`) | `https://hisaby.bhd-om.com/api/auth/bhd/callback` |
 | نَسَب | `bhd-nasab` | `https://nasab.bhd-om.com` | `https://nasab.bhd-om.com/api/auth/bhd/callback` |
-| متجر BHD | `bhd-store` | عند الإطلاق `https://store.bhd-om.com` | `{origin}/api/auth/bhd/callback` |
+| متجر BHD | `bhd-store` | `https://bhdstor.bhd-om.com` | `https://bhdstor.bhd-om.com/api/auth/bhd/callback` |
 | مكتب BHD | `bhd-office` | داخلي | `{origin}/api/auth/bhd/callback` |
 | بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 
@@ -522,7 +522,14 @@ bhd_oauth_consents
 - `/login` هو شاشة الهوية
 - `client_id=bhd-portal` إن بقيت البوابة تطلب توكن لنفسها (جلسة `bhd_portal` يمكن أن تُشتق من `bhd_id` دون OIDC داخلي لأنها نفس التطبيق)
 
-### نَسَب / متجر / مكتب / بيتك
+### متجر BHD (`ainoamn/BHD-STOR`)
+
+- `BHD_OAUTH_CLIENT_ID=bhd-store`
+- النطاق الرسمي: `bhdstor.bhd-om.com` — CNAME `cname.vercel-dns.com`
+- `redirect_uri`: `https://bhdstor.bhd-om.com/api/auth/bhd/callback`
+- نفّذ القسم 6 عند أول شاشة دخول
+
+### نَسَب / مكتب / بيتك
 
 - نفّذ القسم 6 فقط
 - `client_id` من جدول 2.1

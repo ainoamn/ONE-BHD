@@ -10,7 +10,7 @@ const intentKeywords: Record<string, string[]> = {
   hisab: ["شركة", "محاسب", "محاسبة", "فاتورة", "ضريبة", "مخزون", "كاشير", "مطعم", "account", "invoice", "pos"],
   baitak: ["عقار", "عقارات", "بيت", "بيتك", "منزل", "أرض", "إيجار", "استثمار", "property", "rent", "baitak"],
   nasab: ["عائلة", "أسرة", "نسب", "شجرة", "أجداد", "قرابة", "family", "tree"],
-  "bhd-store": ["متجر", "بيع", "تجارة", "منتج", "طلب", "بائع", "سوق", "shop", "store", "commerce"],
+  "bhd-store": ["متجر", "بيع", "تجارة", "منتج", "طلب", "بائع", "سوق", "bhdstor", "shop", "store", "commerce"],
   "bhd-office": ["وثيقة", "أرشيف", "مكتب", "تشغيل", "إدارة داخلية", "archive", "office", "document"],
 };
 
