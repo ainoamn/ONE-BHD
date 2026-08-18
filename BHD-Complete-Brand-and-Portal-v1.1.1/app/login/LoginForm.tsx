@@ -91,7 +91,7 @@ export function LoginForm() {
           <ul>
             <li>إيميل أو اسم مستخدم + كلمة مرور</li>
             <li>دفتر عناوين مرتبط بالحساب</li>
-            <li>Google عند اكتمال الإعداد</li>
+            <li>Google بنفس حساب منظومة BHD</li>
           </ul>
         </aside>
 
