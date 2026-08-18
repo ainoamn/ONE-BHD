@@ -35,6 +35,15 @@ export function verifyClientSecret(clientId: string, secret: string): IdentityCl
   return client;
 }
 
+/**
+ * Confidential secret if provided; first-party clients may complete
+ * authorization_code with PKCE alone until per-client secrets are set.
+ */
+export function resolveOAuthClient(clientId: string, secret: string): IdentityClient | null {
+  if (secret) return verifyClientSecret(clientId, secret);
+  return getIdentityClient(clientId) ?? null;
+}
+
 export function signingKey(): Uint8Array {
   const secret = identityTokenSecret();
   if (!secret) {

@@ -35,6 +35,11 @@ export function verifyClientSecret(clientId: string, secret: string): IdentityCl
   return client;
 }
 
+export function resolveOAuthClient(clientId: string, secret: string): IdentityClient | null {
+  if (secret) return verifyClientSecret(clientId, secret);
+  return getIdentityClient(clientId) ?? null;
+}
+
 export function signingKey(): Uint8Array {
   const secret = identityTokenSecret();
   if (!secret) {

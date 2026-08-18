@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { verifyClientSecret, verifyPkce, randomUrlToken } from "../../lib/identity/crypto";
+import { resolveOAuthClient, verifyPkce, randomUrlToken } from "../../lib/identity/crypto";
 import { identityIssuer } from "../../lib/identity/issuer";
 import { consumeTicket, saveTicket } from "../../lib/identity/tickets";
 import { signAccessToken, signIdToken, tokenTtl } from "../../lib/identity/tokens";
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   const grantType = form.get("grant_type") || "";
   const clientId = form.get("client_id") || "";
   const clientSecret = form.get("client_secret") || "";
-  const client = verifyClientSecret(clientId, clientSecret);
+  const client = resolveOAuthClient(clientId, clientSecret);
   if (!client) {
     return NextResponse.json({ error: "invalid_client" }, { status: 401 });
   }
