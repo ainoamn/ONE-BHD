@@ -29,10 +29,10 @@ export const products: Product[] = [
       "المحافظ، المصاريف، الرحلات، الجمعيات والالتزامات المشتركة في تجربة عربية واضحة.",
     descriptionEn:
       "Wallets, expenses, trips, circles and shared commitments in one clear Arabic-first experience.",
-    href: "https://wazen-roan.vercel.app/",
+    href: "https://wazen.bhd-om.com/",
     repository: "https://github.com/ainoamn/WAZEN",
-    statusAr: "نسخة تجريبية",
-    statusEn: "Live preview",
+    statusAr: "متاح الآن",
+    statusEn: "Available now",
     mark: "و",
     accent: "#126b63",
     soft: "#e8f4f1",
@@ -50,8 +50,8 @@ export const products: Product[] = [
       "فواتير، كاشير، مطاعم، مخزون، ضريبة وتقارير مالية من منصة واحدة.",
     descriptionEn:
       "Invoicing, POS, restaurants, inventory, VAT and financial reports from one platform.",
-    href: "https://bhd-pro.vercel.app/",
-    repository: "https://github.com/ainoamn/BHD-Pro",
+    href: "https://hisaby.bhd-om.com/",
+    repository: "https://github.com/ainoamn/hisaby",
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ح",
@@ -62,20 +62,20 @@ export const products: Product[] = [
     capabilitiesEn: ["Accounting and invoices", "POS and restaurants", "Inventory, reports and VAT"],
   },
   {
-    slug: "ain-oman",
-    name: "AIN OMAN",
-    nameAr: "عين عُمان",
+    slug: "baitak",
+    name: "BAITAK",
+    nameAr: "بيتك",
     categoryAr: "العقارات والاستثمار",
     categoryEn: "Property & investment",
     descriptionAr:
       "منصة متكاملة للبيع والشراء والإيجار وإدارة العقارات والاستثمار.",
     descriptionEn:
       "An integrated platform for buying, selling, renting and managing property investments.",
-    href: "https://github.com/ainoamn/ainoamn-ain-oman-web",
+    href: "https://baitak.bhd-om.com/",
     repository: "https://github.com/ainoamn/ainoamn-ain-oman-web",
-    statusAr: "قيد التطوير",
-    statusEn: "In development",
-    mark: "ع",
+    statusAr: "متاح الآن",
+    statusEn: "Available now",
+    mark: "ب",
     accent: "#a66b2d",
     soft: "#f8efe4",
     capabilitiesAr: ["بيع وشراء العقارات", "الإيجار والإدارة", "الخرائط والتحليلات"],
@@ -91,10 +91,10 @@ export const products: Product[] = [
       "شجرة عائلة رقمية تحفظ الروابط والقصص والذاكرة بين الأجيال.",
     descriptionEn:
       "A digital family tree that preserves relationships, stories and heritage across generations.",
-    href: "https://nasab-mu.vercel.app/",
+    href: "https://nasab.bhd-om.com/",
     repository: "https://github.com/ainoamn/Nasab",
-    statusAr: "نسخة تجريبية",
-    statusEn: "Live preview",
+    statusAr: "متاح الآن",
+    statusEn: "Available now",
     mark: "ن",
     accent: "#8a3c45",
     soft: "#f6e9eb",
@@ -115,7 +115,7 @@ export const products: Product[] = [
     repository: "https://github.com/ainoamn/BHD-STOR",
     statusAr: "قيد التطوير",
     statusEn: "In development",
-    mark: "ب",
+    mark: "م",
     accent: "#315d89",
     soft: "#e9f0f7",
     capabilitiesAr: ["متاجر متعددة البائعين", "إدارة الطلبات", "الشحن والمدفوعات"],
@@ -144,5 +144,6 @@ export const products: Product[] = [
 ];
 
 export function getProduct(slug: string): Product | undefined {
-  return products.find((product) => product.slug === slug);
+  const resolved = slug === "ain-oman" ? "baitak" : slug;
+  return products.find((product) => product.slug === resolved);
 }

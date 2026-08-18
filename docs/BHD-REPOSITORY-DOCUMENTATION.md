@@ -148,7 +148,8 @@ npm start
 | `/terms` | الشروط |
 | `/contact` | التواصل |
 | `/apps` | مشغّل التطبيقات |
-| `/login` | دخول Google التجريبي (حساب BHD) |
+| `/login` | دخول حساب BHD (بريد/اسم مستخدم + Google) على الهوية |
+| `/admin` | لوحة تحكم الهوية — مدراء المنصة فقط (`BHD_PLATFORM_ADMIN_EMAILS`) |
 | `/healthz` | `{ "status": "ok", "service": "bhd-portal" }` |
 | `/sitemap.xml` | خريطة الموقع |
 | `/robots.txt` | قواعد الأرشفة |
@@ -165,14 +166,15 @@ npm start
 - Content-Security-Policy: `default-src 'self'` و`frame-ancestors 'none'`
 - HSTS، `X-Frame-Options: DENY`، `X-Content-Type-Options: nosniff`
 - Permissions-Policy تعطّل الكاميرا والميكروفون والموقع والدفع
-- صفحة `/login` : `noindex, noarchive` و`Cache-Control: private, no-store`
-- دخول Google التجريبي: التحقق من ID Token على الخادم وكوكي `bhd_portal` — التفاصيل في [`BHD-UNIFIED-GOOGLE-AUTH.md`](BHD-UNIFIED-GOOGLE-AUTH.md)
-- لا قاعدة بيانات تشغيلية للبوابة
+- صفحة `/login` و`/admin` و`/oauth/*`: `noindex, noarchive` و`Cache-Control: private, no-store`
+- هوية BHD (OIDC) على `https://id.bhd-om.com` — المواصفة: [`BHD-IDENTITY-SSO.md`](BHD-IDENTITY-SSO.md)
+- لوحة الإدارة: `https://id.bhd-om.com/admin` (نفس المسار على `www.bhd-om.com/admin`)
+- Neon `bhd-identity` عبر `DATABASE_URL` — لا تُشارك مع وازن أو حسابي
 
-ما لم يُنفَّذ بعد (مقصود):
+ما يبقى لكل منتج (مقصود):
 
-- BHD Identity / OpenID Connect وجلسة واحدة عبر كل المنتجات
-- لوحة إدارة مركزية
+- أدوار المدير داخل كل تطبيق، لا من الهوية
+- ربط SSO في وازن ثم حسابي ثم نَسَب وبيتك (القسم 6 من مواصفة الهوية)
 
 ---
 
@@ -180,7 +182,7 @@ npm start
 
 | البند | القيمة |
 |---|---|
-| الإنتاج | https://one-bhd.vercel.app |
+| الإنتاج | https://www.bhd-om.com وhttps://id.bhd-om.com |
 | Git | فرع `main` على `ainoamn/ONE-BHD` |
 | البناء | `next build` داخل مجلد `v1.1.0` |
 | إعادة النشر CLI | من جذر المستودع: `npx vercel --prod --yes` بعد ربط المشروع |
@@ -208,11 +210,17 @@ npm start
 
 ## 11. المنتجات المرتبطة (حسب البوابة)
 
-البوابة تعرض المنتجات وتربط إلى مواقعها أو مستودعاتها. البيانات التشغيلية تبقى خارج البوابة.
+البوابة تعرض المنتجات وتربط إلى مواقعها الرسمية تحت `bhd-om.com`. البيانات التشغيلية تبقى خارج البوابة.
 
-أمثلة في الواجهة العربية: وازن، حسابي، عين عُمان، نَسَب، متجر BHD، مكتب BHD.
+| المنتج | النطاق |
+|---|---|
+| وازن | https://wazen.bhd-om.com |
+| حسابي | https://hisaby.bhd-om.com |
+| نَسَب | https://nasab.bhd-om.com |
+| بيتك (العقار، كان عين عُمان) | https://baitak.bhd-om.com |
+| متجر BHD / مكتب BHD | عند الإطلاق |
 
-روابطها في الكود ما زالت تشير إلى المستودعات والمواقع المستقلة (مثل [وازن](https://wazen-roan.vercel.app/) و[مستودع وازن](https://github.com/ainoamn/WAZEN)).
+CNAME لكل نطاق فرعي من عُمان: `cname.vercel-dns.com` (ليس `vercel-dns-017`).
 
 ---
 

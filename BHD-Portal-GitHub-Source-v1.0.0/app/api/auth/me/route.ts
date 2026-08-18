@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentSession } from "../../../lib/auth/session";
 import { getSelfContact, getUserById } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
+import { isPlatformAdminEmail } from "../../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
 
@@ -18,7 +19,7 @@ export async function GET() {
     }
     const contact = await getSelfContact(user.id);
     return NextResponse.json(
-      { user, contact },
+      { user, contact, platformAdmin: isPlatformAdminEmail(user.email) },
       { headers: { "Cache-Control": "no-store" } },
     );
   }
@@ -36,6 +37,7 @@ export async function GET() {
         mustCompleteProfile: false,
       },
       contact: null,
+      platformAdmin: isPlatformAdminEmail(session.email),
     },
     { headers: { "Cache-Control": "no-store" } },
   );

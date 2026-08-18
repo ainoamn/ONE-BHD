@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { InnerPageShell } from "../../components/InnerPageShell";
 import { getProduct, products } from "../../lib/products";
 
@@ -21,6 +21,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
+  if (slug === "ain-oman") redirect("/products/baitak");
   const product = getProduct(slug);
   if (!product) notFound();
 

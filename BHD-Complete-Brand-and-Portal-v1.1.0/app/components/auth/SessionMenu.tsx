@@ -9,6 +9,11 @@ type User = {
   picture: string | null;
 };
 
+type MeResponse = {
+  user?: User | null;
+  platformAdmin?: boolean;
+};
+
 type Props = {
   signInLabel: string;
   signOutLabel: string;
@@ -16,13 +21,17 @@ type Props = {
 
 export function SessionMenu({ signInLabel, signOutLabel }: Props) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [platformAdmin, setPlatformAdmin] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/auth/me", { cache: "no-store" })
       .then((response) => response.json())
-      .then((data: { user?: User | null }) => {
-        if (!cancelled) setUser(data.user ?? null);
+      .then((data: MeResponse) => {
+        if (!cancelled) {
+          setUser(data.user ?? null);
+          setPlatformAdmin(Boolean(data.platformAdmin));
+        }
       })
       .catch(() => {
         if (!cancelled) setUser(null);
@@ -58,6 +67,11 @@ export function SessionMenu({ signInLabel, signOutLabel }: Props) {
         <span className="session-initial">{user.name.slice(0, 1)}</span>
       )}
       <span className="session-name">{user.name}</span>
+      {platformAdmin ? (
+        <InstantLink className="session-signin" href="/admin">
+          الإدارة
+        </InstantLink>
+      ) : null}
       <button type="button" className="session-signout" onClick={() => void signOut()}>
         {signOutLabel}
       </button>

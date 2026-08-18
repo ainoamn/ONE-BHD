@@ -37,6 +37,7 @@ test("keeps the login surface private and wires identity APIs", async () => {
   ]);
   assert.match(config, /noindex, noarchive/);
   assert.match(config, /private, no-store/);
+  assert.match(config, /\/admin/);
   assert.match(config, /accounts\.google\.com/);
   assert.match(login, /LoginForm/);
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
@@ -52,6 +53,9 @@ test("keeps the login surface private and wires identity APIs", async () => {
   await access(new URL("app/oauth/token/route.ts", root));
   await access(new URL("app/api/auth/bhd/start/route.ts", root));
   await access(new URL("app/api/auth/bhd/callback/route.ts", root));
+  await access(new URL("app/admin/page.tsx", root));
+  await access(new URL("app/api/admin/overview/route.ts", root));
+  await access(new URL("app/api/admin/users/route.ts", root));
 });
 
 test("provides a minimal non-cacheable health endpoint", async () => {
@@ -69,6 +73,20 @@ test("warms internal routes and keeps the smart guide private by design", async 
   assert.match(warmup, /router\.prefetch/);
   assert.match(instantLink, /prefetch/);
   assert.match(advisor, /يعمل هذا الدليل محليًا/);
+});
+
+test("points WAZEN HISAB NASAB and BAITAK at official bhd-om.com hosts", async () => {
+  const products = await readFile(new URL("app/lib/products.ts", root), "utf8");
+  assert.match(products, /https:\/\/wazen\.bhd-om\.com\//);
+  assert.match(products, /https:\/\/hisaby\.bhd-om\.com\//);
+  assert.match(products, /https:\/\/nasab\.bhd-om\.com\//);
+  assert.match(products, /https:\/\/baitak\.bhd-om\.com\//);
+  assert.match(products, /nameAr: "بيتك"/);
+  assert.doesNotMatch(products, /عين عُمان/);
+  assert.doesNotMatch(products, /AIN OMAN/);
+  assert.doesNotMatch(products, /wazen-roan\.vercel\.app/);
+  assert.doesNotMatch(products, /bhd-pro\.vercel\.app/);
+  assert.doesNotMatch(products, /nasab-mu\.vercel\.app/);
 });
 
 test("uses the official BHD logo assets across the portal", async () => {

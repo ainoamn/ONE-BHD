@@ -88,16 +88,20 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     postLogoutRedirectUris: ["http://localhost:3000/"],
   },
   {
-    clientId: "bhd-ain-oman",
-    name: "AIN OMAN",
-    secretEnv: "BHD_OAUTH_CLIENT_SECRET_AIN_OMAN",
-    redirectUris: ["http://localhost:3000/api/auth/bhd/callback"],
-    postLogoutRedirectUris: ["http://localhost:3000/"],
+    clientId: "bhd-baitak",
+    name: "BAITAK",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_BAITAK",
+    redirectUris: [
+      "https://baitak.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://baitak.bhd-om.com/", "http://localhost:3000/"],
   },
 ];
 
 export function getIdentityClient(clientId: string): IdentityClient | undefined {
-  return IDENTITY_CLIENTS.find((client) => client.clientId === clientId);
+  const resolved = clientId === "bhd-ain-oman" ? "bhd-baitak" : clientId;
+  return IDENTITY_CLIENTS.find((client) => client.clientId === resolved);
 }
 
 export function isAllowedRedirect(client: IdentityClient, redirectUri: string, requestOrigin?: string): boolean {

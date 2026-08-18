@@ -350,7 +350,7 @@ A BHD Product
 ### مستويات العلامة
 
 1. **Masterbrand:** BHD.
-2. **Endorsed products:** WAZEN, HISAB, NASAB, AIN OMAN.
+2. **Endorsed products:** WAZEN, HISAB, NASAB, BAITAK.
 3. **BHD-named products:** BHD STORE, BHD OFFICE.
 4. **Internal services:** BHD Identity, BHD Control Plane.
 

@@ -146,7 +146,7 @@
 |---|---|---|---|
 | WAZEN / وازن | إدارة الأموال | `github.com/ainoamn/WAZEN` | `wazen-roan.vercel.app` |
 | HISAB / حسابي | المحاسبة والأعمال | `github.com/ainoamn/BHD-Pro` | `bhd-pro.vercel.app` |
-| AIN OMAN / عين عُمان | العقار والاستثمار | `github.com/ainoamn/ainoamn-ain-oman-web` | المستودع مؤقتًا |
+| BAITAK / بيتك | العقار والاستثمار | `github.com/ainoamn/ainoamn-ain-oman-web` | `baitak.bhd-om.com` |
 | NASAB / نَسَب | شجرة العائلة | `github.com/ainoamn/Nasab` | `nasab-mu.vercel.app` |
 | BHD STORE | التجارة الإلكترونية | `github.com/ainoamn/BHD-STOR` | المستودع مؤقتًا |
 | BHD OFFICE | تشغيل الأعمال | `github.com/ainoamn/bhd-om` | نظام داخلي/المستودع |

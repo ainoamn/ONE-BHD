@@ -8,7 +8,7 @@ import { InstantLink } from "./InstantLink";
 const intentKeywords: Record<string, string[]> = {
   wazen: ["مال", "أموال", "محفظ", "مصروف", "ميزانية", "رحلة", "جمعية", "دين", "التزام", "money", "wallet", "budget"],
   hisab: ["شركة", "محاسب", "محاسبة", "فاتورة", "ضريبة", "مخزون", "كاشير", "مطعم", "account", "invoice", "pos"],
-  "ain-oman": ["عقار", "عقارات", "بيت", "منزل", "أرض", "إيجار", "استثمار", "property", "rent"],
+  baitak: ["عقار", "عقارات", "بيت", "بيتك", "منزل", "أرض", "إيجار", "استثمار", "property", "rent", "baitak"],
   nasab: ["عائلة", "أسرة", "نسب", "شجرة", "أجداد", "قرابة", "family", "tree"],
   "bhd-store": ["متجر", "بيع", "تجارة", "منتج", "طلب", "بائع", "سوق", "shop", "store", "commerce"],
   "bhd-office": ["وثيقة", "أرشيف", "مكتب", "تشغيل", "إدارة داخلية", "archive", "office", "document"],

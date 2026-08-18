@@ -95,6 +95,8 @@ function withSecurityHeaders(response: Response, request: Request): Response {
   if (
     url.pathname === "/login" ||
     url.pathname.startsWith("/login/") ||
+    url.pathname === "/admin" ||
+    url.pathname.startsWith("/admin/") ||
     url.pathname === "/callback" ||
     url.pathname.startsWith("/callback/") ||
     url.pathname === "/signin-with-chatgpt" ||
