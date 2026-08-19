@@ -17,6 +17,10 @@ export type FacebookProfile = {
   email: string;
   name: string;
   picture: string | null;
+  gender: string | null;
+  birthDate: string | null;
+  city: string | null;
+  hometown: string | null;
 };
 
 function secretKey() {
@@ -41,7 +45,8 @@ export function facebookLoginUrl(input: { state: string; redirectUri: string }):
     redirect_uri: input.redirectUri,
     state: input.state,
     response_type: "code",
-    scope: "email,public_profile",
+    scope: "email,public_profile,user_birthday,user_gender,user_location,user_hometown",
+    auth_type: "rerequest",
   });
   return `${DIALOG}?${params.toString()}`;
 }
@@ -95,6 +100,25 @@ export function facebookOAuthCookieOptions() {
   };
 }
 
+function parseFacebookBirthday(value?: string): string | null {
+  const raw = value?.trim() || "";
+  if (!raw) return null;
+  const parts = raw.split("/");
+  if (parts.length === 3) {
+    const [month, day, year] = parts;
+    if (year.length === 4) return `${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}`;
+  }
+  return raw;
+}
+
+function parseFacebookGender(value?: string): string | null {
+  const raw = value?.trim().toLowerCase() || "";
+  if (!raw) return null;
+  if (raw === "male") return "male";
+  if (raw === "female") return "female";
+  return raw;
+}
+
 async function graphJson<T>(url: string): Promise<T> {
   const response = await fetch(url, { cache: "no-store" });
   const data = (await response.json()) as T & { error?: { message?: string } };
@@ -127,12 +151,16 @@ export async function exchangeFacebookCode(code: string, redirectUri: string): P
   }
 
   const meUrl = new URL(`${GRAPH}/me`);
-  meUrl.searchParams.set("fields", "id,name,email,picture.type(large)");
+  meUrl.searchParams.set("fields", "id,name,email,picture.type(large),birthday,gender,location{name},hometown{name}");
   meUrl.searchParams.set("access_token", token.access_token);
   const me = await graphJson<{
     id?: string;
     name?: string;
     email?: string;
+    birthday?: string;
+    gender?: string;
+    location?: { name?: string };
+    hometown?: { name?: string };
     picture?: { data?: { url?: string } };
   }>(meUrl.toString());
 
@@ -146,5 +174,9 @@ export async function exchangeFacebookCode(code: string, redirectUri: string): P
     email,
     name: (me.name || email.split("@")[0]).trim(),
     picture: me.picture?.data?.url || null,
+    gender: parseFacebookGender(me.gender),
+    birthDate: parseFacebookBirthday(me.birthday),
+    city: me.location?.name?.trim() || null,
+    hometown: me.hometown?.name?.trim() || null,
   };
 }

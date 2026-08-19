@@ -13,6 +13,8 @@ type AccountUser = {
   email: string;
   username: string | null;
   phone: string | null;
+  gender: string | null;
+  birthDate: string | null;
   picture: string | null;
   emailVerified: boolean;
   googleLinked: boolean;
@@ -27,6 +29,7 @@ type AccountContact = {
   whatsapp: string | null;
   address: string | null;
   city: string | null;
+  hometown: string | null;
   country: string | null;
   zipCode: string | null;
 };
@@ -73,10 +76,13 @@ export function AccountConsole() {
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [phone, setPhone] = useState("");
+  const [gender, setGender] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [phone2, setPhone2] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
+  const [hometown, setHometown] = useState("");
   const [country, setCountry] = useState("OM");
   const [zipCode, setZipCode] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
@@ -87,10 +93,13 @@ export function AccountConsole() {
     setName(payload.user.name || "");
     setUsername(payload.user.username || "");
     setPhone(payload.user.phone || "");
+    setGender(payload.user.gender || "");
+    setBirthDate(payload.user.birthDate || "");
     setPhone2(payload.contact?.phone2 || "");
     setWhatsapp(payload.contact?.whatsapp || "");
     setAddress(payload.contact?.address || "");
     setCity(payload.contact?.city || "");
+    setHometown(payload.contact?.hometown || "");
     setCountry(payload.contact?.country || "OM");
     setZipCode(payload.contact?.zipCode || "");
   }
@@ -127,10 +136,13 @@ export function AccountConsole() {
           name,
           username: username || null,
           phone: phone || null,
+          gender: gender || null,
+          birthDate: birthDate || null,
           phone2: phone2 || null,
           whatsapp: whatsapp || null,
           address: address || null,
           city: city || null,
+          hometown: hometown || null,
           country: country || "OM",
           zipCode: zipCode || null,
           currentPassword: currentPassword || undefined,
@@ -205,6 +217,14 @@ export function AccountConsole() {
                   <dt>آخر دخول</dt>
                   <dd>{formatDate(user.lastLoginAt)}</dd>
                 </div>
+                <div>
+                  <dt>الجنس</dt>
+                  <dd>{user.gender === "male" ? "ذكر" : user.gender === "female" ? "أنثى" : user.gender || "—"}</dd>
+                </div>
+                <div>
+                  <dt>تاريخ الميلاد</dt>
+                  <dd>{user.birthDate || "—"}</dd>
+                </div>
               </dl>
             </section>
 
@@ -212,7 +232,7 @@ export function AccountConsole() {
               <form className="account-panel" onSubmit={onSubmit}>
                 <div className="account-panel-head">
                   <h2>تعديل البيانات</h2>
-                  <p>البريد ثابت لأنه مفتاح الدخول. غيّر الاسم والهاتف والعنوان من هنا.</p>
+                  <p>البريد ثابت لأنه مفتاح الدخول. رقم الهاتف لا يأتي من فيسبوك؛ أدخله هنا. الجنس وتاريخ الميلاد ومكان الإقامة تُملأ من فيسبوك إن سمح الحساب، ويمكن تعديلها هنا.</p>
                 </div>
                 <div className="account-fields">
                   <label>
@@ -229,7 +249,19 @@ export function AccountConsole() {
                   </label>
                   <label>
                     الهاتف
-                    <input value={phone} onChange={(event) => setPhone(event.target.value)} />
+                    <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="فيسبوك لا يرسل الرقم — أدخله هنا" />
+                  </label>
+                  <label>
+                    الجنس
+                    <select value={gender} onChange={(event) => setGender(event.target.value)}>
+                      <option value="">غير محدد</option>
+                      <option value="male">ذكر</option>
+                      <option value="female">أنثى</option>
+                    </select>
+                  </label>
+                  <label>
+                    تاريخ الميلاد
+                    <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
                   </label>
                   <label>
                     هاتف إضافي
@@ -244,8 +276,12 @@ export function AccountConsole() {
                     <input value={address} onChange={(event) => setAddress(event.target.value)} />
                   </label>
                   <label>
-                    المدينة
+                    المدينة / مكان الإقامة
                     <input value={city} onChange={(event) => setCity(event.target.value)} />
+                  </label>
+                  <label>
+                    مسقط الرأس
+                    <input value={hometown} onChange={(event) => setHometown(event.target.value)} />
                   </label>
                   <label>
                     الدولة

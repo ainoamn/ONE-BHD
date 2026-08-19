@@ -7,7 +7,7 @@
 ## في لوحة Meta (ما يبقى لك)
 
 1. أنت في المكان الصحيح: **حالات الاستخدام → تسجيل دخول فيسبوك**.
-2. الأذونات اللازمة فقط: `email` و`public_profile`. أزل `user_birthday` و`user_friends` و`user_gender` و`user_age_range` حتى لا تتأخر مراجعة التطبيق.
+2. الأذونات اللازمة للدخول: `email` و`public_profile`. إن أردت ملء الملف من فيسبوك أضف أيضاً: `user_birthday` و`user_gender` و`user_location` و`user_hometown`. **لا تضف** الصور أو المنشورات أو الأصدقاء. فيسبوك **لا يعطي رقم الهاتف** عبر تسجيل الدخول؛ الهاتف يُكتب في `/account`.
 3. من الشريط الجانبي اضغط **الإعدادات** داخل حالة استخدام فيسبوك، وأضف **Valid OAuth Redirect URIs** حرفياً:
    - `https://id.bhd-om.com/api/auth/facebook/callback`
    - `https://www.bhd-om.com/api/auth/facebook/callback`
@@ -25,6 +25,6 @@
 - `GET /api/auth/facebook/start` يحوّل إلى Meta.
 - `GET /api/auth/facebook/callback` يستبدل الرمز على الخادم، يتحقق أن التوكن لهذا الـ App ID، ثم يفتح جلسة `bhd_id`.
 - العمود `bhd_users.facebook_id`. إن وُجد بريد موثّق مطابق يُربط الحساب بدل إنشاء حساب ثانٍ.
-- بدون بريد من فيسبوك يُرفض الدخول (`fb=email`).
+- بعد الدخول تُملأ في `/account` إن وُجدت: الجنس، تاريخ الميلاد، المدينة (`user_location`)، مسقط الرأس (`user_hometown`). الهاتف يبقى يدوياً.
 
 واتساب ليس جزءاً من هذا المسار؛ يُضبط لاحقاً كرمز لمرة واحدة.

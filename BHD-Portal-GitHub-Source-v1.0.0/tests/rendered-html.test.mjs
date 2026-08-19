@@ -45,6 +45,8 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
   assert.match(facebookStart, /facebookLoginUrl/);
   assert.match(schema, /facebook_id/);
+  assert.match(schema, /birth_date/);
+  assert.match(schema, /hometown/);
   assert.match(schema, /bhd_users/);
   assert.match(schema, /bhd_contacts/);
   assert.match(schema, /bhd_oauth_tickets/);

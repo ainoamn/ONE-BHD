@@ -12,6 +12,8 @@ export type PublicUser = {
   email: string;
   username: string | null;
   phone: string | null;
+  gender: string | null;
+  birthDate: string | null;
   picture: string | null;
   emailVerified: boolean;
   mustCompleteProfile: boolean;
@@ -44,6 +46,8 @@ export function toPublicUser(user: BhdUser): PublicUser {
     email: user.email,
     username: user.username,
     phone: user.phone,
+    gender: user.gender,
+    birthDate: user.birthDate,
     picture: user.avatar,
     emailVerified: user.emailVerified,
     mustCompleteProfile: user.mustCompleteProfile,
@@ -108,9 +112,11 @@ async function ensureSelfContact(
     whatsapp?: string | null;
     address?: string | null;
     city?: string | null;
+    hometown?: string | null;
     country?: string | null;
     zipCode?: string | null;
   },
+  fillEmptyOnly = false,
 ): Promise<BhdContact> {
   const db = getDb();
   const existingRows = await db
@@ -120,19 +126,26 @@ async function ensureSelfContact(
     .limit(1);
   const existing = existingRows[0];
 
+  const pick = <T,>(incoming: T | undefined, current: T) => {
+    if (incoming === undefined) return current;
+    if (fillEmptyOnly) return current || incoming;
+    return incoming;
+  };
+
   if (existing) {
     const [updated] = await db
       .update(contacts)
       .set({
         name: data.name,
         email: data.email,
-        phone: data.phone ?? existing.phone,
-        phone2: data.phone2 ?? existing.phone2,
-        whatsapp: data.whatsapp ?? existing.whatsapp,
-        address: data.address ?? existing.address,
-        city: data.city ?? existing.city,
+        phone: pick(data.phone, existing.phone),
+        phone2: pick(data.phone2, existing.phone2),
+        whatsapp: pick(data.whatsapp, existing.whatsapp),
+        address: pick(data.address, existing.address),
+        city: pick(data.city, existing.city),
+        hometown: pick(data.hometown, existing.hometown),
         country: data.country || existing.country || "OM",
-        zipCode: data.zipCode ?? existing.zipCode,
+        zipCode: pick(data.zipCode, existing.zipCode),
         updatedAt: new Date(),
       })
       .where(eq(contacts.id, existing.id))
@@ -152,6 +165,7 @@ async function ensureSelfContact(
       whatsapp: data.whatsapp || null,
       address: data.address || null,
       city: data.city || null,
+      hometown: data.hometown || null,
       country: data.country || "OM",
       zipCode: data.zipCode || null,
     })
@@ -319,6 +333,10 @@ export async function loginOrRegisterWithFacebook(input: {
   email: string;
   name: string;
   picture: string | null;
+  gender: string | null;
+  birthDate: string | null;
+  city: string | null;
+  hometown: string | null;
 }): Promise<PublicUser> {
   requireDatabase();
   await ensureIdentitySchema();
@@ -335,6 +353,8 @@ export async function loginOrRegisterWithFacebook(input: {
         facebookId: input.facebookId,
         name: input.name || user.name,
         avatar: input.picture || user.avatar,
+        gender: user.gender || input.gender,
+        birthDate: user.birthDate || input.birthDate,
         emailVerified: true,
         loginAttempts: 0,
         lockedUntil: null,
@@ -352,6 +372,8 @@ export async function loginOrRegisterWithFacebook(input: {
         email,
         facebookId: input.facebookId,
         avatar: input.picture,
+        gender: input.gender,
+        birthDate: input.birthDate,
         emailVerified: true,
         mustCompleteProfile: true,
         lastLoginAt: new Date(),
@@ -361,11 +383,17 @@ export async function loginOrRegisterWithFacebook(input: {
     user = created;
   }
 
-  await ensureSelfContact(user.id, {
-    name: user.name,
-    email: user.email,
-    phone: user.phone,
-  });
+  await ensureSelfContact(
+    user.id,
+    {
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      city: input.city,
+      hometown: input.hometown,
+    },
+    true,
+  );
 
   return toPublicUser(user);
 }
@@ -390,6 +418,7 @@ export type AccountContact = {
   whatsapp: string | null;
   address: string | null;
   city: string | null;
+  hometown: string | null;
   country: string | null;
   zipCode: string | null;
 };
@@ -399,6 +428,7 @@ export async function getAccountProfile(id: string): Promise<{
   contact: AccountContact | null;
 } | null> {
   if (!isDatabaseConfigured()) return null;
+  await ensureIdentitySchema();
   const db = getDb();
   const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
   const user = rows[0];
@@ -419,6 +449,7 @@ export async function getAccountProfile(id: string): Promise<{
           whatsapp: contact.whatsapp,
           address: contact.address,
           city: contact.city,
+          hometown: contact.hometown,
           country: contact.country,
           zipCode: contact.zipCode,
         }
@@ -446,10 +477,13 @@ export async function updateOwnProfile(
     name?: string;
     username?: string | null;
     phone?: string | null;
+    gender?: string | null;
+    birthDate?: string | null;
     phone2?: string | null;
     whatsapp?: string | null;
     address?: string | null;
     city?: string | null;
+    hometown?: string | null;
     country?: string | null;
     zipCode?: string | null;
     currentPassword?: string;
@@ -457,6 +491,7 @@ export async function updateOwnProfile(
   },
 ): Promise<PublicUser> {
   requireDatabase();
+  await ensureIdentitySchema();
   const db = getDb();
   const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
   const user = rows[0];
@@ -488,6 +523,8 @@ export async function updateOwnProfile(
   }
 
   const phone = input.phone !== undefined ? input.phone?.trim() || null : user.phone;
+  const gender = input.gender !== undefined ? input.gender?.trim() || null : user.gender;
+  const birthDate = input.birthDate !== undefined ? input.birthDate?.trim() || null : user.birthDate;
 
   const [updated] = await db
     .update(users)
@@ -495,6 +532,8 @@ export async function updateOwnProfile(
       name,
       username,
       phone,
+      gender,
+      birthDate,
       passwordHash,
       mustCompleteProfile: false,
       updatedAt: new Date(),
@@ -510,6 +549,7 @@ export async function updateOwnProfile(
     whatsapp: input.whatsapp,
     address: input.address,
     city: input.city,
+    hometown: input.hometown,
     country: input.country || "OM",
     zipCode: input.zipCode,
   });

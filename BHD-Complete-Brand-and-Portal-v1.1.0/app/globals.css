@@ -4122,7 +4122,8 @@ h3 {
 
 .account-fields .is-wide { grid-column: 1 / -1; }
 
-.account-fields input {
+.account-fields input,
+.account-fields select {
   min-height: 44px;
   padding: 10px 12px;
   border: 1px solid #d7e2dc;

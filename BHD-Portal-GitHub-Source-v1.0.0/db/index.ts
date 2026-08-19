@@ -34,6 +34,9 @@ export async function ensureIdentitySchema(): Promise<void> {
       await getSql().unsafe(
         `CREATE UNIQUE INDEX IF NOT EXISTS bhd_users_facebook_id_key ON bhd_users (facebook_id)`,
       );
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS gender text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS birth_date text`);
+      await getSql().unsafe(`ALTER TABLE bhd_contacts ADD COLUMN IF NOT EXISTS hometown text`);
     })().catch((error) => {
       schemaReady = null;
       throw error;

@@ -48,6 +48,8 @@ export async function GET() {
         mustCompleteProfile: false,
         googleLinked: true,
         facebookLinked: false,
+        gender: null,
+        birthDate: null,
         hasPassword: false,
         createdAt: null,
         lastLoginAt: null,
@@ -84,10 +86,13 @@ export async function PATCH(request: Request) {
       name?: string;
       username?: string | null;
       phone?: string | null;
+      gender?: string | null;
+      birthDate?: string | null;
       phone2?: string | null;
       whatsapp?: string | null;
       address?: string | null;
       city?: string | null;
+      hometown?: string | null;
       country?: string | null;
       zipCode?: string | null;
       currentPassword?: string;
