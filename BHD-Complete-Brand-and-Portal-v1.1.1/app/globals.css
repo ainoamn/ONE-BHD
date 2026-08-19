@@ -2309,8 +2309,13 @@ h3 {
 .login-screen {
   min-height: 100svh;
   display: grid;
-  place-items: start center;
-  padding: 20px 16px 32px;
+  place-items: center;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(24px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
+  overflow-x: hidden;
   background:
     radial-gradient(circle at 12% 18%, rgba(8, 163, 159, 0.12), transparent 28%),
     radial-gradient(circle at 88% 82%, rgba(181, 141, 85, 0.14), transparent 30%),
@@ -2352,8 +2357,10 @@ h3 {
 .login-brand-panel {
   display: grid;
   align-content: center;
-  gap: 14px;
-  padding: 48px 40px;
+  justify-items: center;
+  gap: 16px;
+  padding: clamp(28px, 5vw, 56px) clamp(20px, 4vw, 44px);
+  text-align: center;
   background:
     linear-gradient(160deg, #092d24 0%, #0c4a3c 55%, #174b70 100%);
   color: #fff;
@@ -2362,60 +2369,57 @@ h3 {
 .login-brand-kicker {
   margin: 0;
   color: #9fd4c4;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
-  letter-spacing: 0.08em;
-}
-
-.login-welcome,
-.login-lead {
-  margin: 0;
-  color: #f4efe4;
-  font-size: 16px;
-  font-weight: 700;
-  line-height: 1.7;
-}
-
-.login-lead {
-  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .login-brand-panel h1 {
   margin: 0;
-  font-size: clamp(26px, 3vw, 36px);
-  line-height: 1.4;
+  max-width: 18em;
+  font-size: clamp(1.45rem, 3.4vw, 2.15rem);
+  line-height: 1.45;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.login-lead,
+.login-highlight,
+.login-promise {
+  margin: 0;
+  max-width: 36em;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: clamp(0.92rem, 1.6vw, 1.05rem);
+  line-height: 1.85;
+  text-wrap: pretty;
+}
+
+.login-highlight {
+  color: #f4efe4;
+  font-weight: 700;
 }
 
 .login-slogan {
   display: grid;
+  justify-items: center;
   gap: 4px;
   margin: 8px 0 0;
 }
 
 .login-slogan strong {
-  font-size: clamp(22px, 2.4vw, 28px);
+  font-size: clamp(1.15rem, 2.2vw, 1.55rem);
   font-weight: 800;
   color: #fff;
-}
-
-.login-slogan span,
-.login-promise {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 14px;
-}
-
-.login-brand-panel > p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 14px;
-  line-height: 1.85;
+  letter-spacing: 0.02em;
 }
 
 .login-apps {
   display: grid;
+  justify-items: center;
   gap: 12px;
   padding: 4px 2px 0;
+  text-align: center;
 }
 
 .login-apps p {
@@ -2428,6 +2432,7 @@ h3 {
 .login-apps ul {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 12px 16px;
   margin: 0;
   padding: 0;
@@ -2451,6 +2456,7 @@ h3 {
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 14px;
   margin-top: 4px;
 }
@@ -2482,7 +2488,8 @@ h3 {
 .login-provider-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .login-card {
-  padding: 34px 32px 28px;
+  padding: clamp(20px, 4vw, 34px) clamp(16px, 3.5vw, 32px) 28px;
+  min-width: 0;
 }
 
 .login-card-tabs {
@@ -2496,7 +2503,7 @@ h3 {
 }
 
 .login-card-tabs button {
-  min-height: 42px;
+  min-height: 44px;
   border: 0;
   border-radius: 10px;
   background: transparent;
@@ -2537,6 +2544,7 @@ h3 {
   background: #fbfcfb;
   color: var(--ink);
   font: inherit;
+  font-size: 16px;
 }
 
 .login-form input:focus {
@@ -2629,9 +2637,21 @@ a.login-submit {
 
 @media (max-width: 900px) {
   .login-stage { grid-template-columns: 1fr; }
-  .login-brand-panel { padding: 28px 22px; }
-  .login-card { padding: 24px 18px; }
   .login-address-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .login-top {
+    flex-wrap: wrap;
+    justify-content: center;
+    text-align: center;
+  }
+  .login-stage { border-radius: 20px; }
+  .login-apps li { min-width: 64px; }
+}
+
+@supports not (text-wrap: balance) {
+  .login-brand-panel h1 { max-width: 16em; }
 }
 
 .google-signin {

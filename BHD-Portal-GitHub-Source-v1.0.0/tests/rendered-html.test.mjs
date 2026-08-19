@@ -47,9 +47,12 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(loginForm, /login-apps/);
   assert.match(loginForm, /login-social/);
   assert.match(loginForm, /BHD ID/);
-  assert.match(loginForm, /من هنا تبدأ أحلامك الأكبر/);
-  assert.match(loginForm, /ابنِ أحلامًا أكبر/);
+  assert.match(loginForm, /من هنا تبدأ الخطوة نحو أحلام أكبر/);
+  const loginCss = await readFile(new URL("app/globals.css", root), "utf8");
+  assert.match(loginCss, /\.login-brand-panel[\s\S]*text-align: center/);
+  assert.match(loginCss, /@media \(max-width: 900px\)/);
   assert.match(loginForm, /Build Higher Dreams/);
+  assert.match(loginForm, /مع بن حمود للتطوير، تبدأ الأحلام وتكبر/);
   assert.doesNotMatch(loginForm, /بوابة الهوية العالمية/);
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
   assert.match(facebookStart, /facebookLoginUrl/);

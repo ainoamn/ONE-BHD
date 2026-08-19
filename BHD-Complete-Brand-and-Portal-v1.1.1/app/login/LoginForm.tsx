@@ -15,11 +15,11 @@ type Lang = "ar" | "en";
 const COPY = {
   ar: {
     kicker: "BHD ID",
-    title: "من هنا تبدأ أحلامك الأكبر",
-    lead: "بوابة موحّدة تجمعك بمنظومة بن حمود للتطوير.",
-    body: "ابنِ أحلامك الأكبر بتسجيل الدخول إلى البوابة الموحّدة: حساب واحد يصل إلى كل منصات BHD وخدماتها، بسهولة وأمان ومن مكان واحد.",
-    slogan: "ابنِ أحلامًا أكبر",
-    promise: "Build Higher Dreams",
+    title: "من هنا تبدأ الخطوة نحو أحلام أكبر",
+    lead: "سجّل دخولك إلى المنظومة الرقمية لـ بن حمود للتطوير، واستمتع بوصول موحّد إلى جميع خدمات ومنصات BHD من خلال هوية رقمية واحدة.",
+    highlight: "بوابة واحدة تجمع أعمالك، خدماتك، ومشاريعك في مكان واحد.",
+    slogan: "Build Higher Dreams",
+    promise: "مع بن حمود للتطوير، تبدأ الأحلام وتكبر.",
     login: "دخول",
     register: "إنشاء حساب",
     identifier: "البريد أو اسم المستخدم",
@@ -58,11 +58,11 @@ const COPY = {
   },
   en: {
     kicker: "BHD ID",
-    title: "Your bigger dreams begin here",
-    lead: "One unified gateway to the Bin Hamood Development ecosystem.",
-    body: "Build Higher Dreams by signing in once — a single account for every BHD platform and service, simple and secure, from one place.",
+    title: "This is the first step toward bigger dreams",
+    lead: "Sign in to the Bin Hamood Development digital ecosystem and reach every BHD service and platform through one digital identity.",
+    highlight: "One gateway that brings your work, services, and projects together.",
     slogan: "Build Higher Dreams",
-    promise: "ابنِ أحلامًا أكبر",
+    promise: "With Bin Hamood Development, dreams begin — and grow.",
     login: "Sign in",
     register: "Create account",
     identifier: "Email or username",
@@ -254,7 +254,7 @@ export function LoginForm() {
             <p className="login-brand-kicker">{t.kicker}</p>
             <h1>{t.title}</h1>
             <p className="login-lead">{t.lead}</p>
-            <p>{t.body}</p>
+            <p className="login-highlight">{t.highlight}</p>
             <p className="login-slogan">
               <strong>{t.slogan}</strong>
             </p>
