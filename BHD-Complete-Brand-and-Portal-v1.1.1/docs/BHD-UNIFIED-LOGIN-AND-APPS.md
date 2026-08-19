@@ -207,7 +207,7 @@ sequenceDiagram
 
 ### 3.2 ماذا تعرض الشاشة
 
-1. لوحة **BHD ID** بنص موحّد: «من هنا تبدأ الخطوة نحو أحلام أكبر» ثم وعد **Build Higher Dreams**. النص موسّط ومتجاوب (`clamp` + عمود واحد تحت 900px).
+1. لوحة **بوابة BHD** بنص موحّد: «من هنا تبدأ الخطوة نحو أحلام أكبر» ثم وعد **Build Higher Dreams**. اسم **بن حمود للتطوير** / **Bin Hamood Development** يظهر بلون ذهبي. النص موسّط ومتجاوب (`clamp` + عمود واحد تحت 900px).
 2. دخول بالبريد أو اسم المستخدم + كلمة المرور (`POST /api/auth/login`).
 3. إنشاء حساب (`POST /api/auth/register`) مع دفتر عنوان SELF اختياري (هاتف، مدينة…).
 4. زر Google **على هذه الشاشة فقط** — GIS / `POST /api/auth/google` يتحقق من ID Token على الخادم بـ `google-auth-library`.

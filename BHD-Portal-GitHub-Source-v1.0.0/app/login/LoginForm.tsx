@@ -14,12 +14,15 @@ type Lang = "ar" | "en";
 
 const COPY = {
   ar: {
-    kicker: "BHD ID",
+    kicker: "بوابة BHD",
     title: "من هنا تبدأ الخطوة نحو أحلام أكبر",
-    lead: "سجّل دخولك إلى المنظومة الرقمية لـ بن حمود للتطوير، واستمتع بوصول موحّد إلى جميع خدمات ومنصات BHD من خلال هوية رقمية واحدة.",
+    brand: "بن حمود للتطوير",
+    leadBefore: "سجّل دخولك إلى المنظومة الرقمية لـ ",
+    leadAfter: "، واستمتع بوصول موحّد إلى جميع خدمات ومنصات BHD من خلال هوية رقمية واحدة.",
     highlight: "بوابة واحدة تجمع أعمالك، خدماتك، ومشاريعك في مكان واحد.",
     slogan: "Build Higher Dreams",
-    promise: "مع بن حمود للتطوير، تبدأ الأحلام وتكبر.",
+    promiseBefore: "مع ",
+    promiseAfter: "، تبدأ الأحلام وتكبر.",
     login: "دخول",
     register: "إنشاء حساب",
     identifier: "البريد أو اسم المستخدم",
@@ -57,12 +60,15 @@ const COPY = {
     network: "تعذّر الاتصال بالخادم.",
   },
   en: {
-    kicker: "BHD ID",
+    kicker: "BHD Gateway",
     title: "This is the first step toward bigger dreams",
-    lead: "Sign in to the Bin Hamood Development digital ecosystem and reach every BHD service and platform through one digital identity.",
+    brand: "Bin Hamood Development",
+    leadBefore: "Sign in to the ",
+    leadAfter: " digital ecosystem and reach every BHD service and platform through one digital identity.",
     highlight: "One gateway that brings your work, services, and projects together.",
     slogan: "Build Higher Dreams",
-    promise: "With Bin Hamood Development, dreams begin — and grow.",
+    promiseBefore: "With ",
+    promiseAfter: ", dreams begin — and grow.",
     login: "Sign in",
     register: "Create account",
     identifier: "Email or username",
@@ -253,12 +259,20 @@ export function LoginForm() {
           <aside className="login-brand-panel">
             <p className="login-brand-kicker">{t.kicker}</p>
             <h1>{t.title}</h1>
-            <p className="login-lead">{t.lead}</p>
+            <p className="login-lead">
+              {t.leadBefore}
+              <span className="login-brand-name">{t.brand}</span>
+              {t.leadAfter}
+            </p>
             <p className="login-highlight">{t.highlight}</p>
             <p className="login-slogan">
               <strong>{t.slogan}</strong>
             </p>
-            <p className="login-promise">{t.promise}</p>
+            <p className="login-promise">
+              {t.promiseBefore}
+              <span className="login-brand-name">{t.brand}</span>
+              {t.promiseAfter}
+            </p>
           </aside>
 
           <section className="login-card">

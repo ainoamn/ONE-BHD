@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LoginForm } from "./LoginForm";
 
-export const metadata: Metadata = { title: "BHD ID | من هنا تبدأ الخطوة نحو أحلام أكبر" };
+export const metadata: Metadata = { title: "بوابة BHD | من هنا تبدأ الخطوة نحو أحلام أكبر" };
 
 export default function LoginPage() {
   return (
