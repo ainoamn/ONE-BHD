@@ -11,6 +11,7 @@ export type Product = {
   statusAr: string;
   statusEn: string;
   mark: string;
+  appId: "wazen" | "hisaby" | "nasab" | "baitak" | "store" | "office";
   accent: string;
   soft: string;
   featured?: boolean;
@@ -34,6 +35,7 @@ export const products: Product[] = [
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "و",
+    appId: "wazen",
     accent: "#126b63",
     soft: "#e8f4f1",
     featured: true,
@@ -55,6 +57,7 @@ export const products: Product[] = [
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ح",
+    appId: "hisaby",
     accent: "#075c45",
     soft: "#e6f1ec",
     featured: true,
@@ -76,6 +79,7 @@ export const products: Product[] = [
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ب",
+    appId: "baitak",
     accent: "#a66b2d",
     soft: "#f8efe4",
     capabilitiesAr: ["بيع وشراء العقارات", "الإيجار والإدارة", "الخرائط والتحليلات"],
@@ -96,6 +100,7 @@ export const products: Product[] = [
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ن",
+    appId: "nasab",
     accent: "#8a3c45",
     soft: "#f6e9eb",
     capabilitiesAr: ["أشجار عائلية تفاعلية", "الدعوات والروابط", "الحفظ والطباعة"],
@@ -116,6 +121,7 @@ export const products: Product[] = [
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "م",
+    appId: "store",
     accent: "#315d89",
     soft: "#e9f0f7",
     capabilitiesAr: ["متاجر متعددة البائعين", "إدارة الطلبات", "الشحن والمدفوعات"],
@@ -136,6 +142,7 @@ export const products: Product[] = [
     statusAr: "نظام داخلي",
     statusEn: "Internal system",
     mark: "B",
+    appId: "office",
     accent: "#283b4d",
     soft: "#e9edf0",
     capabilitiesAr: ["إدارة الوثائق", "العمليات الداخلية", "الأرشفة والحماية"],

@@ -2,6 +2,7 @@
 
 import { BHD_APPS, type BhdApp } from "../../lib/bhd/apps";
 import { DEFAULT_IDENTITY_ISSUER } from "../../lib/identity/issuer";
+import { BhdAppIcon } from "./BhdAppIcon";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export type BhdSwitcherUser = {
@@ -30,9 +31,22 @@ function isCurrentApp(app: BhdApp, pageOrigin: string) {
   return Boolean(app.origin) && here === stripSlash(app.origin);
 }
 
-function openApp(app: BhdApp) {
+function accountPageUrl(pageOrigin: string) {
+  if (!pageOrigin) return "/account";
+  const accountApp = BHD_APPS.find((app) => app.id === "account");
+  const portalApp = BHD_APPS.find((app) => app.id === "portal");
+  if (
+    (accountApp && isCurrentApp(accountApp, pageOrigin)) ||
+    (portalApp && isCurrentApp(portalApp, pageOrigin))
+  ) {
+    return "/account";
+  }
+  return `${DEFAULT_IDENTITY_ISSUER}/account`;
+}
+
+function openApp(app: BhdApp, pageOrigin: string) {
   if (app.mode === "identity") {
-    window.location.assign("https://id.bhd-om.com/");
+    window.location.assign(accountPageUrl(pageOrigin));
     return;
   }
   if (app.mode === "sso" && app.startUrl) {
@@ -83,11 +97,19 @@ export function BhdAppSwitcher({
 
   function onAppClick(app: BhdApp) {
     if (!app.enabled) return;
+    if (app.id === "account") {
+      if (window.location.pathname.startsWith("/account")) {
+        close();
+        return;
+      }
+      window.location.assign(accountPageUrl(origin));
+      return;
+    }
     if (origin && isCurrentApp(app, origin)) {
       close();
       return;
     }
-    openApp(app);
+    openApp(app, origin);
   }
 
   const initial = user.name.trim().slice(0, 1) || "B";
@@ -140,12 +162,11 @@ export function BhdAppSwitcher({
                   aria-current={current ? "page" : undefined}
                   onClick={() => onAppClick(app)}
                 >
-                  <span
+                  <BhdAppIcon
+                    id={app.id}
+                    title={app.nameAr}
                     className={current ? "bhd-switcher-mark is-current" : "bhd-switcher-mark"}
-                    style={{ background: app.soft, color: app.accent, ["--ring" as string]: app.accent }}
-                  >
-                    {app.mark}
-                  </span>
+                  />
                   <span>{app.nameAr}</span>
                 </button>
               );
@@ -163,7 +184,7 @@ export function BhdAppSwitcher({
               <small>{user.email}</small>
             </div>
           </div>
-          <a className="bhd-switcher-account-link" href={DEFAULT_IDENTITY_ISSUER + "/"}>
+          <a className="bhd-switcher-account-link" href={accountPageUrl(origin)}>
             الحساب
           </a>
           {platformAdmin ? (

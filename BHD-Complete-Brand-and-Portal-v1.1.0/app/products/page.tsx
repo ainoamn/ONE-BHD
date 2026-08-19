@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { InnerPageShell } from "../components/InnerPageShell";
 import { InstantLink } from "../components/InstantLink";
+import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { products } from "../lib/products";
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function ProductsPage() {
             style={{ "--accent": product.accent, "--soft": product.soft } as React.CSSProperties}
           >
             <div className="catalog-card-top">
-              <span className="product-mark">{product.mark}</span>
+              <BhdAppIcon id={product.appId} title={product.nameAr} className="product-mark" />
               <span className="product-status"><i />{product.statusAr}</span>
             </div>
             <small>0{index + 1} · {product.categoryAr}</small>

@@ -148,6 +148,7 @@ npm start
 | `/terms` | الشروط |
 | `/contact` | التواصل |
 | `/apps` | دليل تطبيقات للزائر (تسويقي) |
+| `/account` | ملف حساب BHD: البيانات، المواقع المرتبطة، الاشتراكات (يتطلب دخولًا) |
 | `/login` | دخول حساب BHD (بريد/اسم مستخدم + Google) على الهوية |
 | `/admin` | لوحة تحكم الهوية — مدراء المنصة فقط (`BHD_PLATFORM_ADMIN_EMAILS`) |
 | `/healthz` | `{ "status": "ok", "service": "bhd-portal" }` |
@@ -166,7 +167,7 @@ npm start
 - Content-Security-Policy: `default-src 'self'` و`frame-ancestors 'none'`
 - HSTS، `X-Frame-Options: DENY`، `X-Content-Type-Options: nosniff`
 - Permissions-Policy تعطّل الكاميرا والميكروفون والموقع والدفع
-- صفحة `/login` و`/admin` و`/oauth/*`: `noindex, noarchive` و`Cache-Control: private, no-store`
+- صفحة `/login` و`/admin` و`/account` و`/oauth/*`: `noindex, noarchive` و`Cache-Control: private, no-store`
 - هوية BHD (OIDC) على `https://id.bhd-om.com` — المواصفة: [`BHD-IDENTITY-SSO.md`](BHD-IDENTITY-SSO.md)
 - لوحة الإدارة: `https://id.bhd-om.com/admin` (نفس المسار على `www.bhd-om.com/admin`)
 - مشغّل التطبيقات بعد الدخول: تسع نقاط بجانب صورة الحساب — المواصفة [`BHD-APP-SWITCHER.md`](BHD-APP-SWITCHER.md)

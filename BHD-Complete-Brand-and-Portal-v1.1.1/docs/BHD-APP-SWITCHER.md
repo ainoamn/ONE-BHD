@@ -65,6 +65,7 @@ sequenceDiagram
 | اسم المكوّن | `BhdAppSwitcher` |
 | مسار المكوّن | `components/bhd/BhdAppSwitcher.tsx` |
 | مسار الكتالوج | `lib/bhd/apps.ts` |
+| مسار الشعار | `components/bhd/BhdAppIcon.tsx` |
 | بادئة CSS | `bhd-switcher-` |
 | اتجاه الواجهة | `dir="rtl"` للعربية |
 | أعمدة الشبكة | 3 |
@@ -91,7 +92,7 @@ sequenceDiagram
 | الصورة | جلسة المنتج (`picture`) وإلا الحرف الأول من `name` |
 | الاسم | جلسة المنتج |
 | البريد | جلسة المنتج |
-| رابط «الحساب» | `https://id.bhd-om.com/` |
+| رابط «الحساب» | على البوابة/الهوية: `/account`. على بقية المنتجات: `https://id.bhd-om.com/account` |
 | خروج | `POST` مسار الخروج الحالي للمنتج ثم تحويل إلى `{ISSUER}/oauth/end-session` كما في قسم 6.5 من SSO |
 
 ---
@@ -102,11 +103,11 @@ sequenceDiagram
 
 | الحالة | السلوك |
 |---|---|
-| `id` يساوي موقعك الحالي (`current`) | أغلق البطاقة. لا تنقل. |
+| `id` يساوي موقعك الحالي (`current`) | أغلق البطاقة. لا تنقل. إلا «الحساب»: افتح `/account` إن لم تكن عليها |
 | `enabled: false` | العنصر ظاهر باهتًا، `aria-disabled="true"`، لا نقر |
 | `mode: "sso"` | `window.location.assign(app.startUrl)` |
 | `mode: "browse"` | `window.location.assign(app.origin + "/")` |
-| `mode: "identity"` | `window.location.assign("https://id.bhd-om.com/")` |
+| `mode: "identity"` | `window.location.assign` لصفحة الحساب (`/account` على البوابة، وإلا `https://id.bhd-om.com/account`) |
 
 `startUrl` ثابت:
 
@@ -268,9 +269,10 @@ export const BHD_APPS: BhdApp[] = [
 
 كل خلية:
 
-- دائرة 48px بلون `soft` وحرف `mark` بلون `accent`
+- مربع مستدير 48px (`BhdAppIcon`) بشعار التطبيق ولون `soft`/`accent`
+- الحرف `mark` احتياطي فقط إن لم يُنسخ مكوّن الشعار
 - اسم عربي تحت الأيقونة، سطر واحد
-- الموقع الحالي: حلقة 2px بلون `accent` حول الدائرة و`aria-current="page"`
+- الموقع الحالي: حلقة 2px بلون `accent` حول الشعار و`aria-current="page"`
 
 أيقونة التسع نقاط: 3×3 مربعات 4px، فجوة 3px، لون `#092d24`. ليست شعار Google.
 
@@ -342,7 +344,7 @@ export const BHD_APPS: BhdApp[] = [
 4. العنصر الحالي معلّم ولا ينقل.
 5. «المكتب» باهت ولا ينقر.
 6. Escape والنقرة خارج البطاقة يغلقانها.
-7. من البوابة، «الحساب» يفتح `https://id.bhd-om.com/`.
+7. من البوابة، «الحساب» يفتح `/account` (أو `https://id.bhd-om.com/account` من منتج آخر).
 8. من البوابة، «البوابة» يغلق البطاقة فقط.
 9. بعد أن يصبح وازن `mode: "sso"`: النقر من البوابة يصل وازن داخلًا دون نموذج كلمة مرور إن جلسة `bhd_id` قائمة.
 10. الخروج من بطاقة الحساب يمسح جلسة المنتج ثم يطلب دخولًا جديدًا على ذلك المنتج.
@@ -382,6 +384,6 @@ export const BHD_APPS: BhdApp[] = [
 الإصدار: bhd-appswitcher.v1
 يعتمد على: docs/BHD-IDENTITY-SSO.md (bhd-identity.v1)
 انسخ docs/BHD-APP-SWITCHER.md وlib/bhd/apps.ts كما هما.
-المكوّن: components/bhd/BhdAppSwitcher.tsx بجانب أيقونة المستخدم بعد الجلسة فقط.
+المكوّن: components/bhd/BhdAppSwitcher.tsx وBhdAppIcon.tsx بجانب أيقونة المستخدم بعد الجلسة فقط.
 لا تحرّف الكتالوج محلياً.
 ```

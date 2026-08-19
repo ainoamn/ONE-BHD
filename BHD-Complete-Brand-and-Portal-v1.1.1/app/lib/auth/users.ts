@@ -1,6 +1,6 @@
 import { and, eq, or, sql } from "drizzle-orm";
 import { getDb, isDatabaseConfigured } from "../../../db";
-import { contacts, users, type BhdContact, type BhdUser } from "../../../db/schema";
+import { contacts, users, oauthTickets, type BhdContact, type BhdUser } from "../../../db/schema";
 import { hashPassword, isStrongPassword, verifyPassword } from "./passwords";
 
 const MAX_ATTEMPTS = 5;
@@ -309,6 +309,144 @@ export async function getUserById(id: string): Promise<PublicUser | null> {
   const db = getDb();
   const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
   return rows[0] ? toPublicUser(rows[0]) : null;
+}
+
+export type AccountProfile = PublicUser & {
+  googleLinked: boolean;
+  hasPassword: boolean;
+  createdAt: string;
+  lastLoginAt: string | null;
+};
+
+export type AccountContact = {
+  phone2: string | null;
+  whatsapp: string | null;
+  address: string | null;
+  city: string | null;
+  country: string | null;
+  zipCode: string | null;
+};
+
+export async function getAccountProfile(id: string): Promise<{
+  user: AccountProfile;
+  contact: AccountContact | null;
+} | null> {
+  if (!isDatabaseConfigured()) return null;
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  const user = rows[0];
+  if (!user) return null;
+  const contact = await getSelfContact(user.id);
+  return {
+    user: {
+      ...toPublicUser(user),
+      googleLinked: Boolean(user.googleId),
+      hasPassword: Boolean(user.passwordHash),
+      createdAt: user.createdAt.toISOString(),
+      lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,
+    },
+    contact: contact
+      ? {
+          phone2: contact.phone2,
+          whatsapp: contact.whatsapp,
+          address: contact.address,
+          city: contact.city,
+          country: contact.country,
+          zipCode: contact.zipCode,
+        }
+      : null,
+  };
+}
+
+export async function listLinkedClientIds(userId: string): Promise<string[]> {
+  if (!isDatabaseConfigured()) return [];
+  try {
+    const db = getDb();
+    const rows = await db
+      .select({ clientId: oauthTickets.clientId })
+      .from(oauthTickets)
+      .where(eq(oauthTickets.userId, userId));
+    return [...new Set(rows.map((row) => row.clientId))];
+  } catch {
+    return [];
+  }
+}
+
+export async function updateOwnProfile(
+  userId: string,
+  input: {
+    name?: string;
+    username?: string | null;
+    phone?: string | null;
+    phone2?: string | null;
+    whatsapp?: string | null;
+    address?: string | null;
+    city?: string | null;
+    country?: string | null;
+    zipCode?: string | null;
+    currentPassword?: string;
+    newPassword?: string;
+  },
+): Promise<PublicUser> {
+  requireDatabase();
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  const user = rows[0];
+  if (!user) throw new Error("NOT_FOUND");
+
+  const name = input.name !== undefined ? input.name.trim() : user.name;
+  if (!name) throw new Error("INVALID_INPUT");
+
+  let username = user.username;
+  if (input.username !== undefined) {
+    username = normalizeUsername(input.username || undefined);
+    if (username && !/^[a-z0-9._-]{3,32}$/.test(username)) {
+      throw new Error("INVALID_USERNAME");
+    }
+    if (username && username !== user.username) {
+      const taken = await findUserByEmailOrUsername(username);
+      if (taken && taken.id !== user.id) throw new Error("EMAIL_OR_USERNAME_TAKEN");
+    }
+  }
+
+  let passwordHash = user.passwordHash;
+  if (input.newPassword) {
+    if (!user.passwordHash) throw new Error("NO_PASSWORD");
+    if (!input.currentPassword) throw new Error("INVALID_CREDENTIALS");
+    const ok = await verifyPassword(input.currentPassword, user.passwordHash);
+    if (!ok) throw new Error("INVALID_CREDENTIALS");
+    if (!isStrongPassword(input.newPassword)) throw new Error("WEAK_PASSWORD");
+    passwordHash = await hashPassword(input.newPassword);
+  }
+
+  const phone = input.phone !== undefined ? input.phone.trim() || null : user.phone;
+
+  const [updated] = await db
+    .update(users)
+    .set({
+      name,
+      username,
+      phone,
+      passwordHash,
+      mustCompleteProfile: false,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id))
+    .returning();
+
+  await ensureSelfContact(updated.id, {
+    name: updated.name,
+    email: updated.email,
+    phone: updated.phone,
+    phone2: input.phone2,
+    whatsapp: input.whatsapp,
+    address: input.address,
+    city: input.city,
+    country: input.country || "OM",
+    zipCode: input.zipCode,
+  });
+
+  return toPublicUser(updated);
 }
 
 export async function getSelfContact(userId: string): Promise<BhdContact | null> {

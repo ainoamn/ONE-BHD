@@ -6,6 +6,7 @@ import { BhdAdvisor } from "./components/BhdAdvisor";
 import { BrandLogo } from "./components/BrandLogo";
 import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
+import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
 import { products } from "./lib/products";
 
 type Language = "ar" | "en";
@@ -53,7 +54,7 @@ const copy = {
     demoName: "عبد الحميد",
     demoAccount: "حساب BHD الشخصي",
     secureSession: "جلسة آمنة",
-    accountEyebrow: "قريبًا · حساب BHD",
+    accountEyebrow: "حساب BHD",
     accountTitle: "حساب واحد يرافقك بين كل المنتجات.",
     accountLead:
       "سجّل الدخول مرة واحدة، ثم افتح وازن أو حسابي أو نَسَب دون تكرار خطوات الدخول — مع جلسة آمنة ومستقلة داخل كل تطبيق.",
@@ -62,6 +63,7 @@ const copy = {
       "لا مشاركة لقواعد البيانات بين التطبيقات",
       "الصلاحيات التشغيلية تبقى داخل كل منتج",
     ],
+    accountCta: "إدارة حسابي",
     visionEyebrow: "هويتنا",
     visionTitle: "جذور عُمانية. طموح يتجاوز الحدود.",
     visionLead:
@@ -124,7 +126,7 @@ const copy = {
     demoName: "Abdul Hamid",
     demoAccount: "Personal BHD account",
     secureSession: "Secure session",
-    accountEyebrow: "Coming soon · BHD Account",
+    accountEyebrow: "BHD Account",
     accountTitle: "One account that moves with you.",
     accountLead:
       "Sign in once, then move between WAZEN, HISAB and NASAB without repeating the journey — with a secure local session inside every product.",
@@ -133,6 +135,7 @@ const copy = {
       "No shared operational databases",
       "Product roles remain within each app",
     ],
+    accountCta: "Manage my account",
     visionEyebrow: "Our character",
     visionTitle: "Omani roots. Ambition beyond borders.",
     visionLead:
@@ -251,12 +254,7 @@ export default function Home() {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <span
-                        className="launcher-mark"
-                        style={{ background: product.soft, color: product.accent }}
-                      >
-                        {product.mark}
-                      </span>
+                      <BhdAppIcon id={product.appId} title={isArabic ? product.nameAr : product.name} className="launcher-mark" />
                       <span>{isArabic ? product.nameAr : product.name}</span>
                     </a>
                   ))}
@@ -440,7 +438,7 @@ export default function Home() {
                 } as React.CSSProperties}
               >
                 <div className="product-card-head">
-                  <span className="product-mark">{product.mark}</span>
+                  <BhdAppIcon id={product.appId} title={isArabic ? product.nameAr : product.name} className="product-mark" />
                   <span className="product-status"><i />{isArabic ? product.statusAr : product.statusEn}</span>
                 </div>
                 <div className="product-number">0{index + 1}</div>
@@ -479,9 +477,12 @@ export default function Home() {
               <small>{t.appLayer}</small>
               <div>
                 {products.slice(0, 5).map((product) => (
-                  <span key={product.name} title={isArabic ? product.nameAr : product.name} style={{ "--app-color": product.accent } as React.CSSProperties}>
-                    {product.mark}
-                  </span>
+                  <BhdAppIcon
+                    key={product.name}
+                    id={product.appId}
+                    title={isArabic ? product.nameAr : product.name}
+                    className="map-app-icon"
+                  />
                 ))}
               </div>
             </div>
@@ -505,7 +506,7 @@ export default function Home() {
             <small>{t.demoAccount}</small>
             <div className="phone-apps">
               {products.slice(0, 4).map((product) => (
-                <span key={product.name} style={{ background: product.soft, color: product.accent }}>{product.mark}</span>
+                <BhdAppIcon key={product.name} id={product.appId} className="phone-app-icon" />
               ))}
             </div>
             <div className="phone-secure"><i /> {t.secureSession}</div>
@@ -522,6 +523,10 @@ export default function Home() {
               <li key={point}><span>✓</span>{point}</li>
             ))}
           </ul>
+          <InstantLink href={signedIn ? "/account" : "/login?next=/account"} className="primary-button">
+            {t.accountCta}
+            <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
+          </InstantLink>
         </div>
       </section>
 

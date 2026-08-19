@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { InnerPageShell } from "../../components/InnerPageShell";
+import { BhdAppIcon } from "../../components/bhd/BhdAppIcon";
 import { getProduct, products } from "../../lib/products";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
@@ -36,7 +37,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         style={{ "--accent": product.accent, "--soft": product.soft } as React.CSSProperties}
       >
         <div className="product-detail-brand">
-          <span>{product.mark}</span>
+          <BhdAppIcon id={product.appId} title={product.nameAr} className="product-detail-logo" />
           <div><small>حالة المنتج</small><strong>{product.statusAr}</strong></div>
         </div>
         <div className="product-detail-copy">

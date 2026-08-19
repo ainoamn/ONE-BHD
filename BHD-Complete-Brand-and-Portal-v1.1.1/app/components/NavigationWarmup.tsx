@@ -13,6 +13,7 @@ const priorityRoutes = [
   "/about",
   "/security",
   "/apps",
+  "/account",
 ];
 
 export function NavigationWarmup() {

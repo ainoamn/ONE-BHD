@@ -38,6 +38,7 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(config, /noindex, noarchive/);
   assert.match(config, /private, no-store/);
   assert.match(config, /\/admin/);
+  assert.match(config, /\/account/);
   assert.match(config, /accounts\.google\.com/);
   assert.match(login, /LoginForm/);
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
@@ -54,6 +55,8 @@ test("keeps the login surface private and wires identity APIs", async () => {
   await access(new URL("app/api/auth/bhd/start/route.ts", root));
   await access(new URL("app/api/auth/bhd/callback/route.ts", root));
   await access(new URL("app/admin/page.tsx", root));
+  await access(new URL("app/account/page.tsx", root));
+  await access(new URL("app/api/account/route.ts", root));
   await access(new URL("app/api/admin/overview/route.ts", root));
   await access(new URL("app/api/admin/users/route.ts", root));
 });
@@ -83,6 +86,8 @@ test("points live BHD products at official bhd-om.com hosts", async () => {
   assert.match(products, /https:\/\/baitak\.bhd-om\.com\//);
   assert.match(products, /https:\/\/bhdstor\.bhd-om\.com\//);
   assert.match(products, /nameAr: "بيتك"/);
+  assert.match(products, /appId: "wazen"/);
+  assert.match(products, /appId: "hisaby"/);
   assert.doesNotMatch(products, /عين عُمان/);
   assert.doesNotMatch(products, /AIN OMAN/);
   assert.doesNotMatch(products, /wazen-roan\.vercel\.app/);
@@ -91,15 +96,20 @@ test("points live BHD products at official bhd-om.com hosts", async () => {
 });
 
 test("ships the frozen BHD app switcher beside the signed-in account", async () => {
-  const [apps, switcher, session] = await Promise.all([
+  const [apps, switcher, session, icon] = await Promise.all([
     readFile(new URL("app/lib/bhd/apps.ts", root), "utf8"),
     readFile(new URL("app/components/bhd/BhdAppSwitcher.tsx", root), "utf8"),
     readFile(new URL("app/components/auth/SessionMenu.tsx", root), "utf8"),
+    readFile(new URL("app/components/bhd/BhdAppIcon.tsx", root), "utf8"),
   ]);
   assert.match(apps, /bhd-appswitcher\.v1/);
   assert.match(apps, /https:\/\/bhdstor\.bhd-om\.com/);
   assert.match(switcher, /تطبيقات BHD/);
+  assert.match(switcher, /\/account/);
+  assert.match(switcher, /BhdAppIcon/);
   assert.match(session, /BhdAppSwitcher/);
+  assert.match(icon, /wazen/);
+  assert.match(icon, /baitak/);
   await access(new URL("docs/BHD-APP-SWITCHER.md", root));
 });
 
