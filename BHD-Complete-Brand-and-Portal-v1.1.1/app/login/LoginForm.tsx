@@ -2,6 +2,7 @@
 
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
+import { FacebookSignInButton } from "../components/auth/FacebookSignInButton";
 import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useState } from "react";
@@ -12,6 +13,23 @@ export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
+  const facebookError = searchParams.get("fb");
+  const facebookMessage =
+    facebookError === "setup"
+      ? "دخول فيسبوك غير مكتمل على الخادم. أضف FACEBOOK_APP_SECRET في Vercel."
+      : facebookError === "database"
+        ? "قاعدة البيانات غير مربوطة."
+        : facebookError === "denied"
+          ? "أُلغي الدخول عبر فيسبوك."
+          : facebookError === "email"
+            ? "يلزم السماح لفيسبوك بمشاركة البريد الإلكتروني."
+            : facebookError === "locked"
+              ? "هذا الحساب غير متاح للدخول."
+              : facebookError === "rate"
+                ? "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة."
+                : facebookError === "failed"
+                  ? "تعذّر التحقق من حساب فيسبوك."
+                  : "";
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -91,7 +109,7 @@ export function LoginForm() {
           <ul>
             <li>إيميل أو اسم مستخدم + كلمة مرور</li>
             <li>دفتر عناوين مرتبط بالحساب</li>
-            <li>Google بنفس حساب منظومة BHD</li>
+            <li>Google أو فيسبوك بنفس حساب منظومة BHD</li>
           </ul>
         </aside>
 
@@ -228,9 +246,9 @@ export function LoginForm() {
               </>
             ) : null}
 
-            {error ? (
+            {error || facebookMessage ? (
               <p className="login-error" role="alert">
-                {error}
+                {error || facebookMessage}
               </p>
             ) : null}
 
@@ -244,6 +262,7 @@ export function LoginForm() {
           </div>
 
           <GoogleSignInButton onSuccess={() => void finishOk()} />
+          <FacebookSignInButton />
 
           <p className="login-footnote">
             بالدخول فإنك توافق على{" "}

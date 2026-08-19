@@ -16,6 +16,7 @@ type AccountUser = {
   picture: string | null;
   emailVerified: boolean;
   googleLinked: boolean;
+  facebookLinked: boolean;
   hasPassword: boolean;
   createdAt: string | null;
   lastLoginAt: string | null;
@@ -187,7 +188,8 @@ export function AccountConsole() {
                 <div className="account-chips">
                   {user.emailVerified ? <span>بريد موثّق</span> : <span>بريد غير موثّق</span>}
                   {user.googleLinked ? <span>مرتبط بجوجل</span> : null}
-                  {user.hasPassword ? <span>دخول بكلمة مرور</span> : <span>دخول بجوجل</span>}
+                  {user.facebookLinked ? <span>مرتبط بفيسبوك</span> : null}
+                  {user.hasPassword ? <span>دخول بكلمة مرور</span> : null}
                 </div>
               </div>
               <dl>

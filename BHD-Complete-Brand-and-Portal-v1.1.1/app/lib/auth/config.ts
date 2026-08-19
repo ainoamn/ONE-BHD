@@ -24,3 +24,18 @@ export function authSecret(): string {
 export function isGoogleAuthConfigured(): boolean {
   return Boolean(googleClientId() && authSecret());
 }
+
+/** Public Meta App ID for bhd-om.com (Facebook Login). Safe to expose. */
+export const BHD_FACEBOOK_APP_ID = "2020952291888711";
+
+export function facebookAppId(): string {
+  return process.env.FACEBOOK_APP_ID?.trim() || process.env.NEXT_PUBLIC_FACEBOOK_APP_ID?.trim() || BHD_FACEBOOK_APP_ID;
+}
+
+export function facebookAppSecret(): string {
+  return process.env.FACEBOOK_APP_SECRET?.trim() || "";
+}
+
+export function isFacebookAuthConfigured(): boolean {
+  return Boolean(facebookAppId() && facebookAppSecret() && authSecret());
+}

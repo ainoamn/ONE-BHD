@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { databaseHealth } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
-import { googleClientId, authSecret } from "../../../lib/auth/config";
+import { googleClientId, facebookAppId, facebookAppSecret, authSecret } from "../../../lib/auth/config";
 import { identityIssuer } from "../../../lib/identity/issuer";
 import { IDENTITY_CLIENTS } from "../../../lib/identity/clients";
 
@@ -20,6 +20,7 @@ export async function GET(request: Request) {
       databaseOk: db.ok,
       users: db.users ?? null,
       googleConfigured: Boolean(googleClientId()),
+      facebookConfigured: Boolean(facebookAppId() && facebookAppSecret()),
       authSecretConfigured: Boolean(authSecret()),
       clients: IDENTITY_CLIENTS.map((client) => client.clientId),
     },

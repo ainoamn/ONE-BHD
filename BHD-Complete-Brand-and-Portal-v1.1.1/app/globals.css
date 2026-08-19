@@ -2526,6 +2526,26 @@ h3 {
   margin-top: 22px;
 }
 
+.facebook-signin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 12px;
+  min-height: 40px;
+  min-width: 320px;
+  padding: 0 16px;
+  border-radius: 4px;
+  background: #1877f2;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.facebook-signin:hover {
+  filter: brightness(1.05);
+}
+
 .login-status,
 .login-setup-note {
   margin: 12px 0 0;

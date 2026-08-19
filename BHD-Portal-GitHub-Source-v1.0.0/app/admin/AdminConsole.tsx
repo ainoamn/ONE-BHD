@@ -11,8 +11,10 @@ type Overview = {
   users: number;
   activeUsers: number;
   googleUsers: number;
+  facebookUsers: number;
   contacts: number;
   googleConfigured: boolean;
+  facebookConfigured: boolean;
   authSecretConfigured: boolean;
   admin: { name: string; email: string };
   clients: Array<{ clientId: string; name: string; productionRedirects: string[] }>;
@@ -26,6 +28,7 @@ type AdminUser = {
   phone: string | null;
   picture: string | null;
   googleLinked: boolean;
+  facebookLinked: boolean;
   hasPassword: boolean;
   emailVerified: boolean;
   isActive: boolean;
@@ -129,6 +132,7 @@ export function AdminConsole({
       { label: "الحسابات", value: overview?.users ?? "—" },
       { label: "نشطة", value: overview?.activeUsers ?? "—" },
       { label: "Google", value: overview?.googleUsers ?? "—" },
+      { label: "فيسبوك", value: overview?.facebookUsers ?? "—" },
       { label: "بطاقات العنوان", value: overview?.contacts ?? "—" },
     ],
     [overview],
@@ -189,6 +193,10 @@ export function AdminConsole({
             <div>
               <dt>Google</dt>
               <dd>{overview?.googleConfigured ? "مفعّل" : "غير مفعّل"}</dd>
+            </div>
+            <div>
+              <dt>فيسبوك</dt>
+              <dd>{overview?.facebookConfigured ? "مفعّل" : "غير مفعّل"}</dd>
             </div>
             <div>
               <dt>توقيع الجلسة</dt>
@@ -272,9 +280,13 @@ export function AdminConsole({
                         {user.emailVerified ? <small>موثّق</small> : <small>غير موثّق</small>}
                       </td>
                       <td>
-                        {user.googleLinked ? "Google" : ""}
-                        {user.googleLinked && user.hasPassword ? " + " : ""}
-                        {user.hasPassword ? "كلمة مرور" : user.googleLinked ? "" : "—"}
+                        {[
+                          user.googleLinked ? "Google" : "",
+                          user.facebookLinked ? "فيسبوك" : "",
+                          user.hasPassword ? "كلمة مرور" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" + ") || "—"}
                       </td>
                       <td>{formatDate(user.lastLoginAt)}</td>
                       <td>

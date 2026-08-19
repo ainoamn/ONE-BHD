@@ -12,6 +12,7 @@ export type AdminUserRow = {
   phone: string | null;
   picture: string | null;
   googleLinked: boolean;
+  facebookLinked: boolean;
   hasPassword: boolean;
   emailVerified: boolean;
   isActive: boolean;
@@ -28,6 +29,7 @@ function toAdminUser(user: BhdUser): AdminUserRow {
     phone: user.phone,
     picture: user.avatar,
     googleLinked: Boolean(user.googleId),
+    facebookLinked: Boolean(user.facebookId),
     hasPassword: Boolean(user.passwordHash),
     emailVerified: user.emailVerified,
     isActive: user.isActive,
@@ -86,6 +88,7 @@ export async function adminOverview() {
       users: 0,
       activeUsers: 0,
       googleUsers: 0,
+      facebookUsers: 0,
       contacts: 0,
       clients,
     };
@@ -97,6 +100,7 @@ export async function adminOverview() {
       users: sql<number>`count(*)::int`,
       activeUsers: sql<number>`count(*) filter (where ${users.isActive})::int`,
       googleUsers: sql<number>`count(*) filter (where ${users.googleId} is not null)::int`,
+      facebookUsers: sql<number>`count(*) filter (where ${users.facebookId} is not null)::int`,
     })
     .from(users);
   const [contactStats] = await db
@@ -110,6 +114,7 @@ export async function adminOverview() {
     users: Number(userStats?.users ?? 0),
     activeUsers: Number(userStats?.activeUsers ?? 0),
     googleUsers: Number(userStats?.googleUsers ?? 0),
+    facebookUsers: Number(userStats?.facebookUsers ?? 0),
     contacts: Number(contactStats?.contacts ?? 0),
     clients,
   };

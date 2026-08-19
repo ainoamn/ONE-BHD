@@ -15,6 +15,33 @@ export function isDatabaseConfigured(): boolean {
   return Boolean(process.env.DATABASE_URL?.trim());
 }
 
+export function getSql() {
+  getDb();
+  if (!globalThis.__bhdPortalSql) {
+    throw new Error("DATABASE_URL is not configured.");
+  }
+  return globalThis.__bhdPortalSql;
+}
+
+let schemaReady: Promise<void> | null = null;
+
+/** Adds identity columns that older Neon databases may still lack. */
+export async function ensureIdentitySchema(): Promise<void> {
+  if (!isDatabaseConfigured()) return;
+  if (!schemaReady) {
+    schemaReady = (async () => {
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS facebook_id text`);
+      await getSql().unsafe(
+        `CREATE UNIQUE INDEX IF NOT EXISTS bhd_users_facebook_id_key ON bhd_users (facebook_id)`,
+      );
+    })().catch((error) => {
+      schemaReady = null;
+      throw error;
+    });
+  }
+  await schemaReady;
+}
+
 export function getDb(): Db {
   const url = process.env.DATABASE_URL?.trim();
   if (!url) {

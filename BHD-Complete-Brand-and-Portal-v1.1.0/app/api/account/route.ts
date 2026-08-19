@@ -47,6 +47,7 @@ export async function GET() {
         emailVerified: true,
         mustCompleteProfile: false,
         googleLinked: true,
+        facebookLinked: false,
         hasPassword: false,
         createdAt: null,
         lastLoginAt: null,

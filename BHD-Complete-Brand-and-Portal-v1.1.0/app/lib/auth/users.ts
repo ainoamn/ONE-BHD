@@ -1,5 +1,5 @@
 import { and, eq, or, sql } from "drizzle-orm";
-import { getDb, isDatabaseConfigured } from "../../../db";
+import { getDb, isDatabaseConfigured, ensureIdentitySchema } from "../../../db";
 import { contacts, users, oauthTickets, type BhdContact, type BhdUser } from "../../../db/schema";
 import { hashPassword, isStrongPassword, verifyPassword } from "./passwords";
 
@@ -74,6 +74,16 @@ async function findUserByEmailOrUsername(emailOrUsername: string): Promise<BhdUs
     .select()
     .from(users)
     .where(or(eq(users.email, emailOrUsername), eq(users.username, emailOrUsername)))
+    .limit(1);
+  return rows[0];
+}
+
+async function findUserByFacebookOrEmail(facebookId: string, email: string): Promise<BhdUser | undefined> {
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(users)
+    .where(or(eq(users.facebookId, facebookId), eq(users.email, email)))
     .limit(1);
   return rows[0];
 }
@@ -304,6 +314,62 @@ export async function loginOrRegisterWithGoogle(input: {
   return toPublicUser(user);
 }
 
+export async function loginOrRegisterWithFacebook(input: {
+  facebookId: string;
+  email: string;
+  name: string;
+  picture: string | null;
+}): Promise<PublicUser> {
+  requireDatabase();
+  await ensureIdentitySchema();
+  const email = normalizeEmail(input.email);
+  const db = getDb();
+
+  let user = await findUserByFacebookOrEmail(input.facebookId, email);
+
+  if (user) {
+    assertUnlocked(user);
+    const [updated] = await db
+      .update(users)
+      .set({
+        facebookId: input.facebookId,
+        name: input.name || user.name,
+        avatar: input.picture || user.avatar,
+        emailVerified: true,
+        loginAttempts: 0,
+        lockedUntil: null,
+        lastLoginAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+    user = updated;
+  } else {
+    const [created] = await db
+      .insert(users)
+      .values({
+        name: input.name,
+        email,
+        facebookId: input.facebookId,
+        avatar: input.picture,
+        emailVerified: true,
+        mustCompleteProfile: true,
+        lastLoginAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+    user = created;
+  }
+
+  await ensureSelfContact(user.id, {
+    name: user.name,
+    email: user.email,
+    phone: user.phone,
+  });
+
+  return toPublicUser(user);
+}
+
 export async function getUserById(id: string): Promise<PublicUser | null> {
   if (!isDatabaseConfigured()) return null;
   const db = getDb();
@@ -313,6 +379,7 @@ export async function getUserById(id: string): Promise<PublicUser | null> {
 
 export type AccountProfile = PublicUser & {
   googleLinked: boolean;
+  facebookLinked: boolean;
   hasPassword: boolean;
   createdAt: string;
   lastLoginAt: string | null;
@@ -341,6 +408,7 @@ export async function getAccountProfile(id: string): Promise<{
     user: {
       ...toPublicUser(user),
       googleLinked: Boolean(user.googleId),
+      facebookLinked: Boolean(user.facebookId),
       hasPassword: Boolean(user.passwordHash),
       createdAt: user.createdAt.toISOString(),
       lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,

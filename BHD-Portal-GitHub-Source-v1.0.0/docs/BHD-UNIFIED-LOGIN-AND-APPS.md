@@ -467,7 +467,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | كيف يعمل التنقل | منتج آخر يستدعي authorize؛ الهوية لا تعرض نموذجاً إن `bhd_id` قائمة |
 | كيف يعمل المشغّل | `SessionMenu` يحمّل `/api/auth/me` ثم `BhdAppSwitcher` |
 | ملفات أُضيفت | انظر القسم 6 |
-| أسرار (أسماء فقط) | `DATABASE_URL`, `AUTH_SECRET`, `IDENTITY_TOKEN_SECRET`, `GOOGLE_CLIENT_ID`, `BHD_PLATFORM_ADMIN_EMAILS`, أسرار العملاء `BHD_OAUTH_CLIENT_SECRET_*` |
+| أسرار (أسماء فقط) | `DATABASE_URL`, `AUTH_SECRET`, `IDENTITY_TOKEN_SECRET`, `GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`, `BHD_PLATFORM_ADMIN_EMAILS`, أسرار العملاء `BHD_OAUTH_CLIENT_SECRET_*` |
 | التقنيات الكاملة | القسم 6 |
 | ملاحظات صيانة | لا تستخدم مسار `start` في البوابة كقالب لمنتج: البوابة تحوّل إلى `origin` |
 
@@ -506,11 +506,13 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | كيف يعمل الدخول | زر «تسجيل الدخول» → `GET /api/auth/bhd/start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل نَسَب) → `callback` يستبدل `code` على الخادم → كوكي `kimi_sid` + عمود `bhd_sub` |
 | كيف يعمل التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ نَسَب لا يقرأ كوكي البوابة |
 | المشغّل | `AppHeader` بعد جلسة نَسَب فقط. «الحساب» → `https://id.bhd-om.com/account`. إعدادات الشجرة/الفوترة تبقى `/account` داخل نَسَب |
+| جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive` + `GET /api/auth/me` + تجديد في `auth.me` |
+| الإدارة | `/admin` لدور `admin` المحلي؛ غير المشرف يرى منعاً صريحاً |
 | ملفات `start` / `callback` | `app/server/bhd/auth.ts` — `/api/auth/bhd/start` و`/callback` و`/logout` |
 | عمود `bhd_sub` | جدول `users` (Neon PostgreSQL) |
 | قلب `mode` إلى `sso` | 19 أغسطس 2026 في `lib/bhd/apps.ts` داخل ONE-BHD |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_OAUTH_REDIRECT_URI`, `BHD_IDENTITY_TOKEN_SECRET`, `APP_SECRET`, `DATABASE_URL` |
-| التقنيات الكاملة لبناء هذا الموقع وكيف يعمل | SPA: Vite + React + TypeScript + Tailwind + tRPC من المتصفح. الخادم: Hono داخل `app/server` يُنشر دالة Vercel واحدة (`Root Directory = app`، مشروع `nasab`). البيانات: Neon PostgreSQL (eu-west-2) عبر Drizzle ومسار Neon HTTP sidecar. الجلسة: JWT HS256 في كوكي Host-only اسمها `kimi_sid` موقَّعة بـ `APP_SECRET`. الواجهة عربية/إنجليزية. المدفوعات (تحويل بنكي / ثواني / Stripe) والكوبونات محلية في نَسَب. الاختبار: Vitest. |
+| التقنيات الكاملة لبناء هذا الموقع وكيف يعمل | SPA: Vite + React + TypeScript + Tailwind + tRPC من المتصفح. الخادم: Hono داخل `app/server` يُنشر دالة Vercel واحدة (`Root Directory = app`، مشروع `nasab`). البيانات: Neon PostgreSQL (eu-west-2) عبر Drizzle ومسار Neon HTTP sidecar. الجلسة: JWT HS256 في كوكي Host-only اسمها `kimi_sid` موقَّعة بـ `APP_SECRET`، خمول منزلق 48 ساعة. الواجهة عربية/إنجليزية. المدفوعات (تحويل بنكي / ثواني / Stripe) والكوبونات محلية في نَسَب. الاختبار: Vitest. |
 | ما لم يُوحَّد | الأشجار، الأعضاء، الدعوات، القصص، GEDCOM، فواتير نَسَب، الخطط، أدوار الشجرة |
 | فريق الصيانة | مستودع `ainoamn/Nasab` |
 
@@ -535,6 +537,8 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | كيف يعمل الدخول | authorize/token على `id.bhd-om.com` بـ `client_id=bhd-store` لا أصل المتجر |
 | التنقل الصامت | كوكي `bhd_id` على الهوية؛ الكتالوج `mode=sso` للمتجر |
 | المشغّل | تسع نقاط في شريط المتجر؛ الحساب `https://id.bhd-om.com/account` |
+| جلسة المنتج | خمول منزلق 48 ساعة + تجديد عند الاستخدام |
+| الفوتر | صف برامجنا من الكتالوج؛ عن الشركة وهوية الشركة على البوابة |
 | تاريخ قلب `mode` إلى `sso` | 19 أغسطس 2026 |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BACKEND_URL` |
 | **التقنيات الكاملة** | Next.js 14 · NestJS · TypeORM · PostgreSQL · Redis · Vercel `bhdstor` · حكم NO-GO للإنتاج |
@@ -544,9 +548,23 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 
 | البند | التوثيق |
 |---|---|
+| تاريخ التثبيت | 19 أغسطس 2026 — OIDC + مشغّل على `master` |
 | `client_id` | `bhd-office` |
-| الحالة في المشغّل | `enabled: false` حتى يتوفر أصل إنتاج |
-| التقنيات الكاملة | _داخلي_ |
+| الأصل | `https://baitak.bhd-om.com` (نطاق إنتاج المكتب الحالي) |
+| `redirect_uri` | `https://baitak.bhd-om.com/api/auth/bhd/callback` + localhost |
+| الحالة في المشغّل | الكتالوج المجمد ما زال `enabled: false` و`origin` فارغ حتى يُحدَّث في ONE-BHD بعد التحقق من أن `GET /api/auth/bhd/start` يعيد 302 إلى الهوية |
+| كيف ثُبّت | القسم 4: عمود `User.bhdSub` · `/api/auth/bhd/start`+`callback`+`logout` · غلاف `/login` و`/register` → الهوية إلا `?local=1` · مشغّل بعد الجلسة · فوتر برامجنا · خمول 48 ساعة |
+| كيف يعمل الدخول | `start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل المنتج) → `callback` يستبدل `code` على الخادم → upsert على `bhdSub` → كوكي NextAuth Host-only |
+| التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ المكتب لا يقرأ كوكي البوابة |
+| المشغّل | تسع نقاط في الرأس العام ورأس لوحة الأدمن بعد الجلسة. «الحساب» → `https://id.bhd-om.com/account` |
+| جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive` + `GET /api/auth/me` |
+| الإدارة | `/admin` لأدوار المنتج المحلية؛ غير المدير يرى منعاً كما هو |
+| ملفات `start` / `callback` | `app/api/auth/bhd/start/route.ts` · `callback/route.ts` · `logout/route.ts` |
+| عمود `bhd_sub` | جدول `User.bhdSub` (Prisma / PostgreSQL Neon المنتج) |
+| أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_OAUTH_REDIRECT_URI`, `NEXTAUTH_SECRET`, `DATABASE_URL` |
+| **التقنيات الكاملة** | Next.js 16 App Router · React 19 · TypeScript · Tailwind · Prisma · PostgreSQL (Neon المنتج) · NextAuth JWT Host-only · next-intl · Vercel مشروع `bhd-om` · عقارات/عقود/محاسبة/دفتر عناوين محلية |
+| ما لم يُوحَّد | العقارات، العقود، الحجوزات، المحاسبة، النظام القديم، أدوار المكتب، الفواتير |
+| فريق الصيانة | مستودع `ainoamn/bhd-om` |
 
 ### 12.8 موقع مستقبلي — قالب للنسخ
 

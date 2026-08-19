@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { adminOverview } from "../../../lib/auth/admin-users";
 import { requirePlatformAdmin } from "../../../lib/auth/platform-admin";
 import { identityIssuer } from "../../../lib/identity/issuer";
-import { googleClientId, authSecret } from "../../../lib/auth/config";
+import { googleClientId, isFacebookAuthConfigured, authSecret } from "../../../lib/auth/config";
 
 export const runtime = "nodejs";
 
@@ -22,6 +22,7 @@ export async function GET(request: Request) {
       issuer: identityIssuer(request),
       admin: gate.session,
       googleConfigured: Boolean(googleClientId()),
+      facebookConfigured: isFacebookAuthConfigured(),
       authSecretConfigured: Boolean(authSecret()),
       ...overview,
     },

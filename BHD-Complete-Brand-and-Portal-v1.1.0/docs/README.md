@@ -9,6 +9,7 @@
 | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) | **خطة المتجر:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع BHD-STOR |
 | [BHD-NEON-DATABASE.md](BHD-NEON-DATABASE.md) | ربط PostgreSQL على Neon لمستخدمي البوابة ودفتر العناوين |
 | [BHD-UNIFIED-GOOGLE-AUTH.md](BHD-UNIFIED-GOOGLE-AUTH.md) | المرحلة 0 فقط: زر Google المحلي بنفس Client ID — ليست SSO |
+| [BHD-FACEBOOK-LOGIN.md](BHD-FACEBOOK-LOGIN.md) | دخول فيسبوك على الهوية فقط |
 | [BHD-PORTAL-FULL-AUDIT.md](BHD-PORTAL-FULL-AUDIT.md) | مراجعة شاملة للبوابة الحية: الفوائد، الخصائص، البناء، الإيجابيات والسلبيات، الأمان والتشفير، النواقص، المخاطر، طريقة العمل، الربط، والترقية |
 | [BHD-REPOSITORY-DOCUMENTATION.md](BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، سياسة الإصدارات، التشغيل، النشر، التحقق |
 

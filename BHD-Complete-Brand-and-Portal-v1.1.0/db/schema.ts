@@ -23,6 +23,7 @@ export const users = pgTable("bhd_users", {
   /** Null for Google-only accounts */
   passwordHash: text("password_hash"),
   googleId: text("google_id").unique(),
+  facebookId: text("facebook_id").unique(),
   avatar: text("avatar"),
   phone: text("phone"),
   isActive: boolean("is_active").notNull().default(true),

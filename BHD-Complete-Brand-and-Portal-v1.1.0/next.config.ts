@@ -8,7 +8,7 @@ const contentSecurityPolicy = [
   "media-src 'self'",
   "frame-ancestors 'none'",
   "form-action 'self'",
-  "img-src 'self' data: https://*.googleusercontent.com",
+  "img-src 'self' data: https://*.googleusercontent.com https://*.fbcdn.net https://*.facebook.com https://platform-lookaside.fbsbx.com https://graph.facebook.com",
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self' 'unsafe-inline' https://accounts.google.com",
