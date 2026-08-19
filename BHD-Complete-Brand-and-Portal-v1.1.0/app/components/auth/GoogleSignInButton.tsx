@@ -57,7 +57,6 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
           shape="circle"
           theme="outline"
           size="large"
-          locale={locale === "en" ? "en" : "ar"}
         />
       </div>
       {loading ? <span className="login-provider-status">…</span> : null}
