@@ -55,7 +55,7 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
           useOneTap={false}
           type="icon"
           shape="circle"
-          theme="filled_white"
+          theme="outline"
           size="large"
           locale={locale === "en" ? "en" : "ar"}
         />
