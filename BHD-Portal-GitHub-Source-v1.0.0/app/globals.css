@@ -1416,8 +1416,123 @@ h3 {
 .footer-brand > div { display: flex; flex-direction: column; }
 .footer-brand small { color: rgba(255, 255, 255, 0.45); }
 .footer-top > p { margin: 0; color: rgba(255, 255, 255, 0.55); font-size: 11px; text-align: center; }
-.footer-links { display: flex; justify-content: end; gap: 22px; color: rgba(255, 255, 255, 0.64); font-size: 10px; }
+.footer-links { display: flex; justify-content: end; flex-wrap: wrap; gap: 22px; color: rgba(255, 255, 255, 0.64); font-size: 10px; }
 .footer-links a:hover { color: #fff; }
+
+.footer-programs {
+  padding-top: 36px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-programs-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.footer-programs-head p {
+  margin: 0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.footer-programs-head a {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.footer-programs-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 12px;
+  padding-bottom: 28px;
+}
+
+.footer-program {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: #fff;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.footer-program .bhd-app-icon {
+  width: 48px;
+  height: 48px;
+}
+
+.company-brief {
+  margin-bottom: 36px;
+  padding: 28px;
+  border: 1px solid #d7e2dc;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.company-brief h2 {
+  margin: 8px 0 12px;
+  font-size: clamp(24px, 3vw, 36px);
+}
+
+.programs-guide {
+  display: grid;
+  gap: 18px;
+}
+
+.program-card {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+  border: 1px solid #d7e2dc;
+  border-radius: 22px;
+  background: #fff;
+}
+
+.program-card header {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.program-card header .bhd-app-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.program-card small {
+  color: #7b8983;
+  font-size: 11px;
+}
+
+.program-card h2 {
+  margin: 4px 0 0;
+  font-size: 22px;
+}
+
+.program-label {
+  margin: 0 0 6px;
+  color: var(--accent, var(--emerald));
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.program-card ul {
+  margin: 0;
+  padding: 0 1.2em 0 0;
+}
+
+.program-card a {
+  justify-self: start;
+  color: var(--accent, var(--emerald));
+  font-weight: 800;
+}
 
 .footer-bottom {
   display: flex;
@@ -1512,6 +1627,7 @@ h3 {
   .vision-cards article { min-height: 175px; }
   .vision-cards h3 { margin-top: 25px; }
   .footer-top { grid-template-columns: 1fr; padding-block: 45px; text-align: center; }
+  .footer-programs-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .footer-brand { justify-self: center; }
   .footer-links { justify-content: center; }
 }

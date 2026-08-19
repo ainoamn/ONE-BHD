@@ -6,6 +6,7 @@ import { BhdAdvisor } from "./components/BhdAdvisor";
 import { BrandLogo } from "./components/BrandLogo";
 import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
+import { SiteFooter } from "./components/SiteFooter";
 import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
 import { products } from "./lib/products";
 
@@ -566,25 +567,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="site-footer">
-        <div className="section-wrap footer-top">
-          <div className="footer-brand">
-            <BrandLogo tone="light" className="footer-official-logo" />
-          </div>
-          <p>{t.footerLine}</p>
-          <div className="footer-links">
-            <InstantLink href="/products">{t.nav[1]}</InstantLink>
-            <InstantLink href="/#vision">{t.nav[3]}</InstantLink>
-            <InstantLink href="/brand">{t.nav[4]}</InstantLink>
-            <InstantLink href="/security">{isArabic ? "الأمان" : "Security"}</InstantLink>
-            <a href="https://github.com/ainoamn" target="_blank" rel="noopener noreferrer">{isArabic ? "المستودع" : "GitHub"}</a>
-          </div>
-        </div>
-        <div className="section-wrap footer-bottom">
-          <span>© 2026 {t.rights}</span>
-          <span>{isArabic ? "مسقط · سلطنة عُمان" : "Muscat · Sultanate of Oman"}</span>
-        </div>
-      </footer>
+      <SiteFooter promise={t.footerLine} rights={t.rights} />
       <BhdAdvisor />
     </main>
   );

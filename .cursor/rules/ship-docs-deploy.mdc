@@ -1,0 +1,12 @@
+---
+description: Always commit, push, document, and deploy without asking later
+alwaysApply: true
+---
+
+# رفع ونشر وتوثيق فوري
+
+بعد إكمال أي تغيير على ONE-BHD: وثّق في `docs/` إن لزم، ثم `git add` و`commit` و`git push origin main`، ثم `npx vercel --prod --yes` من جذر المستودع (مجلد النشر `BHD-Complete-Brand-and-Portal-v1.1.0`).
+
+لا تسأل المستخدم «هل أرفع؟» أو «هل أنشر؟» لاحقاً. نفّذ مباشرة ما لم يمنع صراحة في نفس الرسالة.
+
+لا ترفع أسراراً (`.env`، كلمات مرور). لا force-push. زامن النسخ الثلاث (v1.1.0 ثم v1.1.1 ثم GitHub-source) قبل الالتزام.

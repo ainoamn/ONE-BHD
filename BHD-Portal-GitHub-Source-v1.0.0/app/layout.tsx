@@ -3,6 +3,7 @@ import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { NavigationWarmup } from "./components/NavigationWarmup";
 import { GoogleOAuthRoot } from "./components/auth/GoogleOAuthRoot";
+import { SessionKeepAlive } from "./components/auth/SessionKeepAlive";
 import "./globals.css";
 
 const plexArabic = IBM_Plex_Sans_Arabic({
@@ -118,6 +119,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={plexArabic.className}>
         <a className="skip-link" href="#main-content">انتقل إلى المحتوى الرئيسي</a>
         <NavigationWarmup />
+        <SessionKeepAlive />
         <GoogleOAuthRoot>
           {children}
         </GoogleOAuthRoot>

@@ -3,6 +3,7 @@
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { SessionMenu } from "../components/auth/SessionMenu";
+import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -308,7 +309,7 @@ export function AccountConsole() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="account-empty">لا توجد اشتراكات مسجّلة على هذا الحساب حتى الآن.</p>
+                    <p className="account-empty">اشتراكات وفواتير كل برنامج تبقى داخله ولا تُعرض هنا. هنا بيانات حساب BHD وارتباطك بالمواقع فقط. لا توجد اشتراكات هوية مسجّلة حتى الآن.</p>
                   )}
                 </section>
               </div>
@@ -316,6 +317,7 @@ export function AccountConsole() {
           </>
         ) : null}
       </main>
+      <SiteFooter />
     </div>
   );
 }

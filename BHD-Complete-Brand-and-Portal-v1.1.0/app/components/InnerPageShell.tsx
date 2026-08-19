@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { BrandLogo } from "./BrandLogo";
 import { InstantLink } from "./InstantLink";
 import { SessionMenu } from "./auth/SessionMenu";
+import { SiteFooter } from "./SiteFooter";
 
 type InnerPageShellProps = {
   eyebrow: string;
@@ -61,24 +62,7 @@ export function InnerPageShell({ eyebrow, title, lead, children }: InnerPageShel
 
       <div className="inner-content section-wrap">{children}</div>
 
-      <footer className="site-footer inner-footer">
-        <div className="section-wrap footer-top">
-          <div className="footer-brand">
-            <BrandLogo tone="light" className="footer-official-logo" />
-          </div>
-          <p>ابنِ أحلامًا أكبر.</p>
-          <div className="footer-links">
-            <InstantLink href="/privacy">الخصوصية</InstantLink>
-            <InstantLink href="/terms">الشروط</InstantLink>
-            <InstantLink href="/security">الأمان</InstantLink>
-            <InstantLink href="/brand">دليل الهوية</InstantLink>
-          </div>
-        </div>
-        <div className="section-wrap footer-bottom">
-          <span>© 2026 شركة بن حمود للتطوير. جميع الحقوق محفوظة.</span>
-          <span>مسقط · سلطنة عُمان</span>
-        </div>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }

@@ -1,10 +1,20 @@
 import { NextResponse } from "next/server";
-import { getCurrentSession } from "../../../lib/auth/session";
+import { applySessionCookies, createSessionToken, getCurrentSession } from "../../../lib/auth/session";
 import { getSelfContact, getUserById } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 import { isPlatformAdminEmail } from "../../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
+
+async function withTouchedSession(
+  body: unknown,
+  session: { sub: string; email: string; name: string; picture: string | null },
+) {
+  const token = await createSessionToken(session);
+  const response = NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
+  applySessionCookies(response.cookies, token);
+  return response;
+}
 
 export async function GET() {
   const session = await getCurrentSession();
@@ -18,13 +28,18 @@ export async function GET() {
       return NextResponse.json({ user: null }, { headers: { "Cache-Control": "no-store" } });
     }
     const contact = await getSelfContact(user.id);
-    return NextResponse.json(
+    return withTouchedSession(
       { user, contact, platformAdmin: isPlatformAdminEmail(user.email) },
-      { headers: { "Cache-Control": "no-store" } },
+      {
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+      },
     );
   }
 
-  return NextResponse.json(
+  return withTouchedSession(
     {
       user: {
         id: session.sub,
@@ -39,6 +54,6 @@ export async function GET() {
       contact: null,
       platformAdmin: isPlatformAdminEmail(session.email),
     },
-    { headers: { "Cache-Control": "no-store" } },
+    session,
   );
 }

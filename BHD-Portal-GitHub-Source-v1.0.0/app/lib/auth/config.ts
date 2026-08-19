@@ -1,6 +1,8 @@
 export const SESSION_COOKIE = "bhd_portal";
 export const IDENTITY_SESSION_COOKIE = "bhd_id";
-export const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 7;
+/** Sliding idle window: any use resets this. 48 hours with no use signs the user out. */
+export const SESSION_IDLE_MAX_AGE_SEC = 60 * 60 * 48;
+export const SESSION_MAX_AGE_SEC = SESSION_IDLE_MAX_AGE_SEC;
 export const SESSION_ISSUER = "bhd-portal";
 
 /** Public One BHD Web Client ID (same as HISAB / WAZEN). Safe to expose in the browser. */

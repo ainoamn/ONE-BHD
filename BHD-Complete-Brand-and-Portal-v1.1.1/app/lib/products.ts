@@ -17,6 +17,7 @@ export type Product = {
   featured?: boolean;
   capabilitiesAr: string[];
   capabilitiesEn: string[];
+  howAr: string;
 };
 
 export const products: Product[] = [
@@ -41,6 +42,7 @@ export const products: Product[] = [
     featured: true,
     capabilitiesAr: ["المحافظ الشخصية والمشتركة", "الرحلات والجمعيات", "المصاريف والالتزامات"],
     capabilitiesEn: ["Personal and shared wallets", "Trips and circles", "Expenses and commitments"],
+    howAr: "تفتح محافظك وتسجّل المصروف يومياً، ثم تشارك الرحلة أو الجمعية مع من تختار دون خلط حسابات الآخرين.",
   },
   {
     slug: "hisab",
@@ -63,6 +65,7 @@ export const products: Product[] = [
     featured: true,
     capabilitiesAr: ["المحاسبة والفواتير", "الكاشير والمطاعم", "المخزون والتقارير والضريبة"],
     capabilitiesEn: ["Accounting and invoices", "POS and restaurants", "Inventory, reports and VAT"],
+    howAr: "تنشئ شركتك داخل حسابي، تصدر الفاتورة أو تبيع من الكاشير، والضريبة والمخزون يبقيان في بيانات حسابي فقط.",
   },
   {
     slug: "baitak",
@@ -84,6 +87,7 @@ export const products: Product[] = [
     soft: "#f8efe4",
     capabilitiesAr: ["بيع وشراء العقارات", "الإيجار والإدارة", "الخرائط والتحليلات"],
     capabilitiesEn: ["Property sales", "Rentals and management", "Maps and analytics"],
+    howAr: "تعرض العقار على الخريطة، تدير البيع أو الإيجار، وملفات العقار تبقى في بيتك لا في وازن أو حسابي.",
   },
   {
     slug: "nasab",
@@ -105,6 +109,7 @@ export const products: Product[] = [
     soft: "#f6e9eb",
     capabilitiesAr: ["أشجار عائلية تفاعلية", "الدعوات والروابط", "الحفظ والطباعة"],
     capabilitiesEn: ["Interactive family trees", "Invitations and relations", "Preservation and printing"],
+    howAr: "تبني الشجرة وتدعو الأقارب، والقصص تُحفظ في نَسَب دون أن تظهر في المتجر أو المحاسبة.",
   },
   {
     slug: "bhd-store",
@@ -126,6 +131,7 @@ export const products: Product[] = [
     soft: "#e9f0f7",
     capabilitiesAr: ["متاجر متعددة البائعين", "إدارة الطلبات", "الشحن والمدفوعات"],
     capabilitiesEn: ["Multi-vendor stores", "Order management", "Shipping and payments"],
+    howAr: "يفتح التاجر متجره ويستقبل الطلب والدفع والشحن داخل المتجر فقط.",
   },
   {
     slug: "bhd-office",
@@ -147,6 +153,7 @@ export const products: Product[] = [
     soft: "#e9edf0",
     capabilitiesAr: ["إدارة الوثائق", "العمليات الداخلية", "الأرشفة والحماية"],
     capabilitiesEn: ["Document management", "Internal operations", "Archiving and protection"],
+    howAr: "مساحة داخلية لوثائق الشركة اليومية؛ ليست للعامة ولا تُمزج مع منتجات الأفراد.",
   },
 ];
 

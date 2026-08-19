@@ -78,7 +78,7 @@ sequenceDiagram
 | صلاحية ID Token | 10 دقائق |
 | صلاحية Access Token | 10 دقائق |
 | صلاحية Refresh Token | 30 يوماً، تدوير عند كل استخدام |
-| صلاحية جلسة الهوية `bhd_id` | 7 أيام |
+| صلاحية جلسة الهوية `bhd_id` | 48 ساعة **خمول منزلق**: أي استخدام يجدّد؛ بعد 48 ساعة بلا استخدام يُسجَّل الخروج تلقائياً |
 | PKCE | إلزامي، `S256` فقط |
 | scopes الافتراضية | `openid profile email` |
 | مطالبات ID Token الإلزامية | `iss`, `aud`, `sub`, `exp`, `iat`, `nonce`, `email`, `email_verified` |
@@ -294,7 +294,7 @@ grant_type=refresh_token
 
 | الاسم | أين | Domain | HttpOnly | Secure | SameSite | الغرض |
 |---|---|---|---|---|---|---|
-| `bhd_id` | الهوية فقط | **Host-only** (لا `.bhd-om.com`) | نعم | نعم في الإنتاج | Lax | جلسة مزوّد الهوية |
+| `bhd_id` | الهوية فقط | **Host-only** (لا `.bhd-om.com`) | نعم | نعم في الإنتاج | Lax | جلسة الهوية؛ خمول 48 ساعة منزلق |
 | `bhd_oauth_state` | المنتج، دقائق | Host-only | نعم | نعم في الإنتاج | Lax | `state` + `nonce` + `code_verifier` أثناء الـ redirect |
 | جلسة المنتج الحالية | المنتج | Host-only | نعم | نعم في الإنتاج | Lax | تبقى أسماء حسابي `bhd_access` ووازن كما هي وبوابة `bhd_portal` |
 
