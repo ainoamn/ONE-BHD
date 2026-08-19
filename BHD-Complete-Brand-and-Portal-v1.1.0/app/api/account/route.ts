@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { BHD_APPS } from "../../../lib/bhd/apps";
-import { authSecret } from "../../../lib/auth/config";
-import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
-import { applySessionCookies, createSessionToken, getCurrentSession } from "../../../lib/auth/session";
-import { getAccountProfile, listLinkedClientIds, updateOwnProfile } from "../../../lib/auth/users";
-import { isDatabaseConfigured } from "../../../../db";
+import { BHD_APPS } from "../../lib/bhd/apps";
+import { authSecret } from "../../lib/auth/config";
+import { allowRequest, clientKey } from "../../lib/auth/rate-limit";
+import { applySessionCookies, createSessionToken, getCurrentSession } from "../../lib/auth/session";
+import { getAccountProfile, listLinkedClientIds, updateOwnProfile } from "../../lib/auth/users";
+import { isDatabaseConfigured } from "../../../db";
 
 export const runtime = "nodejs";
 
