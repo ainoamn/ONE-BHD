@@ -5,6 +5,7 @@
 > **التاريخ:** 18 أغسطس 2026  
 > **الإصدار:** `bhd-appswitcher.v1`  
 > **يعتمد على:** [`BHD-IDENTITY-SSO.md`](BHD-IDENTITY-SSO.md) الإصدار `bhd-identity.v1`  
+> **الدليل التشغيلي:** [`BHD-UNIFIED-LOGIN-AND-APPS.md`](BHD-UNIFIED-LOGIN-AND-APPS.md)  
 > **الناشر:** بوابة BHD — مشروع Vercel `one-bhd`
 
 انسخ هذا الملف إلى مستودع المنتج تحت `docs/BHD-APP-SWITCHER.md` دون تعديل القيم المجمّدة. انسخ أيضاً الكتالوج المجمد في القسم 4 إلى `lib/bhd/apps.ts` **حرفياً**. لا تضف تطبيقاً محلياً، ولا تحذف تطبيقاً، ولا تغيّر رابط النقر.
