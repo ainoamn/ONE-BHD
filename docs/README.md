@@ -2,7 +2,9 @@
 
 | الملف | الغرض |
 |---|---|
-| [BHD-IDENTITY-SSO.md](BHD-IDENTITY-SSO.md) | **المواصفة المعتمدة** لهوية BHD الموحّدة (OIDC) ولوحة `/admin` وصفحة `/account`. تُنسخ كما هي إلى بقية المواقع |
+| [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات والتنقل الصامت، وتقنيات كل موقع بعد التثبيت |
+| [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات لكل المواقع |
+| [BHD-APP-SWITCHER.md](BHD-APP-SWITCHER.md) | **المواصفة المعتمدة** لمشغّل التطبيقات بعد الدخول (تسع نقاط بجانب الحساب وشعارات التطبيقات). تُنسخ كما هي مع `lib/bhd/apps.ts` |
 | [BHD-WAZEN-INTEGRATION.md](BHD-WAZEN-INTEGRATION.md) | **خطة وازن الجاهزة للتنفيذ:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع WAZEN |
 | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) | **خطة المتجر:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع BHD-STOR |
 | [BHD-NEON-DATABASE.md](BHD-NEON-DATABASE.md) | ربط PostgreSQL على Neon لمستخدمي البوابة ودفتر العناوين |
