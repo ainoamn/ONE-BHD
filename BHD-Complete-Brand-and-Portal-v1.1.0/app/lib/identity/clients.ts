@@ -86,8 +86,20 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     clientId: "bhd-office",
     name: "BHD Office",
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_OFFICE",
-    redirectUris: ["http://localhost:3000/api/auth/bhd/callback"],
-    postLogoutRedirectUris: ["http://localhost:3000/"],
+    redirectUris: [
+      "https://baitak.bhd-om.com/api/auth/bhd/callback",
+      "https://www.bhd-om.com/api/auth/bhd/callback",
+      "https://bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+      "http://127.0.0.1:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: [
+      "https://baitak.bhd-om.com/",
+      "https://www.bhd-om.com/",
+      "https://bhd-om.com/",
+      "http://localhost:3000/",
+      "http://127.0.0.1:3000/",
+    ],
   },
   {
     clientId: "bhd-baitak",
