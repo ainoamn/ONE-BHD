@@ -9,7 +9,7 @@ import {
   readFacebookOAuthState,
 } from "../../../../lib/auth/facebook";
 import { allowRequest, clientKey } from "../../../../lib/auth/rate-limit";
-import { applySessionCookies, createSessionToken } from "../../../../lib/auth/session";
+import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../../lib/auth/session";
 import { loginOrRegisterWithFacebook } from "../../../../lib/auth/users";
 import { isSafeNextPath } from "../../../../lib/identity/safe-next";
 
@@ -44,6 +44,7 @@ export async function GET(request: Request) {
   try {
     const facebook = await exchangeFacebookCode(code, oauth.redirectUri);
     const user = await loginOrRegisterWithFacebook(facebook);
+    rejectAccountSwitch(await getCurrentSession(), user.id);
     const token = await createSessionToken({
       sub: user.id,
       email: user.email,
@@ -57,6 +58,7 @@ export async function GET(request: Request) {
     return response;
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
+    if (message === "SWITCH_REQUIRES_LOGOUT") return fail("switch");
     if (message === "ACCOUNT_LOCKED" || message === "ACCOUNT_DISABLED") return fail("locked");
     if (message === "FACEBOOK_EMAIL_REQUIRED") return fail("email");
     return fail("failed");

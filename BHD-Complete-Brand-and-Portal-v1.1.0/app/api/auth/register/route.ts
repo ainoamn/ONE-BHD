@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
-import { applySessionCookies, createSessionToken } from "../../../lib/auth/session";
+import { applySessionCookies, createSessionToken, getCurrentSession } from "../../../lib/auth/session";
 import { registerWithPassword, type RegisterInput } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -17,8 +17,8 @@ function messageFor(code: string) {
       return "كلمة المرور يجب أن تكون 8 أحرف على الأقل.";
     case "INVALID_USERNAME":
       return "اسم المستخدم: 3–32 حرفًا (لاتيني صغير، أرقام، . _ -).";
-    case "INVALID_INPUT":
-      return "أكمل الاسم والإيميل وكلمة المرور.";
+    case "SWITCH_REQUIRES_LOGOUT":
+      return "أنت داخل بحساب آخر. اخرج أولاً ثم أنشئ حساباً جديداً.";
     default:
       return "تعذّر إنشاء الحساب.";
   }
@@ -36,6 +36,9 @@ export async function POST(request: Request) {
   }
 
   try {
+    if (await getCurrentSession()) {
+      throw new Error("SWITCH_REQUIRES_LOGOUT");
+    }
     const body = (await request.json()) as RegisterInput;
     const user = await registerWithPassword(body);
     const token = await createSessionToken({
@@ -49,7 +52,7 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
-    const status = code === "EMAIL_OR_USERNAME_TAKEN" ? 409 : 400;
+    const status = code === "EMAIL_OR_USERNAME_TAKEN" || code === "SWITCH_REQUIRES_LOGOUT" ? 409 : 400;
     return NextResponse.json({ message: messageFor(code) }, { status });
   }
 }

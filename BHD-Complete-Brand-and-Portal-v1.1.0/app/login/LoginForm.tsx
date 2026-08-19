@@ -5,7 +5,7 @@ import { InstantLink } from "../components/InstantLink";
 import { FacebookSignInButton } from "../components/auth/FacebookSignInButton";
 import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 type Mode = "login" | "register";
 
@@ -27,7 +27,9 @@ export function LoginForm() {
               ? "هذا الحساب غير متاح للدخول."
               : facebookError === "rate"
                 ? "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة."
-                : facebookError === "failed"
+                : facebookError === "switch"
+                  ? "أنت داخل بحساب آخر. اخرج أولاً ثم ادخل بالحساب الجديد."
+                  : facebookError === "failed"
                   ? "تعذّر التحقق من حساب فيسبوك."
                   : "";
   const [mode, setMode] = useState<Mode>("login");
@@ -47,6 +49,24 @@ export function LoginForm() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("OM");
   const [zipCode, setZipCode] = useState("");
+  const [existing, setExisting] = useState<{ name: string; email: string } | null | undefined>(undefined);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/auth/me", { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data: { user?: { name?: string; email?: string } | null }) => {
+        if (cancelled) return;
+        if (data.user?.email) setExisting({ name: data.user.name || data.user.email, email: data.user.email });
+        else setExisting(null);
+      })
+      .catch(() => {
+        if (!cancelled) setExisting(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function finishOk() {
     const next = nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/";
@@ -114,6 +134,27 @@ export function LoginForm() {
         </aside>
 
         <section className="login-card">
+          {existing ? (
+            <div className="login-already">
+              <h2>حساب واحد في هذا المتصفح</h2>
+              <p>
+                أنت داخل الآن كـ <strong>{existing.name}</strong>
+                <br />
+                <small>{existing.email}</small>
+              </p>
+              <p>
+                لا يُسمح بفتح حساب BHD ثانٍ في نفس الجلسة، ولا بفتح مواقع المجموعة بحساب مختلف. لتغيير
+                الحساب اخرج ثم ادخل من جديد.
+              </p>
+              <InstantLink className="login-submit" href="/account">
+                متابعة إلى الحساب
+              </InstantLink>
+              <a className="login-switch-out" href="/oauth/end-session?client_id=bhd-portal&post_logout_redirect_uri=https://id.bhd-om.com/login">
+                خروج ثم دخول بحساب آخر
+              </a>
+            </div>
+          ) : (
+            <>
           <div className="login-card-tabs" role="tablist">
             <button
               type="button"
@@ -269,6 +310,8 @@ export function LoginForm() {
             <InstantLink href="/privacy">الخصوصية</InstantLink> و
             <InstantLink href="/terms">الشروط</InstantLink>.
           </p>
+            </>
+          )}
         </section>
       </div>
     </div>

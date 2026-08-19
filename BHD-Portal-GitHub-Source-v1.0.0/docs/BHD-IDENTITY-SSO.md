@@ -304,6 +304,8 @@ grant_type=refresh_token
 
 ممنوع ضبط `Domain=.bhd-om.com` على `bhd_id`. SSO يعمل بإعادة توجيه المنتج إلى الهوية التي ترى كوكيزها على `id.bhd-om.com`.
 
+**حساب واحد في الجلسة.** مضيف الهوية القانوني هو `https://id.bhd-om.com` فقط. دخول ثانٍ بينما `bhd_id` لحساب مختلف يُرفض (`SWITCH_REQUIRES_LOGOUT`) حتى يتم `end-session`. المنتج عند `callback` يستبدل جلسته المحلية بالكامل بـ `sub` القادم؛ لا يجوز بقاء `/admin` على مستخدم قديم. `www` و`one-bhd.vercel.app` يحوّلان مسارات الدخول والحساب إلى `id`.
+
 حسابي على `hisaby.bhd-om.com` (و`hisaby.pro`) يعمل بنفس التحويل. لا حاجة لكوكي مشترك عبر النطاقات.
 
 ---

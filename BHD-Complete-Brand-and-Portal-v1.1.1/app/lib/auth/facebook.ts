@@ -31,7 +31,7 @@ function secretKey() {
 
 export function facebookCallbackOrigin(request: Request): string {
   const origin = new URL(request.url).origin;
-  if (ALLOWED_ORIGINS.has(origin)) return origin;
+  if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) return origin;
   return "https://id.bhd-om.com";
 }
 

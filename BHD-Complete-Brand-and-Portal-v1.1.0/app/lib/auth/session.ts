@@ -76,6 +76,13 @@ export async function getCurrentSession(): Promise<PortalSession | null> {
   return readSessionToken(token);
 }
 
+/** One BHD identity per browser: switching accounts requires logout first. */
+export function rejectAccountSwitch(current: PortalSession | null, nextUserId: string) {
+  if (current && current.sub !== nextUserId) {
+    throw new Error("SWITCH_REQUIRES_LOGOUT");
+  }
+}
+
 export function applySessionCookies(
   store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
   token: string,

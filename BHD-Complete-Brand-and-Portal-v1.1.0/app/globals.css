@@ -2434,8 +2434,13 @@ h3 {
   border-color: #08a39f;
 }
 
-.login-submit {
+.login-submit,
+a.login-submit {
   min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
   border: 0;
   border-radius: 13px;
   background: var(--ink);
@@ -2544,6 +2549,27 @@ h3 {
 
 .facebook-signin:hover {
   filter: brightness(1.05);
+}
+
+.login-already {
+  display: grid;
+  gap: 14px;
+}
+
+.login-already h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.login-already p {
+  margin: 0;
+  color: #3f5b51;
+  line-height: 1.7;
+}
+
+.login-switch-out {
+  color: var(--emerald);
+  font-weight: 700;
 }
 
 .login-status,

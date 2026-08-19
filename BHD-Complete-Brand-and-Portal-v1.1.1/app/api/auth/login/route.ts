@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
-import { applySessionCookies, createSessionToken } from "../../../lib/auth/session";
+import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../lib/auth/session";
 import { loginWithPassword } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -15,8 +15,8 @@ function messageFor(code: string) {
       return "الإيميل/اسم المستخدم أو كلمة المرور غير صحيحة.";
     case "ACCOUNT_LOCKED":
       return "الحساب مقفل مؤقتًا بعد محاولات فاشلة. حاول بعد ربع ساعة.";
-    case "ACCOUNT_DISABLED":
-      return "هذا الحساب غير نشط.";
+    case "SWITCH_REQUIRES_LOGOUT":
+      return "أنت داخل بحساب آخر. اخرج أولاً ثم ادخل بالحساب الجديد.";
     default:
       return "تعذّر تسجيل الدخول.";
   }
@@ -36,6 +36,7 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as { identifier?: string; password?: string };
     const user = await loginWithPassword(body.identifier || "", body.password || "");
+    rejectAccountSwitch(await getCurrentSession(), user.id);
     const token = await createSessionToken({
       sub: user.id,
       email: user.email,
@@ -47,7 +48,7 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
-    const status = code === "ACCOUNT_LOCKED" ? 403 : 401;
+    const status = code === "ACCOUNT_LOCKED" ? 403 : code === "SWITCH_REQUIRES_LOGOUT" ? 409 : 401;
     return NextResponse.json({ message: messageFor(code) }, { status });
   }
 }

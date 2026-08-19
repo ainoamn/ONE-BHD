@@ -6,7 +6,7 @@ import {
 } from "../../../lib/auth/config";
 import { verifyGoogleIdToken } from "../../../lib/auth/google";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
-import { applySessionCookies, createSessionToken } from "../../../lib/auth/session";
+import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../lib/auth/session";
 import { loginOrRegisterWithGoogle } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -50,6 +50,7 @@ export async function POST(request: Request) {
       name: google.name,
       picture: google.picture,
     });
+    rejectAccountSwitch(await getCurrentSession(), user.id);
     const token = await createSessionToken({
       sub: user.id,
       email: user.email,
@@ -61,6 +62,12 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "";
+    if (code === "SWITCH_REQUIRES_LOGOUT") {
+      return NextResponse.json(
+        { message: "أنت داخل بحساب آخر. اخرج أولاً ثم ادخل بالحساب الجديد." },
+        { status: 409 },
+      );
+    }
     if (code === "ACCOUNT_LOCKED" || code === "ACCOUNT_DISABLED") {
       return NextResponse.json({ message: "هذا الحساب غير متاح للدخول." }, { status: 403 });
     }

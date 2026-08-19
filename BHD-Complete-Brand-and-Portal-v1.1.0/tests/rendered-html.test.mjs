@@ -94,12 +94,14 @@ test("warms internal routes and keeps the smart guide private by design", async 
 });
 
 test("enforces idle sign-out, one session, programs footer, and shared brand chrome", async () => {
-  const [config, keepAlive, footer, apps, layout] = await Promise.all([
+  const [config, keepAlive, footer, apps, layout, middleware, session] = await Promise.all([
     readFile(new URL("app/lib/auth/config.ts", root), "utf8"),
     readFile(new URL("app/components/auth/SessionKeepAlive.tsx", root), "utf8"),
     readFile(new URL("app/components/SiteFooter.tsx", root), "utf8"),
     readFile(new URL("app/apps/page.tsx", root), "utf8"),
     readFile(new URL("app/layout.tsx", root), "utf8"),
+    readFile(new URL("middleware.ts", root), "utf8"),
+    readFile(new URL("app/lib/auth/session.ts", root), "utf8"),
   ]);
   assert.match(config, /SESSION_IDLE_MAX_AGE_SEC = 60 \* 60 \* 48/);
   assert.match(keepAlive, /\/api\/auth\/me/);
@@ -109,6 +111,8 @@ test("enforces idle sign-out, one session, programs footer, and shared brand chr
   assert.match(apps, /كيف يعمل/);
   assert.match(apps, /الفوائد/);
   assert.match(layout, /SessionKeepAlive/);
+  assert.match(middleware, /id\.bhd-om\.com/);
+  assert.match(session, /SWITCH_REQUIRES_LOGOUT/);
   await access(new URL("docs/BHD-UNIFIED-LOGIN-AND-APPS.md", root));
 });
 

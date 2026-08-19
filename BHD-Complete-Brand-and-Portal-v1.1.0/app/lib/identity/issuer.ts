@@ -5,7 +5,10 @@ export function identityIssuer(request?: Request): string {
   if (configured) return configured.replace(/\/$/, "");
   if (request) {
     try {
-      return new URL(request.url).origin;
+      const origin = new URL(request.url).origin;
+      if (origin.startsWith("http://localhost") || origin.startsWith("http://127.0.0.1")) {
+        return origin;
+      }
     } catch {
       /* fall through */
     }
