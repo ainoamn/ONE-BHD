@@ -45,7 +45,7 @@ export function facebookLoginUrl(input: { state: string; redirectUri: string }):
     redirect_uri: input.redirectUri,
     state: input.state,
     response_type: "code",
-    scope: "email,public_profile,user_birthday,user_gender,user_location,user_hometown",
+    scope: "email,public_profile,user_birthday,user_gender,user_location",
     auth_type: "rerequest",
   });
   return `${DIALOG}?${params.toString()}`;
@@ -151,7 +151,7 @@ export async function exchangeFacebookCode(code: string, redirectUri: string): P
   }
 
   const meUrl = new URL(`${GRAPH}/me`);
-  meUrl.searchParams.set("fields", "id,name,email,picture.type(large),birthday,gender,location{name},hometown{name}");
+  meUrl.searchParams.set("fields", "id,name,email,picture.type(large),birthday,gender,location{name}");
   meUrl.searchParams.set("access_token", token.access_token);
   const me = await graphJson<{
     id?: string;
@@ -160,7 +160,6 @@ export async function exchangeFacebookCode(code: string, redirectUri: string): P
     birthday?: string;
     gender?: string;
     location?: { name?: string };
-    hometown?: { name?: string };
     picture?: { data?: { url?: string } };
   }>(meUrl.toString());
 
@@ -177,6 +176,6 @@ export async function exchangeFacebookCode(code: string, redirectUri: string): P
     gender: parseFacebookGender(me.gender),
     birthDate: parseFacebookBirthday(me.birthday),
     city: me.location?.name?.trim() || null,
-    hometown: me.hometown?.name?.trim() || null,
+    hometown: null,
   };
 }
