@@ -5,7 +5,8 @@
 > **التاريخ:** 18 أغسطس 2026  
 > **الإصدار:** `bhd-identity.v1`  
 > **الناشر:** بوابة BHD — مشروع Vercel `one-bhd`  
-> **المُصدِر (Issuer):** `https://id.bhd-om.com`
+> **المُصدِر (Issuer):** `https://id.bhd-om.com`  
+> **الدليل التشغيلي للفرق:** [`BHD-UNIFIED-LOGIN-AND-APPS.md`](BHD-UNIFIED-LOGIN-AND-APPS.md) — كيف يُبنى الدخول، كيف يعمل التنقل دون إعادة تسجيل، وكيف يوثّق كل موقع تثبيته وتقنياته.
 
 **حالة التنفيذ الحي (18 أغسطس 2026):** مزوّد الهوية يعمل على البوابة المنشورة. اكتشاف OIDC:
 `https://one-bhd.vercel.app/.well-known/openid-configuration`
