@@ -8,7 +8,7 @@ import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
-import { products } from "./lib/products";
+import { isExternalProductHref, products } from "./lib/products";
 
 type Language = "ar" | "en";
 
@@ -42,7 +42,7 @@ const copy = {
     architectureEyebrow: "منظومة BHD",
     architectureTitle: "منفصلة هندسيًا، موحّدة في التجربة.",
     architectureLead:
-      "كل تطبيق يملك مستودعه ونشره وبياناته، بينما تجمعها هوية BHD ومشغّل تطبيقات واحد. هذا يمنح كل منتج حرية التطور دون أن يفقد المستخدم إحساس المنظومة.",
+      "كل تطبيق مستقل بنشره وبياناته، بينما تجمعها هوية BHD ومشغّل تطبيقات واحد. هذا يمنح كل منتج حرية التطور دون أن يفقد المستخدم إحساس المنظومة.",
     appLayer: "طبقة التطبيقات",
     identityLayer: "هوية BHD",
     accountLayer: "حساب BHD",
@@ -114,7 +114,7 @@ const copy = {
     architectureEyebrow: "BHD Ecosystem",
     architectureTitle: "Independent by design. Unified by experience.",
     architectureLead:
-      "Every app owns its code, deployment and data, while BHD Identity and a shared app launcher bring them together without limiting how each product grows.",
+      "Every app owns its deployment and data, while BHD Identity and a shared app launcher bring them together without limiting how each product grows.",
     appLayer: "Application layer",
     identityLayer: "BHD Identity",
     accountLayer: "BHD Account",
@@ -449,10 +449,17 @@ export default function Home() {
                   {isArabic ? product.descriptionAr : product.descriptionEn}
                 </p>
                 <div className="product-card-footer">
-                  <a href={product.href} target="_blank" rel="noopener noreferrer">
-                    {isLive ? t.open : t.explore}
-                    <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-                  </a>
+                  {isExternalProductHref(product.href) ? (
+                    <a href={product.href} target="_blank" rel="noopener noreferrer">
+                      {isLive ? t.open : t.explore}
+                      <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
+                    </a>
+                  ) : (
+                    <InstantLink href={product.href}>
+                      {t.explore}
+                      <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
+                    </InstantLink>
+                  )}
                   <small>{t.bhdProduct}</small>
                 </div>
               </article>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { InnerPageShell } from "../../components/InnerPageShell";
 import { BhdAppIcon } from "../../components/bhd/BhdAppIcon";
-import { getProduct, products } from "../../lib/products";
+import { getProduct, isExternalProductHref, products } from "../../lib/products";
 
 type ProductPageProps = { params: Promise<{ slug: string }> };
 
@@ -49,12 +49,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
             ))}
           </ul>
           <div className="detail-actions">
-            <a className="primary-button" href={product.href} target="_blank" rel="noopener noreferrer">
-              فتح المنتج <span aria-hidden="true">←</span>
-            </a>
-            <a className="text-button" href={product.repository} target="_blank" rel="noopener noreferrer">
-              مستودع المشروع
-            </a>
+            {isExternalProductHref(product.href) ? (
+              <a className="primary-button" href={product.href} target="_blank" rel="noopener noreferrer">
+                فتح المنتج <span aria-hidden="true">←</span>
+              </a>
+            ) : null}
           </div>
         </div>
       </section>

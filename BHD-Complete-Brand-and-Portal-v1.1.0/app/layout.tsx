@@ -97,7 +97,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
         url: baseUrl.toString(),
         logo: new URL("/brand/bhd-logo-4096.png", baseUrl).toString(),
         foundingLocation: { "@type": "Place", name: "Muscat, Sultanate of Oman" },
-        sameAs: ["https://github.com/ainoamn"],
       },
       {
         "@type": "WebSite",

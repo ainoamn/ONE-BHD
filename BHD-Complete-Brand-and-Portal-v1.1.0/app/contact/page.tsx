@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BrandLogo } from "../components/BrandLogo";
+import { InstantLink } from "../components/InstantLink";
 import { InnerPageShell } from "../components/InnerPageShell";
 
 export const metadata: Metadata = { title: "تواصل معنا" };
@@ -9,15 +10,15 @@ export default function ContactPage() {
     <InnerPageShell
       eyebrow="تواصل مع BHD"
       title="لنبنِ شيئًا عمليًا."
-      lead="حتى اعتماد قنوات التواصل الرسمية، نستقبل ملاحظات المشاريع والمتابعة التقنية عبر حساب BHD في GitHub دون جمع بياناتك داخل البوابة."
+      lead="شركة بن حمود للتطوير من مسقط. الصفحات العامة لا تجمع بياناتك؛ تفاصيل الشركة والعلامة موجودة داخل الموقع."
     >
       <section className="contact-panel">
         <div><BrandLogo className="contact-official-logo" /><small>بن حمود للتطوير</small></div>
         <h2>مسقط، سلطنة عُمان</h2>
-        <p>يمكنك الاطلاع على المشاريع المفتوحة وحالة تطويرها من الملف الرسمي.</p>
-        <a className="primary-button" href="https://github.com/ainoamn" target="_blank" rel="noopener noreferrer">
-          فتح مستودع المشاريع <span aria-hidden="true">←</span>
-        </a>
+        <p>تعرّف على الشركة ومنتجاتها من الصفحات الرسمية للبوابة.</p>
+        <InstantLink className="primary-button" href="/about">
+          عن الشركة <span aria-hidden="true">←</span>
+        </InstantLink>
       </section>
     </InnerPageShell>
   );

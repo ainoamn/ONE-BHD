@@ -3,7 +3,7 @@
 import { BrandLogo } from "./BrandLogo";
 import { InstantLink } from "./InstantLink";
 import { BhdAppIcon } from "./bhd/BhdAppIcon";
-import { products } from "../lib/products";
+import { isExternalProductHref, products } from "../lib/products";
 
 type SiteFooterProps = {
   promise?: string;
@@ -22,17 +22,29 @@ export function SiteFooter({
           <InstantLink href="/apps">كل التطبيقات وشرحها</InstantLink>
         </div>
         <div className="footer-programs-grid">
-          {products.map((product) => (
-            <a
-              key={product.slug}
-              href={product.href}
-              className="footer-program"
-              title={product.nameAr}
-            >
-              <BhdAppIcon id={product.appId} title={product.nameAr} />
-              <span>{product.nameAr}</span>
-            </a>
-          ))}
+          {products.map((product) =>
+            isExternalProductHref(product.href) ? (
+              <a
+                key={product.slug}
+                href={product.href}
+                className="footer-program"
+                title={product.nameAr}
+              >
+                <BhdAppIcon id={product.appId} title={product.nameAr} />
+                <span>{product.nameAr}</span>
+              </a>
+            ) : (
+              <InstantLink
+                key={product.slug}
+                href={product.href}
+                className="footer-program"
+                title={product.nameAr}
+              >
+                <BhdAppIcon id={product.appId} title={product.nameAr} />
+                <span>{product.nameAr}</span>
+              </InstantLink>
+            ),
+          )}
         </div>
       </div>
       <div className="section-wrap footer-top">

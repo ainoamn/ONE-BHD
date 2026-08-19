@@ -144,6 +144,20 @@ test("points live BHD products at official bhd-om.com hosts", async () => {
   assert.match(products, /appId: "hisaby"/);
   assert.doesNotMatch(products, /عين عُمان/);
   assert.doesNotMatch(products, /AIN OMAN/);
+  assert.doesNotMatch(products, /github\.com/);
+  assert.doesNotMatch(products, /repository:/);
+  const [productPage, contact, securityTxt, home, layout] = await Promise.all([
+    readFile(new URL("app/products/[slug]/page.tsx", root), "utf8"),
+    readFile(new URL("app/contact/page.tsx", root), "utf8"),
+    readFile(new URL("public/.well-known/security.txt", root), "utf8"),
+    readFile(new URL("app/page.tsx", root), "utf8"),
+    readFile(new URL("app/layout.tsx", root), "utf8"),
+  ]);
+  assert.doesNotMatch(productPage, /مستودع المشروع/);
+  assert.doesNotMatch(contact, /github\.com/);
+  assert.doesNotMatch(securityTxt, /github\.com/);
+  assert.doesNotMatch(home, /مستودع/);
+  assert.doesNotMatch(layout, /github\.com/);
   assert.doesNotMatch(products, /wazen-roan\.vercel\.app/);
   assert.doesNotMatch(products, /bhd-pro\.vercel\.app/);
   assert.doesNotMatch(products, /nasab-mu\.vercel\.app/);

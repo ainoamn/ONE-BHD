@@ -7,7 +7,6 @@ export type Product = {
   descriptionAr: string;
   descriptionEn: string;
   href: string;
-  repository: string;
   statusAr: string;
   statusEn: string;
   mark: string;
@@ -32,7 +31,6 @@ export const products: Product[] = [
     descriptionEn:
       "Wallets, expenses, trips, circles and shared commitments in one clear Arabic-first experience.",
     href: "https://wazen.bhd-om.com/",
-    repository: "https://github.com/ainoamn/WAZEN",
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "و",
@@ -55,7 +53,6 @@ export const products: Product[] = [
     descriptionEn:
       "Invoicing, POS, restaurants, inventory, VAT and financial reports from one platform.",
     href: "https://hisaby.bhd-om.com/",
-    repository: "https://github.com/ainoamn/hisaby",
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ح",
@@ -78,7 +75,6 @@ export const products: Product[] = [
     descriptionEn:
       "An integrated platform for buying, selling, renting and managing property investments.",
     href: "https://baitak.bhd-om.com/",
-    repository: "https://github.com/ainoamn/ainoamn-ain-oman-web",
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ب",
@@ -100,7 +96,6 @@ export const products: Product[] = [
     descriptionEn:
       "A digital family tree that preserves relationships, stories and heritage across generations.",
     href: "https://nasab.bhd-om.com/",
-    repository: "https://github.com/ainoamn/Nasab",
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "ن",
@@ -122,7 +117,6 @@ export const products: Product[] = [
     descriptionEn:
       "A multi-vendor digital marketplace designed for Omani and Gulf commerce.",
     href: "https://bhdstor.bhd-om.com/",
-    repository: "https://github.com/ainoamn/BHD-STOR",
     statusAr: "متاح الآن",
     statusEn: "Available now",
     mark: "م",
@@ -143,8 +137,7 @@ export const products: Product[] = [
       "مساحة تشغيلية آمنة لإدارة أعمال الشركة ووثائقها وعملياتها اليومية.",
     descriptionEn:
       "A secure operational workspace for company documents, workflows and daily administration.",
-    href: "https://github.com/ainoamn/bhd-om",
-    repository: "https://github.com/ainoamn/bhd-om",
+    href: "/products/bhd-office",
     statusAr: "نظام داخلي",
     statusEn: "Internal system",
     mark: "B",
@@ -160,4 +153,8 @@ export const products: Product[] = [
 export function getProduct(slug: string): Product | undefined {
   const resolved = slug === "ain-oman" ? "baitak" : slug;
   return products.find((product) => product.slug === resolved);
+}
+
+export function isExternalProductHref(href: string): boolean {
+  return href.startsWith("https://") || href.startsWith("http://");
 }

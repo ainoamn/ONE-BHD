@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { InnerPageShell } from "../components/InnerPageShell";
 import { InstantLink } from "../components/InstantLink";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
-import { products } from "../lib/products";
+import { isExternalProductHref, products } from "../lib/products";
 
 export const metadata: Metadata = {
   title: "برامجنا",
@@ -53,7 +53,11 @@ export default function AppsPage() {
               <p className="program-label">كيف يعمل</p>
               <p>{product.howAr}</p>
             </div>
-            <a href={product.href}>{product.statusEn === "Internal system" ? "مستودع داخلي" : "فتح البرنامج"}</a>
+            {isExternalProductHref(product.href) ? (
+              <a href={product.href} target="_blank" rel="noopener noreferrer">فتح البرنامج</a>
+            ) : (
+              <InstantLink href={product.href}>تعرّف على البرنامج</InstantLink>
+            )}
           </article>
         ))}
       </section>
