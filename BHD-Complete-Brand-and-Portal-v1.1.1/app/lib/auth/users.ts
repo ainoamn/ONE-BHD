@@ -419,7 +419,7 @@ export async function updateOwnProfile(
     passwordHash = await hashPassword(input.newPassword);
   }
 
-  const phone = input.phone !== undefined ? input.phone.trim() || null : user.phone;
+  const phone = input.phone !== undefined ? input.phone?.trim() || null : user.phone;
 
   const [updated] = await db
     .update(users)
