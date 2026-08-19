@@ -2367,11 +2367,17 @@ h3 {
   letter-spacing: 0.08em;
 }
 
-.login-welcome {
+.login-welcome,
+.login-lead {
   margin: 0;
   color: #f4efe4;
-  font-size: 15px;
+  font-size: 16px;
   font-weight: 700;
+  line-height: 1.7;
+}
+
+.login-lead {
+  font-weight: 600;
 }
 
 .login-brand-panel h1 {

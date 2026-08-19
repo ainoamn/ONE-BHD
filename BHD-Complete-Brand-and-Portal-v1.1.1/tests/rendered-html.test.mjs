@@ -46,8 +46,11 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(loginForm, /language-button/);
   assert.match(loginForm, /login-apps/);
   assert.match(loginForm, /login-social/);
+  assert.match(loginForm, /BHD ID/);
+  assert.match(loginForm, /من هنا تبدأ أحلامك الأكبر/);
   assert.match(loginForm, /ابنِ أحلامًا أكبر/);
   assert.match(loginForm, /Build Higher Dreams/);
+  assert.doesNotMatch(loginForm, /بوابة الهوية العالمية/);
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
   assert.match(facebookStart, /facebookLoginUrl/);
   const accountConsole = await readFile(new URL("app/account/AccountConsole.tsx", root), "utf8");

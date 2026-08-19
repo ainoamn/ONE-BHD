@@ -14,13 +14,12 @@ type Lang = "ar" | "en";
 
 const COPY = {
   ar: {
-    kicker: "بوابة الهوية العالمية",
-    welcome: "مرحباً بك",
-    title: "حساب BHD واحد لكل منظومة بن حمود للتطوير",
+    kicker: "BHD ID",
+    title: "من هنا تبدأ أحلامك الأكبر",
+    lead: "بوابة موحّدة تجمعك بمنظومة بن حمود للتطوير.",
+    body: "ابنِ أحلامك الأكبر بتسجيل الدخول إلى البوابة الموحّدة: حساب واحد يصل إلى كل منصات BHD وخدماتها، بسهولة وأمان ومن مكان واحد.",
     slogan: "ابنِ أحلامًا أكبر",
-    sloganWith: "مع بن حمود للتطوير",
     promise: "Build Higher Dreams",
-    body: "من هنا تدخل إلى وازن وحسابي ونَسَب وبيتك والمتجر وبقية برامج المجموعة. حساب واحد. جلسة واحدة.",
     login: "دخول",
     register: "إنشاء حساب",
     identifier: "البريد أو اسم المستخدم",
@@ -58,13 +57,12 @@ const COPY = {
     network: "تعذّر الاتصال بالخادم.",
   },
   en: {
-    kicker: "Global identity gateway",
-    welcome: "Welcome",
-    title: "One BHD account for the Bin Hamood Development family",
+    kicker: "BHD ID",
+    title: "Your bigger dreams begin here",
+    lead: "One unified gateway to the Bin Hamood Development ecosystem.",
+    body: "Build Higher Dreams by signing in once — a single account for every BHD platform and service, simple and secure, from one place.",
     slogan: "Build Higher Dreams",
-    sloganWith: "with Bin Hamood Development",
     promise: "ابنِ أحلامًا أكبر",
-    body: "Sign in once for WAZEN, HISAB, NASAB, BAITAK, the Store, and the rest of the group. One account. One session.",
     login: "Sign in",
     register: "Create account",
     identifier: "Email or username",
@@ -254,14 +252,13 @@ export function LoginForm() {
         <div className="login-stage">
           <aside className="login-brand-panel">
             <p className="login-brand-kicker">{t.kicker}</p>
-            <p className="login-welcome">{t.welcome}</p>
             <h1>{t.title}</h1>
+            <p className="login-lead">{t.lead}</p>
+            <p>{t.body}</p>
             <p className="login-slogan">
               <strong>{t.slogan}</strong>
-              <span>{t.sloganWith}</span>
             </p>
             <p className="login-promise">{t.promise}</p>
-            <p>{t.body}</p>
           </aside>
 
           <section className="login-card">
