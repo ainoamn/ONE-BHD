@@ -87,6 +87,7 @@ export function AccountConsole() {
   const [zipCode, setZipCode] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   function applyPayload(payload: AccountPayload) {
     setData(payload);
@@ -128,6 +129,16 @@ export function AccountConsole() {
     setSaving(true);
     setError("");
     setSaved("");
+    if (newPassword && newPassword !== confirmPassword) {
+      setError("تأكيد كلمة المرور غير مطابق.");
+      setSaving(false);
+      return;
+    }
+    if (data?.user && !data.user.hasPassword && newPassword && newPassword.length < 8) {
+      setError("كلمة المرور يجب أن تكون 8 أحرف على الأقل.");
+      setSaving(false);
+      return;
+    }
     try {
       const response = await fetch("/api/account", {
         method: "PATCH",
@@ -154,7 +165,12 @@ export function AccountConsole() {
       applyPayload(payload);
       setCurrentPassword("");
       setNewPassword("");
-      setSaved("تم حفظ بياناتك. ستظهر في بقية مواقع BHD عند الدخول التالي.");
+      setConfirmPassword("");
+      setSaved(
+        newPassword
+          ? "تم حفظ كلمة المرور. يمكنك الدخول لاحقاً بالبريد وكلمة المرور أو عبر فيسبوك/جوجل."
+          : "تم حفظ بياناتك. ستظهر في بقية مواقع BHD عند الدخول التالي.",
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "تعذّر حفظ التعديلات.");
     } finally {
@@ -232,7 +248,7 @@ export function AccountConsole() {
               <form className="account-panel" onSubmit={onSubmit}>
                 <div className="account-panel-head">
                   <h2>تعديل البيانات</h2>
-                  <p>البريد ثابت لأنه مفتاح الدخول. رقم الهاتف لا يأتي من فيسبوك؛ أدخله هنا. الجنس وتاريخ الميلاد ومكان الإقامة تُملأ من فيسبوك إن سمح الحساب، ويمكن تعديلها هنا.</p>
+                  <p>البريد ثابت لأنه مفتاح الدخول. إن دخلت بفيسبوك أو جوجل يمكنك هنا إنشاء كلمة مرور للمرات القادمة. رقم الهاتف لا يأتي من فيسبوك.</p>
                 </div>
                 <div className="account-fields">
                   <label>
@@ -301,8 +317,23 @@ export function AccountConsole() {
                         كلمة مرور جديدة
                         <input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" />
                       </label>
+                      <label>
+                        تأكيد كلمة المرور الجديدة
+                        <input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" />
+                      </label>
                     </>
-                  ) : null}
+                  ) : (
+                    <>
+                      <label>
+                        إنشاء كلمة مرور
+                        <input type="password" value={newPassword} onChange={(event) => setNewPassword(event.target.value)} autoComplete="new-password" placeholder="8 أحرف على الأقل" />
+                      </label>
+                      <label>
+                        تأكيد كلمة المرور
+                        <input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" />
+                      </label>
+                    </>
+                  )}
                 </div>
                 <button type="submit" className="primary-button" disabled={saving}>
                   {saving ? "جاري الحفظ…" : "حفظ التعديلات"}

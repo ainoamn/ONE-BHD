@@ -514,11 +514,12 @@ export async function updateOwnProfile(
 
   let passwordHash = user.passwordHash;
   if (input.newPassword) {
-    if (!user.passwordHash) throw new Error("NO_PASSWORD");
-    if (!input.currentPassword) throw new Error("INVALID_CREDENTIALS");
-    const ok = await verifyPassword(input.currentPassword, user.passwordHash);
-    if (!ok) throw new Error("INVALID_CREDENTIALS");
     if (!isStrongPassword(input.newPassword)) throw new Error("WEAK_PASSWORD");
+    if (user.passwordHash) {
+      if (!input.currentPassword) throw new Error("INVALID_CREDENTIALS");
+      const ok = await verifyPassword(input.currentPassword, user.passwordHash);
+      if (!ok) throw new Error("INVALID_CREDENTIALS");
+    }
     passwordHash = await hashPassword(input.newPassword);
   }
 

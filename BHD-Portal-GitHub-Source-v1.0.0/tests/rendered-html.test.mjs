@@ -44,6 +44,10 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(login, /LoginForm/);
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
   assert.match(facebookStart, /facebookLoginUrl/);
+  const accountConsole = await readFile(new URL("app/account/AccountConsole.tsx", root), "utf8");
+  const usersLib = await readFile(new URL("app/lib/auth/users.ts", root), "utf8");
+  assert.match(accountConsole, /إنشاء كلمة مرور/);
+  assert.doesNotMatch(usersLib, /throw new Error\("NO_PASSWORD"\)/);
   assert.match(schema, /facebook_id/);
   assert.match(schema, /birth_date/);
   assert.match(schema, /hometown/);

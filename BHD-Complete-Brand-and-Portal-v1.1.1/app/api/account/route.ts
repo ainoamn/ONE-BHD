@@ -122,8 +122,7 @@ export async function PATCH(request: Request) {
       INVALID_USERNAME: ["اسم المستخدم من 3 إلى 32 حرفًا إنجليزيًا أو رقمًا.", 400],
       EMAIL_OR_USERNAME_TAKEN: ["اسم المستخدم مستخدم مسبقًا.", 409],
       INVALID_CREDENTIALS: ["كلمة المرور الحالية غير صحيحة.", 401],
-      WEAK_PASSWORD: ["كلمة المرور الجديدة ضعيفة.", 400],
-      NO_PASSWORD: ["هذا الحساب بلا كلمة مرور محلية. استخدم جوجل للدخول.", 400],
+      WEAK_PASSWORD: ["كلمة المرور يجب أن تكون 8 أحرف على الأقل.", 400],
       NOT_FOUND: ["الحساب غير موجود.", 404],
     };
     const [message, status] = messages[code] || ["تعذّر حفظ التعديلات.", 400];
