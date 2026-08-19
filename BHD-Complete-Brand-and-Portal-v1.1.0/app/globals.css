@@ -2309,18 +2309,39 @@ h3 {
 .login-screen {
   min-height: 100svh;
   display: grid;
-  place-items: center;
-  padding: 28px 16px;
+  place-items: start center;
+  padding: 20px 16px 32px;
   background:
     radial-gradient(circle at 12% 18%, rgba(8, 163, 159, 0.12), transparent 28%),
     radial-gradient(circle at 88% 82%, rgba(181, 141, 85, 0.14), transparent 30%),
     #f4f7f5;
 }
 
-.login-stage {
-  width: min(1040px, 100%);
+.login-shell {
+  width: min(1080px, 100%);
   display: grid;
-  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+}
+
+.login-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.login-top-mark { width: min(180px, 52vw); height: auto; }
+.login-lang {
+  border: 1px solid #d7e2dc;
+  border-radius: 999px;
+  background: #fff;
+  padding: 8px 14px;
+}
+
+.login-stage {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   overflow: hidden;
   border: 1px solid #d7e2dc;
   border-radius: 28px;
@@ -2330,46 +2351,129 @@ h3 {
 
 .login-brand-panel {
   display: grid;
-  align-content: start;
-  gap: 18px;
-  padding: 42px 36px;
+  align-content: center;
+  gap: 14px;
+  padding: 48px 40px;
   background:
     linear-gradient(160deg, #092d24 0%, #0c4a3c 55%, #174b70 100%);
   color: #fff;
 }
 
-.login-brand-logo { width: min(220px, 100%); }
 .login-brand-kicker {
-  margin: 18px 0 0;
+  margin: 0;
   color: #9fd4c4;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 800;
+  letter-spacing: 0.08em;
 }
+
+.login-welcome {
+  margin: 0;
+  color: #f4efe4;
+  font-size: 15px;
+  font-weight: 700;
+}
+
 .login-brand-panel h1 {
   margin: 0;
-  font-size: clamp(28px, 3vw, 38px);
-  line-height: 1.35;
+  font-size: clamp(26px, 3vw, 36px);
+  line-height: 1.4;
 }
+
+.login-slogan {
+  display: grid;
+  gap: 4px;
+  margin: 8px 0 0;
+}
+
+.login-slogan strong {
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 800;
+  color: #fff;
+}
+
+.login-slogan span,
+.login-promise {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 14px;
+}
+
 .login-brand-panel > p {
   margin: 0;
   color: rgba(255, 255, 255, 0.82);
   font-size: 14px;
   line-height: 1.85;
 }
-.login-brand-panel ul {
-  margin: 8px 0 0;
+
+.login-apps {
+  display: grid;
+  gap: 12px;
+  padding: 4px 2px 0;
+}
+
+.login-apps p {
+  margin: 0;
+  color: #4d635a;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.login-apps ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+  margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.login-apps li {
   display: grid;
-  gap: 10px;
+  justify-items: center;
+  gap: 6px;
+  min-width: 72px;
+  color: #3f574d;
+  font-size: 11px;
+  font-weight: 700;
 }
-.login-brand-panel li {
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
-  font-size: 13px;
+
+.login-apps li.is-soon { opacity: 0.45; }
+.login-apps .bhd-app-icon { width: 44px; height: 44px; }
+
+.login-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  margin-top: 4px;
 }
+
+.login-provider { display: grid; justify-items: center; gap: 6px; }
+.login-provider-hit {
+  width: 48px;
+  height: 48px;
+  overflow: hidden;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+.login-provider-btn {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #fff;
+  cursor: pointer;
+}
+
+.login-provider-btn svg { width: 22px; height: 22px; }
+.login-provider-btn.is-facebook { background: #1877f2; }
+.login-provider-btn.is-whatsapp { background: #25d366; }
+.login-provider-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
 .login-card {
   padding: 34px 32px 28px;

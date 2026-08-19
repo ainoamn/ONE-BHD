@@ -28,9 +28,10 @@ test("applies production browser security headers", async () => {
 });
 
 test("keeps the login surface private and wires identity APIs", async () => {
-  const [config, login, googleRoute, facebookStart, schema, discovery] = await Promise.all([
+  const [config, login, loginForm, googleRoute, facebookStart, schema, discovery] = await Promise.all([
     readFile(new URL("next.config.ts", root), "utf8"),
     readFile(new URL("app/login/page.tsx", root), "utf8"),
+    readFile(new URL("app/login/LoginForm.tsx", root), "utf8"),
     readFile(new URL("app/api/auth/google/route.ts", root), "utf8"),
     readFile(new URL("app/api/auth/facebook/start/route.ts", root), "utf8"),
     readFile(new URL("db/schema.ts", root), "utf8"),
@@ -42,6 +43,11 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(config, /\/account/);
   assert.match(config, /accounts\.google\.com/);
   assert.match(login, /LoginForm/);
+  assert.match(loginForm, /language-button/);
+  assert.match(loginForm, /login-apps/);
+  assert.match(loginForm, /login-social/);
+  assert.match(loginForm, /ابنِ أحلامًا أكبر/);
+  assert.match(loginForm, /Build Higher Dreams/);
   assert.match(googleRoute, /loginOrRegisterWithGoogle/);
   assert.match(facebookStart, /facebookLoginUrl/);
   const accountConsole = await readFile(new URL("app/account/AccountConsole.tsx", root), "utf8");
