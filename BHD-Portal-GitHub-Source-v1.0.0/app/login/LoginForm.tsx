@@ -153,6 +153,14 @@ export function LoginForm() {
   const [existing, setExisting] = useState<{ name: string; email: string } | null | undefined>(undefined);
 
   useEffect(() => {
+    const local = searchParams.get("local");
+    const next = searchParams.get("next") || "";
+    if (local === "1" && next.startsWith("/admin")) {
+      window.location.replace("/api/auth/admin-entry");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     const stored = window.localStorage.getItem("bhd-login-lang");
     if (stored === "en" || stored === "ar") setLang(stored);
   }, []);

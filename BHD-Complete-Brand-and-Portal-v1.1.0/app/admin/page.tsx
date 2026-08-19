@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function AdminPage() {
   const session = await getCurrentSession();
   if (!session) {
-    redirect("/login?next=/admin");
+    redirect("/api/auth/admin-entry");
   }
   if (!isPlatformAdminEmail(session.email)) {
     return (
@@ -25,6 +25,7 @@ export default async function AdminPage() {
           <h1>ليست لديك صلاحية الإدارة.</h1>
           <p>هذا المسار لحسابات منصة BHD فقط. أدوار المنتجات تبقى داخل كل موقع.</p>
           <InstantLink href="/">العودة إلى البوابة</InstantLink>
+          <a href="/api/auth/admin-entry">دخول الإدارة</a>
         </main>
       </div>
     );

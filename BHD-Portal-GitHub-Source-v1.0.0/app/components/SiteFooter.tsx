@@ -47,6 +47,7 @@ export function SiteFooter({
           <InstantLink href="/privacy">الخصوصية</InstantLink>
           <InstantLink href="/terms">الشروط</InstantLink>
           <InstantLink href="/security">الأمان</InstantLink>
+          <a href="/api/auth/admin-entry">دخول الإدارة</a>
         </div>
       </div>
       <div className="section-wrap footer-bottom">

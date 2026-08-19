@@ -72,7 +72,17 @@ test("keeps the login surface private and wires identity APIs", async () => {
   await access(new URL("app/oauth/token/route.ts", root));
   await access(new URL("app/api/auth/bhd/start/route.ts", root));
   await access(new URL("app/api/auth/bhd/callback/route.ts", root));
+  await access(new URL("app/api/auth/admin-entry/route.ts", root));
   await access(new URL("app/admin/page.tsx", root));
+  const [adminEntry, adminPage, footer] = await Promise.all([
+    readFile(new URL("app/api/auth/admin-entry/route.ts", root), "utf8"),
+    readFile(new URL("app/admin/page.tsx", root), "utf8"),
+    readFile(new URL("app/components/SiteFooter.tsx", root), "utf8"),
+  ]);
+  assert.match(adminEntry, /\/api\/auth\/bhd\/start/);
+  assert.match(adminPage, /\/api\/auth\/admin-entry/);
+  assert.match(footer, /\/api\/auth\/admin-entry/);
+  assert.match(loginForm, /local === "1"/);
   await access(new URL("app/account/page.tsx", root));
   await access(new URL("app/api/account/route.ts", root));
   await access(new URL("app/api/admin/overview/route.ts", root));

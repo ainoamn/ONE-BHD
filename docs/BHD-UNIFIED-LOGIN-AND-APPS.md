@@ -61,7 +61,7 @@
 
 هذه الفقرة جزء من المواصفة. مخالفتها (مثل فتح `wazen.bhd-om.com/admin` بحساب بينما `id` بحساب آخر) تُعدّ عيباً في تثبيت المنتج لا في الهوية.
 
-**الإدارة.** صفحات إعدادات الأدمن (`/admin` على الهوية، ولوحات الأدمن داخل كل منتج) **للمدير فقط**. على البوابة: `BHD_PLATFORM_ADMIN_EMAILS` و`requirePlatformAdmin` — غير المدرج يرى منعاً صريحاً. أدوار منتج (مشرف شركة في حسابي، إلخ) تبقى جداول ذلك المنتج ولا تُفتح من الهوية.
+**الإدارة.** صفحات إعدادات الأدمن (`/admin` على الهوية، ولوحات الأدمن داخل كل منتج) **للمدير فقط**. دخول الإدارة من المنتج: `GET /api/auth/admin-entry` (القسم 4.9) وليس `/login?local=1`. على البوابة: `BHD_PLATFORM_ADMIN_EMAILS` و`requirePlatformAdmin` — غير المدرج يرى منعاً صريحاً. أدوار منتج تبقى جداول ذلك المنتج ولا تُفتح من الهوية.
 
 ---
 
@@ -329,6 +329,34 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 
 عندما يعمل `start` بـ 302 إلى الهوية: أبلغ ONE-BHD لقلب `mode` إلى `"sso"` وإعادة نسخ الكتالوج.
 
+### 4.9 دخول الإدارة — `GET /api/auth/admin-entry` (Checklist سريع)
+
+لا ترسل المشرف إلى `/login?local=1&next=/admin`. ذلك يفتح كلمة مرور محلية ويكسر الحساب الواحد. انسخ الملف المرجعي:
+
+`BHD-Complete-Brand-and-Portal-v1.1.0/app/api/auth/admin-entry/route.ts`
+
+يحوّل إلى `{origin}/api/auth/bhd/start?returnTo=/admin` (نفس جلسة هوية BHD).
+
+| خطوة | ماذا تفعل |
+|---|---|
+| 1 | انسخ `app/api/auth/admin-entry/route.ts` إلى المنتج |
+| 2 | في صفحة `/login` (أو `/auth/login`) إن وُجد `local=1` و`next` يبدأ بـ `/admin` → `redirect("/api/auth/admin-entry")` |
+| 3 | أي Gate يمنع `/admin`: زر الدخول = `/api/auth/admin-entry` لا `/login?local=1…` |
+| 4 | رابط «دخول أدمن» في الفوتر = `/api/auth/admin-entry` |
+| 5 | إن لم يكن مسار الإدارة `/admin` مرّر `?next=/المسار` أو غيّر القيمة الافتراضية في الملف |
+
+مسارات الإدارة المعتمدة اليوم:
+
+| الموقع | مسار الإدارة | `returnTo` |
+|---|---|---|
+| الهوية / البوابة | `/admin` | `/admin` |
+| وازن | `/admin` | `/admin` |
+| نَسَب | `/admin` | `/admin` |
+| حسابي | أكّد المسار في مستودع حسابي إن لم يكن `/admin` | |
+| المتجر / بيتك / المكتب | أكّد المسار إن اختلف | |
+
+بعد `callback` امسح جلسة المنتج السابقة. `/admin` لنفس `bhd_sub` فقط.
+
 ---
 
 ## 5. ما يُحظر (مخاطر مرفوضة)
@@ -378,6 +406,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | `app/oauth/token/route.ts` | استبدال الكود/التحديث |
 | `app/oauth/userinfo/route.ts` | قراءة الملف الحي للمنتجات |
 | `app/api/auth/bhd/start/route.ts` | SSO البوابة (يحوّل إلى origin لأنها الهوية) |
+| `app/api/auth/admin-entry/route.ts` | دخول الإدارة → `start?returnTo=/admin` (يُنسخ للمنتجات) |
 | `app/lib/bhd/apps.ts` | الكتالوج المجمد |
 | `app/lib/identity/clients.ts` | تسجيل `redirect_uri` |
 | `app/components/SiteFooter.tsx` | فوتر برامجنا + عن الشركة + الهوية |
@@ -541,7 +570,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | الأصل | `https://bhdstor.bhd-om.com` |
 | تاريخ التثبيت | 18–19 أغسطس 2026 — OIDC + مشغّل على `main` |
 | خطة التنفيذ | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) |
-| كيف ثُبّت | `users.bhd_sub` · `/api/auth/bhd/start`+`callback`+`logout` · غلاف `/auth/login` و`/auth/register` → الهوية إلا `?local=1` · مشغّل بعد الجلسة |
+| كيف ثُبّت | `users.bhd_sub` · `/api/auth/bhd/start`+`callback`+`logout` · `admin-entry` لـ `/admin` · غلاف `/auth/login` و`/auth/register` → الهوية إلا `?local=1` (و`local=1&next=/admin` → `admin-entry`) · مشغّل بعد الجلسة |
 | كيف يعمل الدخول | authorize/token على `id.bhd-om.com` بـ `client_id=bhd-store` لا أصل المتجر |
 | التنقل الصامت | كوكي `bhd_id` على الهوية؛ الكتالوج `mode=sso` للمتجر |
 | المشغّل | تسع نقاط في شريط المتجر؛ الحساب `https://id.bhd-om.com/account` |
@@ -561,7 +590,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | الأصل | `https://baitak.bhd-om.com` (نطاق إنتاج المكتب الحالي) |
 | `redirect_uri` | `https://baitak.bhd-om.com/api/auth/bhd/callback` + localhost |
 | الحالة في المشغّل | الكتالوج المجمد ما زال `enabled: false` و`origin` فارغ حتى يُحدَّث في ONE-BHD بعد التحقق من أن `GET /api/auth/bhd/start` يعيد 302 إلى الهوية |
-| كيف ثُبّت | القسم 4: عمود `User.bhdSub` · `/api/auth/bhd/start`+`callback`+`logout` · غلاف `/login` و`/register` → الهوية إلا `?local=1` · مشغّل بعد الجلسة · فوتر برامجنا · خمول 48 ساعة |
+| كيف ثُبّت | القسم 4: عمود `User.bhdSub` · `/api/auth/bhd/start`+`callback`+`logout` · `admin-entry` · غلاف `/login` و`/register` → الهوية إلا `?local=1` · مشغّل بعد الجلسة · فوتر برامجنا · خمول 48 ساعة |
 | كيف يعمل الدخول | `start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل المنتج) → `callback` يستبدل `code` على الخادم → upsert على `bhdSub` → كوكي NextAuth Host-only |
 | التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ المكتب لا يقرأ كوكي البوابة |
 | المشغّل | تسع نقاط في الرأس العام ورأس لوحة الأدمن بعد الجلسة. «الحساب» → `https://id.bhd-om.com/account` |
