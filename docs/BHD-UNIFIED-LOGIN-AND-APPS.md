@@ -601,13 +601,14 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | `client_id` | `bhd-nasab` |
 | الأصل | `https://nasab.bhd-om.com` (نسخة Vercel: `https://nasab-mu.vercel.app`) |
 | `redirect_uri` | `https://nasab.bhd-om.com/api/auth/bhd/callback` + `https://nasab-mu.vercel.app/api/auth/bhd/callback` + `http://localhost:5173/api/auth/bhd/callback` |
-| كيف ثُبّت | القسم 6 من SSO ثم نسخ الكتالوج والمشغّل من `v1.1.0`. الخطة في مستودع نَسَب: `docs/BHD-NASAB-INTEGRATION.md` |
-| كيف يعمل الدخول | زر «تسجيل الدخول» → `GET /api/auth/bhd/start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل نَسَب) → `callback` يستبدل `code` على الخادم → كوكي `kimi_sid` + عمود `bhd_sub` |
+| كيف ثُبّت | القسم 6 + **0.7** + **4.9** ثم المشغّل. الخطة في مستودع نَسَب: `docs/BHD-NASAB-INTEGRATION.md` · `docs/BHD-PRODUCT-SSO-ADMIN.md` |
+| كيف يعمل الدخول | زر «تسجيل الدخول» → `GET /api/auth/bhd/start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل نَسَب) → `callback` يربط `bhd_sub` (يبقي دور الأدمن المحلي إن وُجد بالبريد) ويمسح جلسة المنتج السابقة → كوكي `kimi_sid` |
 | كيف يعمل التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ نَسَب لا يقرأ كوكي البوابة |
 | المشغّل | `AppHeader` بعد جلسة نَسَب فقط. «الحساب» → `https://id.bhd-om.com/account`. إعدادات الشجرة/الفوترة تبقى `/account` داخل نَسَب |
-| جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive` + `GET /api/auth/me` + تجديد في `auth.me` |
-| الإدارة | `/admin` لدور `admin` المحلي؛ غير المشرف يرى منعاً صريحاً |
-| ملفات `start` / `callback` | `app/server/bhd/auth.ts` — `/api/auth/bhd/start` و`/callback` و`/logout` |
+| جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive` + `GET /api/auth/me` + تجديد في `auth.me`؛ `callback` يمسح الجلسة السابقة |
+| الإدارة | صلاحية محلية `users.role=admin` فقط مربوط بـ `bhd_sub`. مسار الدخول: `GET /api/auth/admin-entry` → SSO → `/admin`. لا `/login?admin=1` ولا كلمة مرور محلية للمستخدم النهائي. غير المشرف يرى منعاً صريحاً. أدمن منصة الهوية لا يفتح نَسَب |
+| الفوتر | رابط «دخول الإدارة» → `/api/auth/admin-entry` |
+| ملفات `start` / `callback` | `app/server/bhd/auth.ts` · `app/server/admin-entry.ts` — `/api/auth/bhd/start` و`/callback` و`/logout` و`/api/auth/admin-entry` |
 | عمود `bhd_sub` | جدول `users` (Neon PostgreSQL) |
 | قلب `mode` إلى `sso` | 19 أغسطس 2026 في `lib/bhd/apps.ts` داخل ONE-BHD |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_OAUTH_REDIRECT_URI`, `BHD_IDENTITY_TOKEN_SECRET`, `APP_SECRET`, `DATABASE_URL` |
