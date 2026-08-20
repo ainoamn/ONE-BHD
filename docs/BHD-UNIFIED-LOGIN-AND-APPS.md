@@ -503,7 +503,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 |---|---|---|---|---|
 | الهوية / البوابة | نعم (هي المُصدِر) | نعم | portal `sso` | القسم 6 أعلاه + 12.1 |
 | وازن | قيد التنفيذ | بعد OIDC | `browse` حتى إشعار ONE-BHD | 12.2 |
-| حسابي | لم يُربط | — | `browse` | 12.3 |
+| حسابي | مربوط في الكود 20 أغسطس 2026 — قلب `sso` بعد تحقق 302 الحي | `bhd-hisaby` | `browse`→`sso` | 12.3 |
 | نَسَب | نعم | نعم | `sso` | 12.4 |
 | بيتك | لم يُربط | — | `browse` | 12.5 |
 | المتجر | نعم | نعم | `sso` | 12.6 |
@@ -583,15 +583,17 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | التقنيات الكاملة لوازن | _الإطار، القاعدة، المحافظ، النشر — يملأها فريق وازن_ |
 | ما لم يُوحَّد | المحافظ، المصاريف، الرحلات، الجمعيات |
 
-### 12.3 حسابي — `ainoamn/hisaby`
+### 12.3 حسابي — `ainoamn/BHD-Pro`
 
 | البند | التوثيق |
 |---|---|
+| تاريخ التثبيت الحي | 20 أغسطس 2026 — OIDC + غلاف دخول + admin-entry |
 | `client_id` | `bhd-hisaby` |
-| نطاق BHD | `https://hisaby.bhd-om.com` (+ `hisaby.pro` إضافي) |
-| ملاحظة | الواجهة تبدأ التحويل؛ callback يضبط كوكي المنتج عبر نفس المنشأ. الشركة لا تُنشأ من الهوية |
-| التقنيات الكاملة | _يملأها فريق حسابي: Nest/Next، Prisma، الفواتير، الكاشير…_ |
-| ما لم يُوحَّد | الشركات، الفواتير، الضريبة، الكاشير |
+| الأصل | `https://hisaby.bhd-om.com` (+ hisaby.pro / bhd-pro.vercel.app) |
+| كيف ثُبّت | Nest `bhd/start|callback|logout` + `admin-entry` · `users.bhd_sub` · rewrite Vercel · غلاف `/login` · ربط بالبريد مع الإبقاء على الدور · لا شركة من الهوية |
+| حالة المشغّل | `mode: "browse"` حتى تحقق `GET …/api/auth/bhd/start` → 302 للهوية؛ ثم قلب إلى `"sso"` |
+| التقنيات | Next.js + NestJS + Prisma + Neon + Render/Vercel — التفاصيل في مستودع BHD-Pro: `docs/HISABY-BHD-SSO-2026-08-20.md` |
+| ما لم يُوحَّد | الشركات، الفواتير، الكاشير، المطاعم، المخزون |
 
 ### 12.4 نَسَب — `ainoamn/Nasab`
 
