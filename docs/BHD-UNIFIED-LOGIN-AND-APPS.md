@@ -414,7 +414,8 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | وازن | `/admin` | `/admin` |
 | نَسَب | `/admin` | `/admin` |
 | حسابي | أكّد المسار في مستودع حسابي إن لم يكن `/admin` | |
-| المتجر / بيتك / المكتب | أكّد المسار إن اختلف | |
+| المتجر | `/dashboard/admin` | `/dashboard/admin` (افتراضي `admin-entry`) |
+| بيتك / المكتب | أكّد المسار إن اختلف | |
 
 بعد `callback` امسح جلسة المنتج السابقة. `/admin` لنفس `bhd_sub` فقط. لربط أدمن محلي قديم أو سياسة الأدوار الآمنة اتبع القسم **0.7**.
 
@@ -631,12 +632,13 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | الأصل | `https://bhdstor.bhd-om.com` |
 | تاريخ التثبيت | 18–19 أغسطس 2026 — OIDC + مشغّل على `main` |
 | خطة التنفيذ | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) |
-| كيف ثُبّت | `users.bhd_sub` · `/api/auth/bhd/start`+`callback`+`logout` · `admin-entry` لـ `/admin` · غلاف `/auth/login` و`/auth/register` → الهوية إلا `?local=1` (و`local=1&next=/admin` → `admin-entry`) · مشغّل بعد الجلسة |
+| كيف ثُبّت | `users.bhd_sub` · `/api/auth/bhd/start`+`callback`+`logout` · `GET /api/auth/admin-entry` → `returnTo=/dashboard/admin` · غلاف `/auth/login` و`/auth/register` → الهوية إلا `?local=1` (و`local=1` نحو لوحة الإدارة → `admin-entry`) · ربط أدمن قديم بالبريد مع الإبقاء على الدور · مشغّل بعد الجلسة |
 | كيف يعمل الدخول | authorize/token على `id.bhd-om.com` بـ `client_id=bhd-store` لا أصل المتجر |
+| الأدمن | صلاحية محلية في جدول `users.role` فقط؛ الهوية لا تمنح أدمن. مسار الدخول: `/api/auth/admin-entry` لا `?local=1`. يتطلب `BACKEND_URL` + migration 017 لربط `bhd_sub` |
 | التنقل الصامت | كوكي `bhd_id` على الهوية؛ الكتالوج `mode=sso` للمتجر |
 | المشغّل | تسع نقاط في شريط المتجر؛ الحساب `https://id.bhd-om.com/account` |
-| جلسة المنتج | خمول منزلق 48 ساعة + تجديد عند الاستخدام |
-| الفوتر | صف برامجنا من الكتالوج؛ عن الشركة وهوية الشركة على البوابة |
+| جلسة المنتج | خمول منزلق 48 ساعة + تجديد عند الاستخدام؛ `callback` يمسح الجلسة السابقة قبل ضبط الجديدة |
+| الفوتر | صف برامجنا + رابط «دخول الإدارة» → `/api/auth/admin-entry` |
 | تاريخ قلب `mode` إلى `sso` | 19 أغسطس 2026 |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BACKEND_URL` |
 | **التقنيات الكاملة** | Next.js 14 · NestJS · TypeORM · PostgreSQL · Redis · Vercel `bhdstor` · حكم NO-GO للإنتاج |
@@ -650,15 +652,16 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | `client_id` | `bhd-office` |
 | الأصل | `https://baitak.bhd-om.com` (نطاق إنتاج المكتب الحالي) |
 | `redirect_uri` | `https://baitak.bhd-om.com/api/auth/bhd/callback` + localhost |
-| الحالة في المشغّل | الكتالوج المجمد ما زال `enabled: false` و`origin` فارغ حتى يُحدَّث في ONE-BHD بعد التحقق من أن `GET /api/auth/bhd/start` يعيد 302 إلى الهوية |
-| كيف ثُبّت | القسم 4: عمود `User.bhdSub` · `/api/auth/bhd/start`+`callback`+`logout` · `admin-entry` · غلاف `/login` و`/register` → الهوية إلا `?local=1` · مشغّل بعد الجلسة · فوتر برامجنا · خمول 48 ساعة |
-| كيف يعمل الدخول | `start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل المنتج) → `callback` يستبدل `code` على الخادم → upsert على `bhdSub` → كوكي NextAuth Host-only |
+| الحالة في المشغّل | `enabled: true` · `origin: https://baitak.bhd-om.com` · `mode: sso` (20 أغسطس 2026) |
+| كيف ثُبّت | القسم 4 + **0.7** + **4.9**: `User.bhdSub` · `start`/`callback`/`logout` · `GET /api/auth/admin-entry` · غلاف `/login`→الهوية · فوتر «دخول الإدارة»→`admin-entry` · ربط أدمن قديم بالبريد مع الإبقاء على الدور · خمول 48 ساعة |
+| كيف يعمل الدخول | `start` → `id.bhd-om.com/oauth/authorize` → `callback` upsert على `bhdSub` (يحفظ ADMIN) → كوكي NextAuth Host-only بعد مسح الجلسة السابقة |
 | التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ المكتب لا يقرأ كوكي البوابة |
-| المشغّل | تسع نقاط في الرأس العام ورأس لوحة الأدمن بعد الجلسة. «الحساب» → `https://id.bhd-om.com/account` |
+| المشغّل | تسع نقاط بعد الجلسة؛ الحساب → `https://id.bhd-om.com/account` |
 | جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive` + `GET /api/auth/me` |
-| الإدارة | `/admin` لأدوار المنتج المحلية؛ غير المدير يرى منعاً كما هو |
-| ملفات `start` / `callback` | `app/api/auth/bhd/start/route.ts` · `callback/route.ts` · `logout/route.ts` |
-| عمود `bhd_sub` | جدول `User.bhdSub` (Prisma / PostgreSQL Neon المنتج) |
+| الإدارة | `/api/auth/admin-entry` → SSO → `/{locale}/admin`؛ الدور من جدول `User` المحلي فقط (ليس من الهوية). أدمن المنصة `BHD_PLATFORM_ADMIN_EMAILS` يخص هوية فقط |
+| ملفات `start` / `callback` | `app/api/auth/bhd/start|callback|logout` · `app/api/auth/admin-entry/route.ts` |
+| عمود `bhd_sub` | `User.bhdSub` |
+| تاريخ قلب `mode` إلى `sso` | 20 أغسطس 2026 |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_OAUTH_REDIRECT_URI`, `NEXTAUTH_SECRET`, `DATABASE_URL` |
 | **التقنيات الكاملة** | Next.js 16 App Router · React 19 · TypeScript · Tailwind · Prisma · PostgreSQL (Neon المنتج) · NextAuth JWT Host-only · next-intl · Vercel مشروع `bhd-om` · عقارات/عقود/محاسبة/دفتر عناوين محلية |
 | ما لم يُوحَّد | العقارات، العقود، الحجوزات، المحاسبة، النظام القديم، أدوار المكتب، الفواتير |
