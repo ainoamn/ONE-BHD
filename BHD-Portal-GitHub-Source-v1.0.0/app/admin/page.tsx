@@ -23,7 +23,10 @@ export default async function AdminPage() {
           <BrandLogo kind="full" tone="ink" className="admin-logo-ink" />
           <p>لوحة التحكم</p>
           <h1>ليست لديك صلاحية الإدارة.</h1>
-          <p>هذا المسار لحسابات منصة BHD فقط. أدوار المنتجات تبقى داخل كل موقع.</p>
+          <p>
+            هذا المسار لحسابات منصة الهوية فقط (`BHD_PLATFORM_ADMIN_EMAILS`).
+            أدوار وازن وحسابي ونَسَب والمتجر تُدار داخل كل منتج على نفس الحساب عبر `bhd_sub` — ليست من هنا.
+          </p>
           <InstantLink href="/">العودة إلى البوابة</InstantLink>
           <a href="/api/auth/admin-entry">دخول الإدارة</a>
         </main>

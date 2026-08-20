@@ -162,6 +162,16 @@ export function AdminConsole({
           </p>
         ) : null}
 
+        <section className="admin-policy" aria-label="حدود صلاحية المنصة">
+          <p>
+            هذه اللوحة لأدمن <strong>الهوية فقط</strong> ({`BHD_PLATFORM_ADMIN_EMAILS`}).
+            لا تمنح صلاحية وازن أو حسابي أو نَسَب أو المتجر من هنا.
+            أدمن كل منتج يُعيَّن في قاعدة ذلك المنتج على نفس <code>bhd_sub</code> — انظر{" "}
+            <InstantLink href="/apps">برامجنا</InstantLink> والدليل{" "}
+            <code>docs/BHD-PRODUCT-SSO-ADMIN.md</code>.
+          </p>
+        </section>
+
         <section className="admin-stats" aria-label="ملخص الهوية">
           {stats.map((stat) => (
             <article key={stat.label}>

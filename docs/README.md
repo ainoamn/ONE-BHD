@@ -3,6 +3,7 @@
 | الملف | الغرض |
 |---|---|
 | [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات والتنقل الصامت، وتقنيات كل موقع بعد التثبيت |
+| [BHD-PRODUCT-SSO-ADMIN.md](BHD-PRODUCT-SSO-ADMIN.md) | **دليل تنفيذ المنتج:** SSO صامت + أدمن محلي لكل موقع (يُنسخ إلى مستودع المنتج) |
 | [BHD-APP-SWITCHER.md](BHD-APP-SWITCHER.md) | **المواصفة المعتمدة** لمشغّل التطبيقات بعد الدخول (تسع نقاط بجانب الحساب وشعارات التطبيقات). تُنسخ كما هي مع `lib/bhd/apps.ts` |
 | [BHD-WAZEN-INTEGRATION.md](BHD-WAZEN-INTEGRATION.md) | **خطة وازن الجاهزة للتنفيذ:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع WAZEN |
 | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) | **خطة المتجر:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع BHD-STOR |
