@@ -184,9 +184,26 @@ test("ships the frozen BHD app switcher beside the signed-in account", async () 
   assert.match(apps, /bhd-appswitcher\.v1/);
   assert.match(apps, /https:\/\/bhdstor\.bhd-om\.com/);
   assert.match(apps, /BHD-PRODUCT-SSO-ADMIN/);
-  const adminConsole = await readFile(new URL("app/admin/AdminConsole.tsx", root), "utf8");
+  assert.match(apps, /id: "portal"[\s\S]*mode: "sso"/);
+  assert.match(apps, /id: "wazen"[\s\S]*mode: "browse"/);
+  assert.match(apps, /id: "hisaby"[\s\S]*mode: "browse"/);
+  assert.match(apps, /id: "nasab"[\s\S]*mode: "sso"/);
+  assert.match(apps, /id: "store"[\s\S]*mode: "sso"/);
+  assert.match(apps, /id: "office"[\s\S]*mode: "sso"[\s\S]*enabled: true/);
+  const [adminConsole, platformAdmin, userinfo, adminPage] = await Promise.all([
+    readFile(new URL("app/admin/AdminConsole.tsx", root), "utf8"),
+    readFile(new URL("app/lib/auth/platform-admin.ts", root), "utf8"),
+    readFile(new URL("app/oauth/userinfo/route.ts", root), "utf8"),
+    readFile(new URL("app/admin/page.tsx", root), "utf8"),
+  ]);
   assert.match(adminConsole, /أدمن.*الهوية فقط|الهوية فقط/);
+  assert.match(platformAdmin, /BHD_PLATFORM_ADMIN_EMAILS/);
+  assert.match(platformAdmin, /requirePlatformAdmin/);
+  assert.match(userinfo, /no-store/);
+  assert.match(adminPage, /admin-entry/);
+  assert.match(adminPage, /BHD_PLATFORM_ADMIN_EMAILS/);
   await access(new URL("docs/BHD-PRODUCT-SSO-ADMIN.md", root));
+  await access(new URL("docs/BHD-UNIFIED-LOGIN-AND-APPS.md", root));
   assert.match(switcher, /تطبيقات BHD/);
   assert.match(switcher, /\/account/);
   assert.match(switcher, /BhdAppIcon/);

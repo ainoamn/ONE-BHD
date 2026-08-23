@@ -171,7 +171,7 @@
 
 لذلك: الدخول السابق إلى **أي** موقع يمر عبر الهوية يكفي للتنقل اللاحق. الموقع الجديد لا يقرأ كوكي الموقع القديم؛ يثق بتوكن صادر من الهوية بعد PKCE.
 
-إن لم تكن جلسة `bhd_id` قائمة (خروج موحّد، أو متصفح آخر، أو انتهاء 7 أيام) تظهر شاشة `/login` مرة واحدة ثم يعود المنتج.
+إن لم تكن جلسة `bhd_id` قائمة (خروج موحّد، أو متصفح آخر، أو انتهاء **48 ساعة خمول**) تظهر شاشة `/login` مرة واحدة ثم يعود المنتج.
 
 ```mermaid
 sequenceDiagram
@@ -308,7 +308,7 @@ sequenceDiagram
 
 - يظهر فقط مع جلسة صالحة.
 - يسار الصورة في RTL: تسع نقاط ثم الأفاتار.
-- الكتالوج المجمد `lib/bhd/apps.ts` — لا قائمة محلية.
+- الكتالوج المجمد `app/lib/bhd/apps.ts` — لا قائمة محلية.
 - `mode: "sso"` → `{origin}/api/auth/bhd/start?returnTo=/`
 - `mode: "browse"` → أصل الموقع فقط (المنتج لم يُكمل القسم 6)
 - `mode: "identity"` → `/account` على البوابة/الهوية وإلا `https://id.bhd-om.com/account`
@@ -445,7 +445,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | الإطار | Next.js `16.2.6` (App Router) + React `19.2.6` | صفحات `/login` `/account` `/admin` ومسارات `/oauth/*` |
 | اللغة | TypeScript `5.9.3` | النوع الصارم في البناء على Vercel |
 | التشغيل | Node.js `>=22.13` | `runtime = "nodejs"` لمسارات الهوية |
-| النشر | Vercel مشروع `one-bhd` | Root Directory المجلد `v1.1.0`؛ نطاقات `www` و`id` و`one-bhd.vercel.app` |
+| النشر | Vercel مشروع `one-bhd` | Root Directory: `BHD-Complete-Brand-and-Portal-v1.1.0`؛ نطاقات `www` و`id` و`one-bhd.vercel.app` |
 | DNS | Hostinger NS + CNAME `cname.vercel-dns.com` | تجنّب عناوين Vercel المكسورة من عُمان |
 | الهوية البصرية | IBM Plex Sans Arabic + Inter عبر `next/font` | RTL افتراضي |
 | الأنماط | `app/globals.css` (ليست Tailwind في واجهة الهوية الأساسية) | بادئة المشغّل `bhd-switcher-` |
@@ -507,7 +507,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | نَسَب | نعم | نعم | `sso` | 12.4 |
 | بيتك | لم يُربط | — | `browse` | 12.5 |
 | المتجر | نعم | نعم | `sso` | 12.6 |
-| المكتب | معطّل في المشغّل | — | `enabled: false` | 12.7 |
+| المكتب | نعم (على نطاق بيتك الحالي) | نعم | `sso` · `enabled: true` | 12.7 |
 
 ---
 
@@ -548,6 +548,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | [BHD-WAZEN-INTEGRATION.md](BHD-WAZEN-INTEGRATION.md) | بطاقة تنفيذ وازن |
 | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) | بطاقة تنفيذ المتجر |
 | [BHD-NEON-DATABASE.md](BHD-NEON-DATABASE.md) | Neon الهوية فقط |
+| [BHD-PRODUCT-SSO-ADMIN.md](BHD-PRODUCT-SSO-ADMIN.md) | تنفيذ SSO + أدمن محلي في كل منتج |
 | [BHD-REPOSITORY-DOCUMENTATION.md](BHD-REPOSITORY-DOCUMENTATION.md) | نشر البوابة |
 
 ---
@@ -561,14 +562,15 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | البند | التوثيق |
 |---|---|
 | تاريخ التثبيت الحي | أغسطس 2026 — OIDC على `id.bhd-om.com` / `one-bhd` |
-| كيف ثُبّت | نفس تطبيق البوابة يخدم الهوية؛ Neon `bhd-identity`؛ مسارات `/oauth/*` و`/login` و`/account` |
+| كيف ثُبّت | نفس تطبيق البوابة يخدم الهوية؛ Neon `bhd-identity`؛ مسارات `/oauth/*` و`/login` و`/account` و`/admin` و`admin-entry` |
 | كيف يعمل الدخول | `LoginForm` → جلسة `bhd_id` → `/oauth/authorize` يصدر كود إن وُجدت الجلسة |
 | كيف يعمل التنقل | منتج آخر يستدعي authorize؛ الهوية لا تعرض نموذجاً إن `bhd_id` قائمة |
 | كيف يعمل المشغّل | `SessionMenu` يحمّل `/api/auth/me` ثم `BhdAppSwitcher` |
+| مراجعة تطبيق الدليلين (23 أغسطس 2026) | مطابق لـ `BHD-UNIFIED-LOGIN-AND-APPS` و`BHD-PRODUCT-SSO-ADMIN` على مستوى الهوية: كوكي `bhd_id` Host-only + خمول 48 ساعة، تحويل المضيف إلى `id`، حساب واحد/`SWITCH_REQUIRES_LOGOUT`، `admin-entry`، أدمن منصة عبر `BHD_PLATFORM_ADMIN_EMAILS` فقط، OIDC كامل، مشغّل بكتالوج مجمد، بلا روابط GitHub عامة، `userinfo` بـ `no-store` |
 | ملفات أُضيفت | انظر القسم 6 |
 | أسرار (أسماء فقط) | `DATABASE_URL`, `AUTH_SECRET`, `IDENTITY_TOKEN_SECRET`, `GOOGLE_CLIENT_ID`, `FACEBOOK_APP_ID`, `FACEBOOK_APP_SECRET`, `BHD_PLATFORM_ADMIN_EMAILS`, أسرار العملاء `BHD_OAUTH_CLIENT_SECRET_*` |
 | التقنيات الكاملة | القسم 6 |
-| ملاحظات صيانة | لا تستخدم مسار `start` في البوابة كقالب لمنتج: البوابة تحوّل إلى `origin` |
+| ملاحظات صيانة | لا تستخدم مسار `start` في البوابة كقالب لمنتج: البوابة تحوّل إلى `origin`. أدمن المنتجات لا يُدار من `/admin` على الهوية — نفّذ `BHD-PRODUCT-SSO-ADMIN.md` في مستودع كل منتج |
 
 ### 12.2 وازن — `ainoamn/WAZEN`
 
