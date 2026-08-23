@@ -592,12 +592,12 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | تاريخ التثبيت الحي | 20 أغسطس 2026 — OIDC + غلاف دخول + admin-entry |
 | `client_id` | `bhd-hisaby` |
 | الأصل | `https://hisaby.bhd-om.com` (+ hisaby.pro / bhd-pro.vercel.app) |
-| كيف ثُبّت | Nest `bhd/start|callback|logout` + `admin-entry` · `users.bhd_sub` · rewrite Vercel · غلاف `/login` · ربط بالبريد مع الإبقاء على الدور · لا شركة من الهوية |
+| كيف ثُبّت | Nest `bhd/start|callback|logout` + `admin-entry` · `users.bhd_sub` · rewrite Vercel · غلاف `/login` · **callback §0.7/§3.3:** `bhd_sub` → بريد موثّق (إبقاء الدور) → وإلا إنشاء مستخدم + شركة STARTER (أدمن تلك الشركة فقط) |
 | حالة المشغّل | `mode: "browse"` حتى تحقق `GET …/api/auth/bhd/start` → 302 للهوية؛ ثم قلب إلى `"sso"` |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_IDENTITY_TOKEN_SECRET` (= `IDENTITY_TOKEN_SECRET` على الهوية، أو `AUTH_SECRET` إن كان الاحتياطي), `JWT_*`, `FRONTEND_URL` |
-| عطل شائع | `?bhd=verify` — ناقص السر أو JWKS فارغ؛ حسابي يحتاط بـ `userinfo` بعد تبادل الكود (23 أغسطس 2026) |
-| التقنيات | Next.js + NestJS + Prisma + Neon + Render/Vercel — `docs/HISABY-BHD-SSO-2026-08-20.md` في مستودع حسابي |
-| ما لم يُوحَّد | الشركات، الفواتير، الكاشير، المطاعم، المخزون |
+| عطل شائع | `?bhd=verify` — ناقص السر أو JWKS فارغ (احتياطي userinfo). `?bhd=exchange` سابقاً بسبب رفض إنشاء المستخدم — أُصلح 23 أغسطس وفق §3.3 |
+| التقنيات | Next.js + NestJS + Prisma + Neon + Render/Vercel — `docs/HISABY-BHD-SSO-2026-08-20.md` · `docs/BHD-PRODUCT-SSO-ADMIN.md` |
+| ما لم يُوحَّد | بيانات التشغيل (فواتير، كاشير، مطاعم، مخزون) — الأدوار محلية |
 
 ### 12.4 نَسَب — `ainoamn/Nasab`
 
@@ -607,13 +607,14 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | `client_id` | `bhd-nasab` |
 | الأصل | `https://nasab.bhd-om.com` (نسخة Vercel: `https://nasab-mu.vercel.app`) |
 | `redirect_uri` | `https://nasab.bhd-om.com/api/auth/bhd/callback` + `https://nasab-mu.vercel.app/api/auth/bhd/callback` + `http://localhost:5173/api/auth/bhd/callback` |
-| كيف ثُبّت | القسم 6 + **0.7** + **4.9** ثم المشغّل. الخطة في مستودع نَسَب: `docs/BHD-NASAB-INTEGRATION.md` · `docs/BHD-PRODUCT-SSO-ADMIN.md` |
-| كيف يعمل الدخول | زر «تسجيل الدخول» → `GET /api/auth/bhd/start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل نَسَب) → `callback` يربط `bhd_sub` (يبقي دور الأدمن المحلي إن وُجد بالبريد) ويمسح جلسة المنتج السابقة → كوكي `kimi_sid` |
+| كيف ثُبّت | القسم 4 + **0.1** + **0.5** + **0.7** + **4.9** ثم المشغّل. الخطة في مستودع نَسَب: `docs/BHD-NASAB-INTEGRATION.md` · `docs/BHD-PRODUCT-SSO-ADMIN.md` |
+| كيف يعمل الدخول | زر «تسجيل الدخول» → `GET /api/auth/bhd/start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل نَسَب) → `callback` يربط `bhd_sub` (يبقي دور الأدمن المحلي إن وُجد بالبريد) ويمسح جلسة المنتج السابقة → كوكي `kimi_sid`. جوجل وكلمة المرور المحلية معطّلان عند جاهزية SSO |
 | كيف يعمل التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ نَسَب لا يقرأ كوكي البوابة |
 | المشغّل | `AppHeader` بعد جلسة نَسَب فقط. «الحساب» → `https://id.bhd-om.com/account`. إعدادات الشجرة/الفوترة تبقى `/account` داخل نَسَب |
 | جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive` + `GET /api/auth/me` + تجديد في `auth.me`؛ `callback` يمسح الجلسة السابقة |
 | الإدارة | صلاحية محلية `users.role=admin` فقط مربوط بـ `bhd_sub`. مسار الدخول: `GET /api/auth/admin-entry` → SSO → `/admin`. لا `/login?admin=1` ولا كلمة مرور محلية للمستخدم النهائي. غير المشرف يرى منعاً صريحاً. أدمن منصة الهوية لا يفتح نَسَب |
-| الفوتر | رابط «دخول الإدارة» → `/api/auth/admin-entry` |
+| الفوتر | صف «برامجنا» من الكتالوج + روابط عن الشركة/الهوية/apps/الخصوصية/الشروط/الأمان على `www.bhd-om.com` + «دخول الإدارة» → `/api/auth/admin-entry` |
+| الهوية البصرية | حبر `#092d24` · أخضر `#075c45` · رمل `#fbfaf7`/`#f4f0e8` · IBM Plex Sans Arabic (لون تمييز نَسَب في أيقونة المشغّل فقط) |
 | ملفات `start` / `callback` | `app/server/bhd/auth.ts` · `app/server/admin-entry.ts` — `/api/auth/bhd/start` و`/callback` و`/logout` و`/api/auth/admin-entry` |
 | عمود `bhd_sub` | جدول `users` (Neon PostgreSQL) |
 | قلب `mode` إلى `sso` | 19 أغسطس 2026 في `lib/bhd/apps.ts` داخل ONE-BHD |
