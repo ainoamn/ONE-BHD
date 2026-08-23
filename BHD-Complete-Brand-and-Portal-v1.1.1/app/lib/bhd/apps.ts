@@ -65,7 +65,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "HISAB",
     origin: "https://hisaby.bhd-om.com",
     startUrl: "https://hisaby.bhd-om.com/api/auth/bhd/start?returnTo=/",
-    mode: "browse",
+    mode: "sso",
     enabled: true,
     mark: "ح",
     accent: "#075c45",
