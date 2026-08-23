@@ -53,6 +53,10 @@ function openApp(app: BhdApp, pageOrigin: string) {
     window.location.assign(app.startUrl);
     return;
   }
+  if (app.startUrl) {
+    window.location.assign(app.startUrl);
+    return;
+  }
   if (app.origin) {
     window.location.assign(`${stripSlash(app.origin)}/`);
   }

@@ -177,7 +177,7 @@ npm start
 ما يبقى لكل منتج (مقصود):
 
 - أدوار المدير داخل كل تطبيق، لا من الهوية
-- ربط SSO في وازن ثم حسابي ثم نَسَب وبيتك والمتجر (القسم 6 من مواصفة الهوية)
+- ربط SSO في وازن ثم حسابي ثم نَسَب وBHD R والمتجر (القسم 6 من مواصفة الهوية)
 - نسخ مشغّل التطبيقات (`BhdAppSwitcher` + `lib/bhd/apps.ts`) إلى تلك المواقع بعد SSO
 
 ---
@@ -221,9 +221,9 @@ npm start
 | وازن | https://wazen.bhd-om.com |
 | حسابي | https://hisaby.bhd-om.com |
 | نَسَب | https://nasab.bhd-om.com |
-| بيتك (العقار، كان عين عُمان) | https://baitak.bhd-om.com |
+| BHD R (العقار؛ كان بيتك / عين عُمان) | https://r.bhd-om.com/ar |
 | متجر BHD | https://bhdstor.bhd-om.com |
-| مكتب BHD | عند الإطلاق |
+| مكتب BHD | https://baitak.bhd-om.com |
 
 CNAME لكل نطاق فرعي من عُمان: `cname.vercel-dns.com` (ليس `vercel-dns-017`).
 

@@ -10,7 +10,7 @@ export type Product = {
   statusAr: string;
   statusEn: string;
   mark: string;
-  appId: "wazen" | "hisaby" | "nasab" | "baitak" | "store" | "office";
+  appId: "wazen" | "hisaby" | "nasab" | "baitak" | "bhd-r" | "store" | "office";
   accent: string;
   soft: string;
   featured?: boolean;
@@ -65,25 +65,26 @@ export const products: Product[] = [
     howAr: "تنشئ شركتك داخل حسابي، تصدر الفاتورة أو تبيع من الكاشير، والضريبة والمخزون يبقيان في بيانات حسابي فقط.",
   },
   {
-    slug: "baitak",
-    name: "BAITAK",
-    nameAr: "بيتك",
-    categoryAr: "العقارات والاستثمار",
-    categoryEn: "Property & investment",
+    slug: "bhd-r",
+    name: "BHD R",
+    nameAr: "BHD R",
+    categoryAr: "إدارة العقارات",
+    categoryEn: "Property management",
     descriptionAr:
-      "منصة متكاملة للبيع والشراء والإيجار وإدارة العقارات والاستثمار.",
+      "منصة آمنة للمالكين والمطورين والمستأجرين: وحدات متاحة لحظياً، عقود إلكترونية، فواتير وصيانة وتقارير واضحة — من العرض حتى التحصيل.",
     descriptionEn:
-      "An integrated platform for buying, selling, renting and managing property investments.",
-    href: "https://baitak.bhd-om.com/",
+      "A secure platform for owners, developers and tenants: live availability, e-contracts, invoices, maintenance and clear reports — from listing to collection.",
+    href: "https://r.bhd-om.com/ar",
     statusAr: "متاح الآن",
     statusEn: "Available now",
-    mark: "ب",
-    appId: "baitak",
+    mark: "R",
+    appId: "bhd-r",
     accent: "#a66b2d",
     soft: "#f8efe4",
-    capabilitiesAr: ["بيع وشراء العقارات", "الإيجار والإدارة", "الخرائط والتحليلات"],
-    capabilitiesEn: ["Property sales", "Rentals and management", "Maps and analytics"],
-    howAr: "تعرض العقار على الخريطة، تدير البيع أو الإيجار، وملفات العقار تبقى في بيتك لا في وازن أو حسابي.",
+    featured: true,
+    capabilitiesAr: ["إشغال لحظي ووحدات منشورة فقط", "عقود إلكترونية ومسارات اعتماد", "تحصيل وفواتير وصيانة موثّقة"],
+    capabilitiesEn: ["Live occupancy and published units only", "E-contracts and approval flows", "Collection, invoices and documented maintenance"],
+    howAr: "تضيف العقار وتنشر المتاح فقط، توقّع العقد إلكترونياً، ثم تتابع الفواتير والصيانة والتقارير في مساحة حسب دورك — ببيانات معزولة عن وازن وحسابي.",
   },
   {
     slug: "nasab",
@@ -151,7 +152,7 @@ export const products: Product[] = [
 ];
 
 export function getProduct(slug: string): Product | undefined {
-  const resolved = slug === "ain-oman" ? "baitak" : slug;
+  const resolved = slug === "ain-oman" || slug === "baitak" ? "bhd-r" : slug;
   return products.find((product) => product.slug === resolved);
 }
 

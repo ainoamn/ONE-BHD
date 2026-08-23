@@ -55,7 +55,7 @@
 
 - الدخول يحدث فقط على `https://id.bhd-om.com`. `/login` و`/account` و`/admin` و`/oauth` على `www` أو `one-bhd.vercel.app` تُحوَّل إلى مضيف الهوية حتى لا تنشأ كوكي ثانية.
 - لا قائمة «إضافة حساب». إن كانت جلسة الهوية قائمة يظهر تنبيه: اخرج ثم ادخل بالحساب الآخر.
-- المنتجات (وازن، حسابي، نَسَب، بيتك، المتجر، المكتب) **ممنوع** أن تُبقي دخولاً محلياً مستقلاً (جوجل/كلمة مرور/أدمن محلي) بجانب هوية BHD. مسار `/admin` في المنتج لنفس `bhd_sub` فقط.
+- المنتجات (وازن، حسابي، نَسَب، BHD R، المتجر، المكتب) **ممنوع** أن تُبقي دخولاً محلياً مستقلاً (جوجل/كلمة مرور/أدمن محلي) بجانب هوية BHD. مسار `/admin` في المنتج لنفس `bhd_sub` فقط.
 - عند `callback` SSO: امسح أي جلسة منتج سابقة واستبدلها بالمستخدم القادم من الهوية. لا تُبقَ مستخدم أدمن قديم إن دخل حساب BHD مختلف.
 - لتغيير الحساب: خروج موحّد من الهوية (`/oauth/end-session`) يمسح `bhd_id` ثم يجب أن يمسح المنتج جلسته. بعدها فقط يُسمح بدخول جديد.
 
@@ -75,7 +75,7 @@
 
 | ينعكس فوراً عبر الهوية (حاسوب ↔ هاتف) | لا ينعكس بين المواقع |
 |---|---|
-| الاسم، البريد، الهاتف، العنوان، الصورة في `/account` | فواتير حسابي، محافظ وازن، طلبات المتجر، شجرة نَسَب، عقارات بيتك |
+| الاسم، البريد، الهاتف، العنوان، الصورة في `/account` | فواتير حسابي، محافظ وازن، طلبات المتجر، شجرة نَسَب، عقارات BHD R |
 | قائمة المواقع المرتبطة بالحساب | اشتراكات ذلك المنتج وخططه |
 | حالة الدخول على الهوية (بعد SSO) | أدوار المشرف داخل المنتج |
 
@@ -225,12 +225,12 @@ sequenceDiagram
 | حسابي | `bhd-hisaby` | `https://hisaby.bhd-om.com` | `https://hisaby.bhd-om.com/api/auth/bhd/callback` |
 | نَسَب | `bhd-nasab` | `https://nasab.bhd-om.com` | `https://nasab.bhd-om.com/api/auth/bhd/callback` |
 | المتجر | `bhd-store` | `https://bhdstor.bhd-om.com` | `https://bhdstor.bhd-om.com/api/auth/bhd/callback` |
-| بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
-| المكتب | `bhd-office` | داخلي | `{origin}/api/auth/bhd/callback` |
+| BHD R | `bhd-r` | `https://r.bhd-om.com` | `https://r.bhd-om.com/api/auth/bhd/callback` (+ `/ar/...` وواجهة API إن وُجدت) |
+| المكتب | `bhd-office` | `https://baitak.bhd-om.com` (نطاق المكتب الحالي) | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 
 محلياً يُسمح أيضاً بـ `http://localhost:3000/api/auth/bhd/callback` (وازن أيضاً `:3001`). المقارنة **مطابقة تامة**.
 
-`hisaby.pro` نطاق إضافي لحسابي وليس عنصراً في المشغّل. `bhd-ain-oman` يُعامل كاسم قديم لـ `bhd-baitak` إن وُجد في حل العميل.
+`hisaby.pro` نطاق إضافي لحسابي وليس عنصراً في المشغّل. الأسماء القديمة `bhd-ain-oman` و`bhd-baitak` تُحلّ إلى `bhd-r` في مزوّد الهوية.
 
 ### 2.2 كوكيز — أسماء ثابتة
 
@@ -415,7 +415,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | نَسَب | `/admin` | `/admin` |
 | حسابي | أكّد المسار في مستودع حسابي إن لم يكن `/admin` | |
 | المتجر | `/dashboard/admin` | `/dashboard/admin` (افتراضي `admin-entry`) |
-| بيتك / المكتب | أكّد المسار إن اختلف | |
+| بيتك / BHD R / المكتب | أكّد المسار إن اختلف | |
 
 بعد `callback` امسح جلسة المنتج السابقة. `/admin` لنفس `bhd_sub` فقط. لربط أدمن محلي قديم أو سياسة الأدوار الآمنة اتبع القسم **0.7**.
 
@@ -505,9 +505,9 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | وازن | قيد التنفيذ | بعد OIDC | `browse` حتى إشعار ONE-BHD | 12.2 |
 | حسابي | مربوط في الكود 20 أغسطس 2026 — قلب `sso` بعد تحقق 302 الحي | `bhd-hisaby` | `browse`→`sso` | 12.3 |
 | نَسَب | نعم | نعم | `sso` | 12.4 |
-| بيتك | لم يُربط | — | `browse` | 12.5 |
+| BHD R | تصفّح عام حتى يُفعَّل OIDC الحي | — | `browse` · `https://r.bhd-om.com/ar` | 12.5 |
 | المتجر | نعم | نعم | `sso` | 12.6 |
-| المكتب | نعم (على نطاق بيتك الحالي) | نعم | `sso` · `enabled: true` | 12.7 |
+| المكتب | نعم (على نطاق baitak.bhd-om.com) | نعم | `sso` · `enabled: true` | 12.7 |
 
 ---
 
@@ -623,14 +623,18 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | ما لم يُوحَّد | الأشجار، الأعضاء، الدعوات، القصص، GEDCOM، فواتير نَسَب، الخطط، أدوار الشجرة |
 | فريق الصيانة | مستودع `ainoamn/Nasab` |
 
-### 12.5 بيتك — `ainoamn/ainoamn-ain-oman-web`
+### 12.5 BHD R — إدارة العقارات (`r.bhd-om.com`)
+
+يحلّ محل منتج «بيتك / عين عُمان» في كتالوج البوابة والمشغّل. الروابط القديمة `/products/baitak` و`/products/ain-oman` تحوّل إلى `/products/bhd-r`.
 
 | البند | التوثيق |
 |---|---|
-| `client_id` | `bhd-baitak` |
-| الأصل | `https://baitak.bhd-om.com` |
-| التقنيات الكاملة | _يملأها فريق بيتك_ |
-| ما لم يُوحَّد | العقارات، الإيجار، الخرائط |
+| `client_id` | `bhd-r` (الأسماء القديمة `bhd-baitak` / `bhd-ain-oman` تُحلّ إليه) |
+| الأصل العام | `https://r.bhd-om.com` — هبوط عربي `https://r.bhd-om.com/ar` |
+| حالة المشغّل | `enabled: true` · `mode: browse` · `startUrl: https://r.bhd-om.com/ar` حتى يثبت `GET …/api/auth/bhd/start` → 302 إلى `id.bhd-om.com` |
+| redirect الإنتاج | `https://r.bhd-om.com/api/auth/bhd/callback` (+ مسار `/ar` وواجهة API إن وُجدت) |
+| أسرار (أسماء فقط) | `BHD_OAUTH_CLIENT_SECRET_R` |
+| ما لم يُوحَّد | الوحدات، العقود، التحصيل، الصيانة، أدوار المالك/المطور/المستأجر |
 
 ### 12.6 المتجر — `ainoamn/BHD-STOR`
 

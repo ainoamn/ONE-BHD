@@ -29,7 +29,7 @@
 
 ## 1. الهدف
 
-بعد تسجيل الدخول الموحّد، يرى المستخدم بجانب صورته شبكة تطبيقات مجموعة بن حمود (سلوك تطبيقات Google: أيقونة تسع نقاط → بطاقة → شبكة 3 أعمدة). ينتقل بين البوابة ووازن وحسابي ونَسَب وبيتك والمتجر دون أن يبحث عن الروابط.
+بعد تسجيل الدخول الموحّد، يرى المستخدم بجانب صورته شبكة تطبيقات مجموعة بن حمود (سلوك تطبيقات Google: أيقونة تسع نقاط → بطاقة → شبكة 3 أعمدة). ينتقل بين البوابة ووازن وحسابي ونَسَب وBHD R والمتجر دون أن يبحث عن الروابط.
 
 ```mermaid
 sequenceDiagram
@@ -212,15 +212,15 @@ export const BHD_APPS: BhdApp[] = [
     soft: "#f6e9eb",
   },
   {
-    id: "baitak",
-    clientId: "bhd-baitak",
-    nameAr: "بيتك",
-    nameEn: "BAITAK",
-    origin: "https://baitak.bhd-om.com",
-    startUrl: "https://baitak.bhd-om.com/api/auth/bhd/start?returnTo=/",
+    id: "bhd-r",
+    clientId: "bhd-r",
+    nameAr: "BHD R",
+    nameEn: "BHD R",
+    origin: "https://r.bhd-om.com",
+    startUrl: "https://r.bhd-om.com/ar",
     mode: "browse",
     enabled: true,
-    mark: "ب",
+    mark: "R",
     accent: "#a66b2d",
     soft: "#f8efe4",
   },
@@ -242,16 +242,18 @@ export const BHD_APPS: BhdApp[] = [
     clientId: "bhd-office",
     nameAr: "المكتب",
     nameEn: "BHD Office",
-    origin: "",
-    startUrl: null,
-    mode: "browse",
-    enabled: false,
+    origin: "https://baitak.bhd-om.com",
+    startUrl: "https://baitak.bhd-om.com/api/auth/bhd/start?returnTo=/",
+    mode: "sso",
+    enabled: true,
     mark: "B",
     accent: "#283b4d",
-    soft: "#e9edf0",
+    soft: "#e8ecf0",
   },
 ];
 ```
+
+> ملاحظة مجمّدة: منتج العقار العام هو **BHD R** على `r.bhd-om.com/ar`. نطاق `baitak.bhd-om.com` يخص **مكتب BHD** فقط ما دام كذلك في الإنتاج.
 
 عندما يُكمل منتج قسم 6 من SSO، **لا يعدّل المنتج ملفه**. يُغيَّر `mode` من `"browse"` إلى `"sso"` هنا في ONE-BHD ثم يُنسخ `apps.ts` إلى الجميع.
 

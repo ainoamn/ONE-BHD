@@ -104,16 +104,6 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     ],
   },
   {
-    clientId: "bhd-baitak",
-    name: "BAITAK",
-    secretEnv: "BHD_OAUTH_CLIENT_SECRET_BAITAK",
-    redirectUris: [
-      "https://baitak.bhd-om.com/api/auth/bhd/callback",
-      "http://localhost:3000/api/auth/bhd/callback",
-    ],
-    postLogoutRedirectUris: ["https://baitak.bhd-om.com/", "http://localhost:3000/"],
-  },
-  {
     clientId: "bhd-r",
     name: "BHD R",
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_R",
@@ -121,18 +111,20 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
       "https://bhd-r-api-phi.vercel.app/api/auth/bhd/callback",
       "https://bhd-r-api-phi.vercel.app/v1/auth/oidc/callback",
       "https://r.bhd-om.com/api/auth/bhd/callback",
+      "https://r.bhd-om.com/ar/api/auth/bhd/callback",
       "http://localhost:3000/api/auth/bhd/callback",
     ],
     postLogoutRedirectUris: [
       "https://bhd-r-api-phi.vercel.app/",
       "https://r.bhd-om.com/",
+      "https://r.bhd-om.com/ar",
       "http://localhost:3000/",
     ],
   },
 ];
 
 export function getIdentityClient(clientId: string): IdentityClient | undefined {
-  const resolved = clientId === "bhd-ain-oman" ? "bhd-baitak" : clientId;
+  const resolved = clientId === "bhd-ain-oman" || clientId === "bhd-baitak" ? "bhd-r" : clientId;
   return IDENTITY_CLIENTS.find((client) => client.clientId === resolved);
 }
 

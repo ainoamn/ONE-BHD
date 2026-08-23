@@ -148,9 +148,10 @@ test("points live BHD products at official bhd-om.com hosts", async () => {
   assert.match(products, /https:\/\/wazen\.bhd-om\.com\//);
   assert.match(products, /https:\/\/hisaby\.bhd-om\.com\//);
   assert.match(products, /https:\/\/nasab\.bhd-om\.com\//);
-  assert.match(products, /https:\/\/baitak\.bhd-om\.com\//);
+  assert.match(products, /https:\/\/r\.bhd-om\.com\/ar/);
   assert.match(products, /https:\/\/bhdstor\.bhd-om\.com\//);
-  assert.match(products, /nameAr: "بيتك"/);
+  assert.match(products, /nameAr: "BHD R"/);
+  assert.match(products, /appId: "bhd-r"/);
   assert.match(products, /appId: "wazen"/);
   assert.match(products, /appId: "hisaby"/);
   assert.doesNotMatch(products, /عين عُمان/);
@@ -209,7 +210,8 @@ test("ships the frozen BHD app switcher beside the signed-in account", async () 
   assert.match(switcher, /BhdAppIcon/);
   assert.match(session, /BhdAppSwitcher/);
   assert.match(icon, /wazen/);
-  assert.match(icon, /baitak/);
+  assert.match(icon, /bhd-r/);
+  assert.match(apps, /id: "bhd-r"[\s\S]*https:\/\/r\.bhd-om\.com\/ar/);
   await access(new URL("docs/BHD-APP-SWITCHER.md", root));
 });
 

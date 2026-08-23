@@ -146,10 +146,10 @@
 |---|---|---|---|
 | WAZEN / وازن | إدارة الأموال | `github.com/ainoamn/WAZEN` | `wazen-roan.vercel.app` |
 | HISAB / حسابي | المحاسبة والأعمال | `github.com/ainoamn/BHD-Pro` | `bhd-pro.vercel.app` |
-| BAITAK / بيتك | العقار والاستثمار | `github.com/ainoamn/ainoamn-ain-oman-web` | `baitak.bhd-om.com` |
-| NASAB / نَسَب | شجرة العائلة | `github.com/ainoamn/Nasab` | `nasab-mu.vercel.app` |
+| BHD R / إدارة العقارات | العقار والإدارة | `r.bhd-om.com` | `https://r.bhd-om.com/ar` |
+| NASAB / نَسَب | شجرة العائلة | `github.com/ainoamn/Nasab` | `nasab.bhd-om.com` |
 | BHD STORE / متجر BHD | التجارة الإلكترونية | `github.com/ainoamn/BHD-STOR` | `bhdstor.bhd-om.com` |
-| BHD OFFICE | تشغيل الأعمال | `github.com/ainoamn/bhd-om` | نظام داخلي/المستودع |
+| BHD OFFICE | تشغيل الأعمال | `github.com/ainoamn/bhd-om` | `baitak.bhd-om.com` |
 
 المرجع البرمجي لهذه البيانات هو `app/lib/products.ts`. يجب تعديل البيانات هناك بدل تكرارها داخل المكونات.
 

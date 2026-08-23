@@ -96,8 +96,9 @@ sequenceDiagram
 | نَسَب | `bhd-nasab` | `https://nasab.bhd-om.com` | `https://nasab.bhd-om.com/api/auth/bhd/callback` |
 | متجر BHD | `bhd-store` | `https://bhdstor.bhd-om.com` | `https://bhdstor.bhd-om.com/api/auth/bhd/callback` |
 | مكتب BHD | `bhd-office` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
-| بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
-| BHD R | `bhd-r` | `https://r.bhd-om.com` / `https://bhd-r-api-phi.vercel.app` | `{origin}/api/auth/bhd/callback` |
+| BHD R | `bhd-r` | `https://r.bhd-om.com` | `https://r.bhd-om.com/api/auth/bhd/callback` (+ `/ar/...`) |
+
+الأسماء القديمة `bhd-baitak` / `bhd-ain-oman` تُحلّ إلى `bhd-r`.
 
 محلياً لكل منتج:
 
@@ -165,7 +166,7 @@ sequenceDiagram
 | وازن | المحافظ، الأعضاء، الفوترة + عمود `bhd_sub` | وازن فقط |
 | حسابي | الشركات، الفواتير، الكاشير + عمود `bhd_sub` على المستخدم | حسابي فقط |
 | البوابة | بعد المرحلة 2 تصبح واجهة فوق الهوية أو تحوّل `/login` إلى المُصدِر | لا قاعدة مستخدمين ثانية |
-| نَسَب / متجر / مكتب / بيتك | بيانات المنتج + `bhd_sub` | ذلك المنتج فقط |
+| نَسَب / متجر / مكتب / BHD R | بيانات المنتج + `bhd_sub` | ذلك المنتج فقط |
 
 `bhd_contacts` من نوع `SELF` هو دفتر عناوين الحساب الموحّد. دفاتر عملاء حسابي تبقى جداول حسابي.
 
@@ -286,14 +287,12 @@ grant_type=refresh_token
 
 التحقق عند المنتج **إلزامي على الخادم:**
 
-1. جلب JWKS من `jwks_uri` (كاش 10 دقائق) أو تحقق HS256 بـ `IDENTITY_TOKEN_SECRET` / `BHD_IDENTITY_TOKEN_SECRET` بينما JWKS فارغ.
+1. جلب JWKS من `jwks_uri` (كاش 10 دقائق) أو `jose` مع `IDENTITY` issuer.
 2. `iss` === `BHD_IDENTITY_ISSUER`
 3. `aud` === `BHD_OAUTH_CLIENT_ID`
 4. `exp` في المستقبل
 5. `nonce` يطابق القيمة المخزّنة في كوكي/جلسة الـ callback
 6. `email_verified === true` وإلا ارفض الدخول (إلا مسار بريد الهوية نفسه بعد تحقق لاحق — للمنتجات ارفض إن لم يكن موثّقاً)
-
-**احتياطي مقبول (حسابي 23 أغسطس 2026):** بعد نجاح `authorization_code` + PKCE، إن فشل تحقق التوقيع وJWKS فارغ، يجوز استدعاء `GET /oauth/userinfo` بـ `access_token` على نفس الـ issuer (TLS) مع الإبقاء على فحص `nonce` من حمولة `id_token`. لا يُستبدل هذا بمصادقة من المتصفح.
 
 ---
 
@@ -508,7 +507,7 @@ bhd_oauth_consents
 | **3** | وازن | قسم 6 كامل؛ دخول محلي يُحوَّل إلى الهوية؛ ترحيل بالقسم 7 |
 | **4** | حسابي | قسم 6 على Nest/Next مع `/api/auth/bhd/callback` عبر بروكسي نفس المنشأ |
 | **5** | البوابة `/login` | تحويل إلى المُصدِر أو نفس التطبيق يخدم الهوية والواجهة |
-| **6** | نَسَب ثم المتجر ثم المكتب ثم بيتك | قسم 6 عند أول شاشة دخول |
+| **6** | نَسَب ثم المتجر ثم المكتب ثم BHD R | قسم 6 عند أول شاشة دخول |
 | **7** | قطع | إزالة أزرار جوجل المحلية وأصول Google الزائدة |
 
 لا تبدأ مرحلة 3 قبل نجاح اختبارات المرحلة 2 في القسم 13.
@@ -547,7 +546,7 @@ bhd_oauth_consents
 - `redirect_uri`: `https://bhdstor.bhd-om.com/api/auth/bhd/callback`
 - نفّذ القسم 6 عند أول شاشة دخول
 
-### نَسَب / مكتب / بيتك
+### نَسَب / مكتب / BHD R
 
 - نفّذ القسم 6 فقط
 - `client_id` من جدول 2.1

@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
-  if (slug === "ain-oman") redirect("/products/baitak");
+  if (slug === "ain-oman" || slug === "baitak") redirect("/products/bhd-r");
   const product = getProduct(slug);
   if (!product) notFound();
 

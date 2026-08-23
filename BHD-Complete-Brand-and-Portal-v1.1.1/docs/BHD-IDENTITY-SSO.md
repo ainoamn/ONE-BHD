@@ -96,7 +96,9 @@ sequenceDiagram
 | نَسَب | `bhd-nasab` | `https://nasab.bhd-om.com` | `https://nasab.bhd-om.com/api/auth/bhd/callback` |
 | متجر BHD | `bhd-store` | `https://bhdstor.bhd-om.com` | `https://bhdstor.bhd-om.com/api/auth/bhd/callback` |
 | مكتب BHD | `bhd-office` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
-| بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
+| BHD R | `bhd-r` | `https://r.bhd-om.com` | `https://r.bhd-om.com/api/auth/bhd/callback` (+ `/ar/...`) |
+
+الأسماء القديمة `bhd-baitak` / `bhd-ain-oman` تُحلّ إلى `bhd-r`.
 
 محلياً لكل منتج:
 
@@ -164,7 +166,7 @@ sequenceDiagram
 | وازن | المحافظ، الأعضاء، الفوترة + عمود `bhd_sub` | وازن فقط |
 | حسابي | الشركات، الفواتير، الكاشير + عمود `bhd_sub` على المستخدم | حسابي فقط |
 | البوابة | بعد المرحلة 2 تصبح واجهة فوق الهوية أو تحوّل `/login` إلى المُصدِر | لا قاعدة مستخدمين ثانية |
-| نَسَب / متجر / مكتب / بيتك | بيانات المنتج + `bhd_sub` | ذلك المنتج فقط |
+| نَسَب / متجر / مكتب / BHD R | بيانات المنتج + `bhd_sub` | ذلك المنتج فقط |
 
 `bhd_contacts` من نوع `SELF` هو دفتر عناوين الحساب الموحّد. دفاتر عملاء حسابي تبقى جداول حسابي.
 
@@ -505,7 +507,7 @@ bhd_oauth_consents
 | **3** | وازن | قسم 6 كامل؛ دخول محلي يُحوَّل إلى الهوية؛ ترحيل بالقسم 7 |
 | **4** | حسابي | قسم 6 على Nest/Next مع `/api/auth/bhd/callback` عبر بروكسي نفس المنشأ |
 | **5** | البوابة `/login` | تحويل إلى المُصدِر أو نفس التطبيق يخدم الهوية والواجهة |
-| **6** | نَسَب ثم المتجر ثم المكتب ثم بيتك | قسم 6 عند أول شاشة دخول |
+| **6** | نَسَب ثم المتجر ثم المكتب ثم BHD R | قسم 6 عند أول شاشة دخول |
 | **7** | قطع | إزالة أزرار جوجل المحلية وأصول Google الزائدة |
 
 لا تبدأ مرحلة 3 قبل نجاح اختبارات المرحلة 2 في القسم 13.
@@ -544,7 +546,7 @@ bhd_oauth_consents
 - `redirect_uri`: `https://bhdstor.bhd-om.com/api/auth/bhd/callback`
 - نفّذ القسم 6 عند أول شاشة دخول
 
-### نَسَب / مكتب / بيتك
+### نَسَب / مكتب / BHD R
 
 - نفّذ القسم 6 فقط
 - `client_id` من جدول 2.1
