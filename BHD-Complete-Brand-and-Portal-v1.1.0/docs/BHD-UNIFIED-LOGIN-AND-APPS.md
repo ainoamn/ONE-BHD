@@ -638,14 +638,14 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 |---|---|
 | `client_id` | `bhd-store` |
 | الأصل | `https://bhdstor.bhd-om.com` |
-| تاريخ التثبيت | 18–19 أغسطس 2026 — OIDC + مشغّل على `main` |
-| خطة التنفيذ | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) |
-| كيف ثُبّت | `users.bhd_sub` · `/api/auth/bhd/start`+`callback`+`logout` · `GET /api/auth/admin-entry` → `returnTo=/dashboard/admin` · غلاف `/auth/login` و`/auth/register` → الهوية إلا `?local=1` (و`local=1` نحو لوحة الإدارة → `admin-entry`) · ربط أدمن قديم بالبريد مع الإبقاء على الدور · مشغّل بعد الجلسة |
+| تاريخ التثبيت | 18–19 أغسطس 2026 — OIDC + مشغّل؛ 23 أغسطس 2026 — Gate الأدمن عبر `admin-entry` + مزامنة الكتالوج |
+| خطة التنفيذ | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) · [BHD-PRODUCT-SSO-ADMIN.md](BHD-PRODUCT-SSO-ADMIN.md) |
+| كيف ثُبّت | `users.bhd_sub` · `/api/auth/bhd/start`+`callback`+`logout` · `GET /api/auth/admin-entry` → `returnTo=/dashboard/admin` · غلاف `/auth/login` و`/auth/register` → الهوية إلا `?local=1` · أي مسار إدارة (middleware أو `next`) → `admin-entry` · ربط أدمن قديم بالبريد مع الإبقاء على الدور · مشغّل بعد الجلسة · كتالوج مجمد من ONE-BHD |
 | كيف يعمل الدخول | authorize/token على `id.bhd-om.com` بـ `client_id=bhd-store` لا أصل المتجر |
-| الأدمن | صلاحية محلية في جدول `users.role` فقط؛ الهوية لا تمنح أدمن. مسار الدخول: `/api/auth/admin-entry` لا `?local=1`. يتطلب `BACKEND_URL` + migration 017 لربط `bhd_sub` |
+| الأدمن | صلاحية محلية في جدول `users.role` فقط؛ الهوية لا تمنح أدمن. مسار الدخول: `/api/auth/admin-entry` لا `?local=1`. middleware يحوّل `/dashboard/admin` بلا جلسة إلى `admin-entry`. يتطلب `BACKEND_URL` + migration 017 لربط `bhd_sub` |
 | التنقل الصامت | كوكي `bhd_id` على الهوية؛ الكتالوج `mode=sso` للمتجر |
-| المشغّل | تسع نقاط في شريط المتجر؛ الحساب `https://id.bhd-om.com/account` |
-| جلسة المنتج | خمول منزلق 48 ساعة + تجديد عند الاستخدام؛ `callback` يمسح الجلسة السابقة قبل ضبط الجديدة |
+| المشغّل | تسع نقاط في شريط المتجر؛ الحساب `https://id.bhd-om.com/account`؛ مزامنة `apps.ts` من ONE-BHD (23 أغسطس 2026) |
+| جلسة المنتج | خمول منزلق 48 ساعة + `SessionKeepAlive`؛ `callback`/`logout` يمسحان جلسة المنتج بما فيها `bhd_sso_profile` |
 | الفوتر | صف برامجنا + رابط «دخول الإدارة» → `/api/auth/admin-entry` |
 | تاريخ قلب `mode` إلى `sso` | 19 أغسطس 2026 |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BACKEND_URL` |
