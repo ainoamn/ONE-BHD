@@ -592,8 +592,8 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | الأصل | `https://hisaby.bhd-om.com` (+ hisaby.pro / bhd-pro.vercel.app) |
 | كيف ثُبّت | Nest `bhd/start|callback|logout` + `admin-entry` · `users.bhd_sub` · rewrite Vercel · غلاف `/login` · ربط بالبريد مع الإبقاء على الدور · لا شركة من الهوية |
 | حالة المشغّل | `mode: "browse"` حتى تحقق `GET …/api/auth/bhd/start` → 302 للهوية؛ ثم قلب إلى `"sso"` |
-| أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_IDENTITY_TOKEN_SECRET` (= `IDENTITY_TOKEN_SECRET` على الهوية), `JWT_*`, `FRONTEND_URL` |
-| عطل شائع | `?bhd=verify` إن نقص `BHD_IDENTITY_TOKEN_SECRET` على Render (HS256 / JWKS فارغ) |
+| أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_IDENTITY_TOKEN_SECRET` (= `IDENTITY_TOKEN_SECRET` على الهوية، أو `AUTH_SECRET` إن كان الاحتياطي), `JWT_*`, `FRONTEND_URL` |
+| عطل شائع | `?bhd=verify` — ناقص السر أو JWKS فارغ؛ حسابي يحتاط بـ `userinfo` بعد تبادل الكود (23 أغسطس 2026) |
 | التقنيات | Next.js + NestJS + Prisma + Neon + Render/Vercel — `docs/HISABY-BHD-SSO-2026-08-20.md` في مستودع حسابي |
 | ما لم يُوحَّد | الشركات، الفواتير، الكاشير، المطاعم، المخزون |
 
