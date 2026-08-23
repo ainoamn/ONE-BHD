@@ -226,6 +226,7 @@ sequenceDiagram
 | نَسَب | `bhd-nasab` | `https://nasab.bhd-om.com` | `https://nasab.bhd-om.com/api/auth/bhd/callback` |
 | المتجر | `bhd-store` | `https://bhdstor.bhd-om.com` | `https://bhdstor.bhd-om.com/api/auth/bhd/callback` |
 | بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
+| BHD R | `bhd-r` | `https://r.bhd-om.com` (حي: `https://bhd-r-api-phi.vercel.app`) | `https://bhd-r-api-phi.vercel.app/api/auth/bhd/callback` (+ `https://r.bhd-om.com/api/auth/bhd/callback`) |
 | المكتب | `bhd-office` | داخلي | `{origin}/api/auth/bhd/callback` |
 
 محلياً يُسمح أيضاً بـ `http://localhost:3000/api/auth/bhd/callback` (وازن أيضاً `:3001`). المقارنة **مطابقة تامة**.
@@ -693,3 +694,16 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | **التقنيات الكاملة لبناء هذا الموقع وكيف يعمل** | الإطار، اللغة، القاعدة، التخزين، الطوابير، المدفوعات، النشر، المراقبة |
 | ما بقي محلياً ولم يُوحَّد | |
 | فريق الصيانة | |
+
+### 12.9 BHD R — `ainoamn/BHD-R`
+
+| البند | التوثيق |
+|---|---|
+| تاريخ تسجيل العميل | 23 أغسطس 2026 — أُضيف `bhd-r` إلى `app/lib/identity/clients.ts` |
+| `client_id` | `bhd-r` |
+| الأصل الحي | `https://bhd-r-api-phi.vercel.app` (هدف: `https://r.bhd-om.com`) |
+| `redirect_uri` | `https://bhd-r-api-phi.vercel.app/api/auth/bhd/callback` (+ legacy `/v1/auth/oidc/callback` + `r.bhd-om.com` + localhost) |
+| المشغّل | عنصر `bhd-r` في `apps.ts` بـ `mode: "sso"` بعد تحقق 302 لـ `start` |
+| سر العميل | مشتق من `AUTH_SECRET` عبر `BHD_OAUTH_CLIENT_SECRET_R` / HMAC `bhd-oauth:bhd-r` ما لم يُضبط صراحة |
+| مستودع المنتج | `ainoamn/BHD-R` — `docs/BHD-R-IDENTITY-SETUP.md` |
+

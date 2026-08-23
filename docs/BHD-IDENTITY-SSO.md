@@ -97,6 +97,7 @@ sequenceDiagram
 | متجر BHD | `bhd-store` | `https://bhdstor.bhd-om.com` | `https://bhdstor.bhd-om.com/api/auth/bhd/callback` |
 | مكتب BHD | `bhd-office` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 | بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
+| BHD R | `bhd-r` | `https://r.bhd-om.com` / `https://bhd-r-api-phi.vercel.app` | `{origin}/api/auth/bhd/callback` |
 
 محلياً لكل منتج:
 

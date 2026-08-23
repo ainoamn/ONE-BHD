@@ -113,6 +113,22 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     ],
     postLogoutRedirectUris: ["https://baitak.bhd-om.com/", "http://localhost:3000/"],
   },
+  {
+    clientId: "bhd-r",
+    name: "BHD R",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_R",
+    redirectUris: [
+      "https://bhd-r-api-phi.vercel.app/api/auth/bhd/callback",
+      "https://bhd-r-api-phi.vercel.app/v1/auth/oidc/callback",
+      "https://r.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: [
+      "https://bhd-r-api-phi.vercel.app/",
+      "https://r.bhd-om.com/",
+      "http://localhost:3000/",
+    ],
+  },
 ];
 
 export function getIdentityClient(clientId: string): IdentityClient | undefined {
