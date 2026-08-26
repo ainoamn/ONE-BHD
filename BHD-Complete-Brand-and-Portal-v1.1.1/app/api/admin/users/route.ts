@@ -11,7 +11,7 @@ import { requirePlatformAdmin } from "../../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
 
-function gateJson(gate: Awaited<ReturnType<typeof requirePlatformAdmin>>) {
+function gateJson(gate: { ok: false; status: 401 | 403 }) {
   return NextResponse.json(
     { message: gate.status === 401 ? "يلزم تسجيل الدخول." : "ليست لديك صلاحية الإدارة." },
     { status: gate.status, headers: { "Cache-Control": "no-store" } },
