@@ -2,6 +2,7 @@ import { and, eq, or, sql } from "drizzle-orm";
 import { getDb, isDatabaseConfigured, ensureIdentitySchema } from "../../../db";
 import { contacts, users, oauthTickets, type BhdContact, type BhdUser } from "../../../db/schema";
 import { hashPassword, isStrongPassword, verifyPassword } from "./passwords";
+import { isPlatformAdminEmail } from "./platform-admin";
 
 const MAX_ATTEMPTS = 5;
 const LOCK_MINUTES = 15;
@@ -266,6 +267,7 @@ export async function loginWithPassword(identifier: string, password: string): P
       lockedUntil: null,
       lastLoginAt: new Date(),
       updatedAt: new Date(),
+      ...(isPlatformAdminEmail(user.email) ? { emailVerified: true } : {}),
     })
     .where(eq(users.id, user.id))
     .returning();

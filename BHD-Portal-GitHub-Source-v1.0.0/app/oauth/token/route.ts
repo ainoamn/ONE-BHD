@@ -5,6 +5,7 @@ import { consumeTicket, saveTicket } from "../../lib/identity/tickets";
 import { signAccessToken, signIdToken, tokenTtl } from "../../lib/identity/tokens";
 import { getUserById, getSelfContact } from "../../lib/auth/users";
 import { authSecret } from "../../lib/auth/config";
+import { ensurePlatformAdminEmailVerified } from "../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
 
@@ -45,6 +46,7 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "invalid_grant" }, { status: 400 });
     }
+    const emailVerified = await ensurePlatformAdminEmailVerified(user);
     const self = await getSelfContact(user.id);
     const idToken = await signIdToken({
       issuer,
@@ -57,7 +59,7 @@ export async function POST(request: Request) {
         picture: user.picture,
         preferred_username: user.username,
         phone_number: self?.phone || user.phone,
-        email_verified: user.emailVerified,
+        email_verified: emailVerified,
       },
     });
     const accessToken = await signAccessToken({ issuer, audience: clientId, sub: user.id });
@@ -90,6 +92,7 @@ export async function POST(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "invalid_grant" }, { status: 400 });
     }
+    const emailVerified = await ensurePlatformAdminEmailVerified(user);
     const self = await getSelfContact(user.id);
     const nextRefresh = randomUrlToken();
     await saveTicket({
@@ -115,7 +118,7 @@ export async function POST(request: Request) {
           picture: user.picture,
           preferred_username: user.username,
           phone_number: self?.phone || user.phone,
-          email_verified: user.emailVerified,
+          email_verified: emailVerified,
         },
       }),
       refresh_token: nextRefresh,

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listAdminUsers, setUserActive } from "../../../lib/auth/admin-users";
+import { listAdminUsers, setUserActive, setUserEmailVerified } from "../../../lib/auth/admin-users";
 import { requirePlatformAdmin } from "../../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
@@ -28,9 +28,25 @@ export async function PATCH(request: Request) {
     );
   }
 
-  const body = (await request.json().catch(() => null)) as { id?: string; isActive?: boolean } | null;
+  const body = (await request.json().catch(() => null)) as {
+    id?: string;
+    isActive?: boolean;
+    emailVerified?: boolean;
+  } | null;
   const id = body?.id?.trim() || "";
-  if (!id || typeof body?.isActive !== "boolean") {
+  if (!id) {
+    return NextResponse.json({ message: "طلب غير صالح." }, { status: 400 });
+  }
+
+  if (typeof body?.emailVerified === "boolean") {
+    const user = await setUserEmailVerified(id, body.emailVerified);
+    if (!user) {
+      return NextResponse.json({ message: "الحساب غير موجود." }, { status: 404 });
+    }
+    return NextResponse.json({ user }, { headers: { "Cache-Control": "no-store" } });
+  }
+
+  if (typeof body?.isActive !== "boolean") {
     return NextResponse.json({ message: "طلب غير صالح." }, { status: 400 });
   }
   if (id === gate.session.sub && body.isActive === false) {

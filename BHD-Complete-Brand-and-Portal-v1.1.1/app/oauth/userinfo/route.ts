@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { identityIssuer } from "../../lib/identity/issuer";
 import { readAccessToken } from "../../lib/identity/tokens";
 import { getSelfContact, getUserById } from "../../lib/auth/users";
+import { ensurePlatformAdminEmailVerified } from "../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
 
@@ -18,12 +19,13 @@ export async function GET(request: Request) {
     if (!user) {
       return NextResponse.json({ error: "invalid_token" }, { status: 401, headers: noStore });
     }
+    const emailVerified = await ensurePlatformAdminEmailVerified(user);
     const self = await getSelfContact(user.id);
     return NextResponse.json(
       {
         sub: user.id,
         email: user.email,
-        email_verified: user.emailVerified,
+        email_verified: emailVerified,
         name: user.name,
         picture: user.picture,
         preferred_username: user.username,

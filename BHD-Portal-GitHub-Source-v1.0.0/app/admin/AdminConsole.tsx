@@ -127,6 +127,30 @@ export function AdminConsole({
     }
   }
 
+  async function verifyEmail(user: AdminUser) {
+    setBusyId(user.id);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: user.id, emailVerified: true }),
+      });
+      const data = (await response.json()) as { user?: AdminUser; message?: string };
+      if (!response.ok) {
+        setError(data.message || "تعذّر توثيق البريد.");
+        return;
+      }
+      if (data.user) {
+        setUsers((current) => current.map((row) => (row.id === data.user!.id ? data.user! : row)));
+      }
+    } catch {
+      setError("تعذّر الاتصال بالخادم.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
   const stats = useMemo(
     () => [
       { label: "الحسابات", value: overview?.users ?? "—" },
@@ -303,14 +327,26 @@ export function AdminConsole({
                         <span className={user.isActive ? "admin-pill is-ok" : "admin-pill"}>{user.isActive ? "نشط" : "موقوف"}</span>
                       </td>
                       <td>
-                        <button
-                          type="button"
-                          className="admin-action"
-                          disabled={busyId === user.id || user.email === operatorEmail}
-                          onClick={() => void toggleActive(user)}
-                        >
-                          {user.isActive ? "إيقاف" : "تفعيل"}
-                        </button>
+                        <div className="admin-row-actions">
+                          {!user.emailVerified ? (
+                            <button
+                              type="button"
+                              className="admin-action"
+                              disabled={busyId === user.id}
+                              onClick={() => void verifyEmail(user)}
+                            >
+                              توثيق البريد
+                            </button>
+                          ) : null}
+                          <button
+                            type="button"
+                            className="admin-action"
+                            disabled={busyId === user.id || user.email === operatorEmail}
+                            onClick={() => void toggleActive(user)}
+                          >
+                            {user.isActive ? "إيقاف" : "تفعيل"}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))

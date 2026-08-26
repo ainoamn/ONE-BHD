@@ -4814,3 +4814,10 @@ a.login-submit {
   font-size: 13px;
   padding: 9px 14px;
 }
+
+.admin-row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}

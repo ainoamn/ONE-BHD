@@ -75,6 +75,20 @@ export async function setUserActive(userId: string, isActive: boolean): Promise<
   return updated ? toAdminUser(updated) : null;
 }
 
+export async function setUserEmailVerified(userId: string, emailVerified: boolean): Promise<AdminUserRow | null> {
+  requireDatabase();
+  const db = getDb();
+  const [updated] = await db
+    .update(users)
+    .set({
+      emailVerified,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId))
+    .returning();
+  return updated ? toAdminUser(updated) : null;
+}
+
 export async function adminOverview() {
   const clients = IDENTITY_CLIENTS.map((client) => ({
     clientId: client.clientId,
