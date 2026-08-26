@@ -13,6 +13,9 @@ test("ships production metadata and security disclosure", async () => {
   assert.match(layout, /Build Higher Dreams/);
   assert.match(layout, /application\/ld\+json/);
   assert.doesNotMatch(page, /codex-preview|SkeletonPreview/);
+  assert.match(page, /gateway-shell/);
+  assert.match(page, /gatewayApps/);
+  await access(new URL("app/company/page.tsx", root));
   await access(new URL("public/og.png", root));
   await access(new URL("public/.well-known/security.txt", root));
   await access(new URL("public/images/bhd-philosophy-hero.webp", root));
@@ -186,11 +189,15 @@ test("ships the frozen BHD app switcher beside the signed-in account", async () 
   assert.match(apps, /https:\/\/bhdstor\.bhd-om\.com/);
   assert.match(apps, /BHD-PRODUCT-SSO-ADMIN/);
   assert.match(apps, /id: "portal"[\s\S]*mode: "sso"/);
-  assert.match(apps, /id: "wazen"[\s\S]*mode: "browse"/);
-  assert.match(apps, /id: "hisaby"[\s\S]*mode: "browse"/);
+  assert.match(apps, /id: "wazen"[\s\S]*mode: "sso"/);
+  assert.match(apps, /id: "hisaby"[\s\S]*mode: "sso"/);
   assert.match(apps, /id: "nasab"[\s\S]*mode: "sso"/);
   assert.match(apps, /id: "store"[\s\S]*mode: "sso"/);
   assert.match(apps, /id: "office"[\s\S]*mode: "sso"[\s\S]*enabled: true/);
+  assert.match(apps, /workspacePath/);
+  assert.match(apps, /workspacePath: "\/dashboard"/);
+  assert.match(apps, /بوابة بن حمود/);
+  assert.match(apps, /workspacePath: "\/company"/);
   const [adminConsole, platformAdmin, userinfo, adminPage] = await Promise.all([
     readFile(new URL("app/admin/AdminConsole.tsx", root), "utf8"),
     readFile(new URL("app/lib/auth/platform-admin.ts", root), "utf8"),
@@ -211,21 +218,25 @@ test("ships the frozen BHD app switcher beside the signed-in account", async () 
   assert.match(session, /BhdAppSwitcher/);
   assert.match(icon, /wazen/);
   assert.match(icon, /bhd-r/);
-  assert.match(apps, /id: "bhd-r"[\s\S]*https:\/\/r\.bhd-om\.com\/ar/);
+  assert.match(apps, /id: "bhd-r"[\s\S]*workspacePath: "\/ar\/portal"/);
+  assert.match(switcher, /launchUrlForApp/);
   await access(new URL("docs/BHD-APP-SWITCHER.md", root));
 });
 
 test("uses the official BHD logo assets across the portal", async () => {
-  const [brandLogo, home] = await Promise.all([
+  const [brandLogo, home, company] = await Promise.all([
     readFile(new URL("app/components/BrandLogo.tsx", root), "utf8"),
     readFile(new URL("app/page.tsx", root), "utf8"),
+    readFile(new URL("app/company/page.tsx", root), "utf8"),
   ]);
   assert.match(brandLogo, /official-logo/);
   assert.match(home, /BrandLogo/);
-  assert.match(home, /BUILD[\s\S]*HIGHER[\s\S]*DREAMS/);
-  assert.match(home, /<b>ا<\/b>بنِ\./);
-  assert.match(home, /<b>أ<\/b>حلامًا\./);
-  assert.match(home, /<b>أ<\/b>كبر\./);
+  assert.match(home, /gateway-shell/);
+  assert.match(home, /بن حمود للتطوير/);
+  assert.match(company, /BUILD[\s\S]*HIGHER[\s\S]*DREAMS/);
+  assert.match(company, /<b>ا<\/b>بنِ\./);
+  assert.match(company, /<b>أ<\/b>حلامًا\./);
+  assert.match(company, /<b>أ<\/b>كبر\./);
   await access(new URL("public/brand/bhd-logo.svg", root));
   await access(new URL("public/brand/bhd-mark.svg", root));
   await access(new URL("public/brand/bhd-logo-4096.png", root));

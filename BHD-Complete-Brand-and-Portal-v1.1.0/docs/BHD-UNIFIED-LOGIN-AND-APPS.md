@@ -309,7 +309,7 @@ sequenceDiagram
 - يظهر فقط مع جلسة صالحة.
 - يسار الصورة في RTL: تسع نقاط ثم الأفاتار.
 - الكتالوج المجمد `app/lib/bhd/apps.ts` — لا قائمة محلية.
-- `mode: "sso"` → `{origin}/api/auth/bhd/start?returnTo=/`
+- `mode: "sso"` → `{origin}/api/auth/bhd/start?returnTo={workspacePath}` حيث `workspacePath` مساحة عمل العميل في الكتالوج.
 - `mode: "browse"` → أصل الموقع فقط (المنتج لم يُكمل القسم 6)
 - `mode: "identity"` → `/account` على البوابة/الهوية وإلا `https://id.bhd-om.com/account`
 - رابط الحساب من منتج آخر: دائماً `https://id.bhd-om.com/account`
@@ -359,7 +359,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 
 **خطأ شائع:** نسخ مسار البوابة الذي يستخدم `{origin}/oauth/authorize` لأن البوابة **هي** الهوية. المنتج يجب أن يستخدم الـ Issuer.
 
-`returnTo` نسبي آمن فقط. من المشغّل دائماً `/`.
+`returnTo` نسبي آمن فقط. من الرئيسية/المشغّل = `workspacePath` في `apps.ts` (لوحة العميل). من `admin-entry` = مسار الإدارة المحلي.
 
 ### 4.5 `GET /api/auth/bhd/callback`
 
@@ -430,7 +430,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 - منح أدوار مدير من الهوية.
 - جلب كتالوج المشغّل من شبكة خارجية في v1 (الملف المجمد).
 - فتح تطبيق المشغّل في تبويب جديد.
-- تغيير `returnTo` إلى مسار داخلي لموقع آخر.
+- تغيير `returnTo` إلى مسار داخلي لموقع **آخر** (يُسمح فقط بمسار نسبي داخل نفس المنتج؛ `workspacePath` من الكتالوج معتمد).
 - بناء تسجيل مستخدم نهائي جديد في المنتج.
 - نسخ قائمة المنتجات التسويقية بدل `apps.ts`.
 

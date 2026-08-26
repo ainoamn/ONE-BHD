@@ -18,6 +18,7 @@ const priorityRoutes = [
   "/privacy",
   "/terms",
   "/contact",
+  "/company",
   "/apps",
   "/login",
   "/account",

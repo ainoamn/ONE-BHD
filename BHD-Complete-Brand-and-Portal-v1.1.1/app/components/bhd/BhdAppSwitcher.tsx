@@ -1,6 +1,6 @@
 "use client";
 
-import { BHD_APPS, type BhdApp } from "../../lib/bhd/apps";
+import { BHD_APPS, launchUrlForApp, type BhdApp } from "../../lib/bhd/apps";
 import { DEFAULT_IDENTITY_ISSUER } from "../../lib/identity/issuer";
 import { BhdAppIcon } from "./BhdAppIcon";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
@@ -49,17 +49,7 @@ function openApp(app: BhdApp, pageOrigin: string) {
     window.location.assign(accountPageUrl(pageOrigin));
     return;
   }
-  if (app.mode === "sso" && app.startUrl) {
-    window.location.assign(app.startUrl);
-    return;
-  }
-  if (app.startUrl) {
-    window.location.assign(app.startUrl);
-    return;
-  }
-  if (app.origin) {
-    window.location.assign(`${stripSlash(app.origin)}/`);
-  }
+  window.location.assign(launchUrlForApp(app, pageOrigin));
 }
 
 export function BhdAppSwitcher({

@@ -1,172 +1,63 @@
 "use client";
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
-import { BhdAdvisor } from "./components/BhdAdvisor";
+import { useEffect, useState } from "react";
 import { BrandLogo } from "./components/BrandLogo";
 import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
-import { isExternalProductHref, products } from "./lib/products";
+import { gatewayApps, launchUrlForApp, type BhdApp } from "./lib/bhd/apps";
 
 type Language = "ar" | "en";
 
 const copy = {
   ar: {
-    nav: ["الرئيسية", "المنتجات", "الفلسفة", "رؤيتنا", "الهوية", "الشركة"],
-    eyebrow: "بن حمود للتطوير - ابنِ أحلامًا أكبر",
-    titleTop: "من عُمان، نبني",
-    titleBottom: "المستقبل الرقمي للأفراد والأعمال.",
-    lead:
-      "في بن حمود للتطوير لا نكتفي ببناء المنتجات؛ نبني التقنية والأعمال والتجارب التي تساعد الأفراد والشركات على رفع سقف طموحاتهم وتحويلها إلى واقع.",
-    primaryCta: "اكتشف فلسفتنا",
-    secondaryCta: "استكشف منتجاتنا",
-    trust: "نبني بوضوح",
-    trust2: "نطمح إلى مستوى أعلى",
-    trust3: "نحوّل الحلم إلى واقع",
-    ecosystem: "منظومة BHD",
-    oneAccount: "حساب واحد",
-    everyProduct: "لكل منتجات BHD",
-    connected: "متصلة عبر هوية BHD",
-    statProducts: "نبني",
-    statIdentity: "نرتقي",
-    statDirection: "نحقق",
-    productsEyebrow: "منتجاتنا الرقمية",
-    productsTitle: "كل منتج يبدأ بحلم يستحق البناء.",
-    productsLead:
-      "من المال والأعمال إلى العائلة والعقار والتجارة؛ نحول الطموحات اليومية إلى منتجات مستقلة تحمل وعد BHD: ابنِ أحلامًا أكبر.",
-    open: "فتح المنتج",
-    explore: "استكشف المشروع",
-    bhdProduct: "منتج من منظومة BHD",
-    architectureEyebrow: "منظومة BHD",
-    architectureTitle: "منفصلة هندسيًا، موحّدة في التجربة.",
-    architectureLead:
-      "كل تطبيق مستقل بنشره وبياناته، بينما تجمعها هوية BHD ومشغّل تطبيقات واحد. هذا يمنح كل منتج حرية التطور دون أن يفقد المستخدم إحساس المنظومة.",
-    appLayer: "طبقة التطبيقات",
-    identityLayer: "هوية BHD",
-    accountLayer: "حساب BHD",
-    portalLayer: "بوابة BHD",
-    architectureNote: "تنقّل موحّد · دخول آمن · بيانات كل تطبيق تبقى مستقلة",
-    identityMeta: "دخول موحّد وآمن",
-    accountMeta: "الملف والأمان",
-    portalMeta: "بوابة الشركة",
-    accountBadge: "حساب BHD",
-    demoName: "عبد الحميد",
-    demoAccount: "حساب BHD الشخصي",
-    secureSession: "جلسة آمنة",
-    accountEyebrow: "حساب BHD",
-    accountTitle: "حساب واحد يرافقك بين كل المنتجات.",
-    accountLead:
-      "سجّل الدخول مرة واحدة، ثم افتح وازن أو حسابي أو نَسَب دون تكرار خطوات الدخول — مع جلسة آمنة ومستقلة داخل كل تطبيق.",
-    accountPoints: [
-      "هوية مركزية بمعيار الهوية المفتوحة",
-      "لا مشاركة لقواعد البيانات بين التطبيقات",
-      "الصلاحيات التشغيلية تبقى داخل كل منتج",
-    ],
-    accountCta: "إدارة حسابي",
-    visionEyebrow: "هويتنا",
-    visionTitle: "جذور عُمانية. طموح يتجاوز الحدود.",
-    visionLead:
-      "نستوحي هدوء التصميم ودقته من عُمان، ونبني بمعايير تجعل منتجاتنا جاهزة للخليج والعالم.",
-    visionCards: [
-      ["عربي أولًا", "واجهات واضحة تراعي اللغة والاتجاه والسياق المحلي من أول سطر."],
-      ["الأمان من البداية", "نفصل الهوية والبيانات والصلاحيات كي تنمو المنظومة بثقة."],
-      ["نبني للنمو", "كل منتج مستقل، قابل للتوسع، وقادر على التطور في مساره الخاص."],
-    ],
-    companyEyebrow: "اسم واحد · وعد واحد",
-    companyTitle: "بن حمود للتطوير هو الاسم. ابنِ أحلامًا أكبر هو الوعد.",
-    companyLead:
-      "ابنِ أحلامًا أكبر مع بن حمود للتطوير؛ علامة عُمانية تحوّل الأفكار إلى منتجات وأعمال وتجارب قادرة على النمو.",
-    companyCta: "تعرّف على مشاريعنا",
+    signIn: "دخول",
+    company: "عن الشركة",
+    brand: "الهوية",
+    appsGuide: "دليل البرامج",
+    eyebrow: "منظومة بن حمود للتطوير",
+    brandLine: "بن حمود للتطوير",
+    title: "بوابتك إلى كل تطبيقات BHD",
+    lead: "حساب واحد، ثم انتقل مباشرة إلى مساحة عملك في وازن وحسابي ونَسَب وBHD R والمتجر — دون المرور بالصفحات التسويقية.",
+    guestHint: "سجّل الدخول مرة واحدة، ثم افتح أي تطبيق من الشبكة أدناه.",
+    signedHint: "اختر تطبيقاً للانتقال مباشرة إلى لوحة عملك.",
+    openWorkspace: "فتح مساحة العمل",
+    companyCta: "بوابة بن حمود",
+    companyHint: "الموقع التعريفي للشركة",
     footerLine: "ابنِ أحلامًا أكبر.",
     rights: "شركة بن حمود للتطوير. جميع الحقوق محفوظة.",
-    apps: "تطبيقات BHD",
-    menu: "القائمة",
-    close: "إغلاق",
   },
   en: {
-    nav: ["Home", "Products", "Philosophy", "Vision", "Brand", "Company"],
-    eyebrow: "BIN HAMOOD DEVELOPMENT · AN OMANI BRAND",
-    titleTop: "From Oman, we build",
-    titleBottom: "digital products for life and business.",
-    lead:
-      "At Bin Hamood Development, we build technology, businesses and experiences that help people and companies aim higher — then turn ambition into reality.",
-    primaryCta: "Discover our philosophy",
-    secondaryCta: "Explore our products",
-    trust: "Build with purpose",
-    trust2: "Aim higher",
-    trust3: "Turn dreams into reality",
-    ecosystem: "BHD Ecosystem",
-    oneAccount: "One account",
-    everyProduct: "for every BHD product",
-    connected: "Connected by BHD Identity",
-    statProducts: "BUILD · Create",
-    statIdentity: "HIGHER · Elevate",
-    statDirection: "DREAMS · Realize",
-    productsEyebrow: "Our digital products",
-    productsTitle: "Every product starts with a dream worth building.",
-    productsLead:
-      "From money and business to family, property and commerce, every independent product carries one BHD promise: Build Higher Dreams.",
-    open: "Open product",
-    explore: "Explore project",
-    bhdProduct: "A BHD Product",
-    architectureEyebrow: "BHD Ecosystem",
-    architectureTitle: "Independent by design. Unified by experience.",
-    architectureLead:
-      "Every app owns its deployment and data, while BHD Identity and a shared app launcher bring them together without limiting how each product grows.",
-    appLayer: "Application layer",
-    identityLayer: "BHD Identity",
-    accountLayer: "BHD Account",
-    portalLayer: "BHD Portal",
-    architectureNote: "Unified navigation · Secure sign-in · Independent product data",
-    identityMeta: "Unified secure sign-in",
-    accountMeta: "Profile and security",
-    portalMeta: "Company portal",
-    accountBadge: "BHD Account",
-    demoName: "Abdul Hamid",
-    demoAccount: "Personal BHD account",
-    secureSession: "Secure session",
-    accountEyebrow: "BHD Account",
-    accountTitle: "One account that moves with you.",
-    accountLead:
-      "Sign in once, then move between WAZEN, HISAB and NASAB without repeating the journey — with a secure local session inside every product.",
-    accountPoints: [
-      "Central identity built on OpenID Connect",
-      "No shared operational databases",
-      "Product roles remain within each app",
-    ],
-    accountCta: "Manage my account",
-    visionEyebrow: "Our character",
-    visionTitle: "Omani roots. Ambition beyond borders.",
-    visionLead:
-      "We draw calm and precision from Oman, then build to standards that prepare our products for the Gulf and the world.",
-    visionCards: [
-      ["Arabic first", "Clear interfaces shaped around language, direction and local context from day one."],
-      ["Secure by design", "Identity, data and permissions are separated so the ecosystem can grow with confidence."],
-      ["Built to grow", "Every product is independent, scalable and free to evolve on its own path."],
-    ],
-    companyEyebrow: "One name · one promise",
-    companyTitle: "Bin Hamood Development is the name. Build Higher Dreams is the promise.",
-    companyLead:
-      "Build higher dreams with Bin Hamood Development — an Omani brand turning ideas into products, businesses and experiences designed to grow.",
-    companyCta: "Meet our projects",
-    footerLine: "BUILD HIGHER DREAMS · Our promise to every ambition.",
+    signIn: "Sign in",
+    company: "Company",
+    brand: "Brand",
+    appsGuide: "Apps guide",
+    eyebrow: "Bin Hamood Development ecosystem",
+    brandLine: "Bin Hamood Development",
+    title: "Your gateway to every BHD app",
+    lead: "One account — then go straight into your workspace in WAZEN, HISAB, NASAB, BHD R and Store, skipping marketing landings.",
+    guestHint: "Sign in once, then open any app from the grid below.",
+    signedHint: "Choose an app to open your workspace directly.",
+    openWorkspace: "Open workspace",
+    companyCta: "Bin Hamood Portal",
+    companyHint: "Company site and story",
+    footerLine: "Build Higher Dreams.",
     rights: "Bin Hamood Development. All rights reserved.",
-    apps: "BHD Apps",
-    menu: "Menu",
-    close: "Close",
   },
 };
 
+function openGatewayApp(app: BhdApp) {
+  window.location.assign(launchUrlForApp(app, window.location.origin));
+}
+
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
-  const [launcherOpen, setLauncherOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
-  const launcherRef = useRef<HTMLDivElement>(null);
+  const [ready, setReady] = useState(false);
   const t = copy[language];
   const isArabic = language === "ar";
+  const apps = gatewayApps();
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -177,405 +68,98 @@ export default function Home() {
     fetch("/api/auth/me", { cache: "no-store" })
       .then((response) => response.json())
       .then((data: { user?: unknown }) => setSignedIn(Boolean(data.user)))
-      .catch(() => setSignedIn(false));
+      .catch(() => setSignedIn(false))
+      .finally(() => setReady(true));
   }, []);
-
-  useEffect(() => {
-    const onPointerDown = (event: PointerEvent) => {
-      if (
-        launcherRef.current &&
-        !launcherRef.current.contains(event.target as Node)
-      ) {
-        setLauncherOpen(false);
-      }
-    };
-    window.addEventListener("pointerdown", onPointerDown);
-    return () => window.removeEventListener("pointerdown", onPointerDown);
-  }, []);
-
-  const sectionLinks = ["/", "/products", "/#philosophy", "/#vision", "/brand", "/about"];
 
   return (
-    <main id="main-content" className="site-shell" lang={language} dir={isArabic ? "rtl" : "ltr"} tabIndex={-1}>
-      <div className="flag-line" aria-hidden="true" />
+    <main
+      id="main-content"
+      className="gateway-shell"
+      lang={language}
+      dir={isArabic ? "rtl" : "ltr"}
+      tabIndex={-1}
+    >
+      <div className="gateway-atmosphere" aria-hidden="true">
+        <div className="gateway-photo" />
+        <div className="gateway-veil" />
+        <div className="gateway-glow" />
+      </div>
 
-      <header className="site-header">
-        <InstantLink className="brand" href="/" aria-label="العودة إلى الرئيسية">
-          <BrandLogo className="header-official-logo" />
+      <header className="gateway-header">
+        <InstantLink className="gateway-brand" href="/" aria-label={t.brandLine}>
+          <BrandLogo kind="full" tone="light" className="gateway-logo" />
         </InstantLink>
 
-        <nav className="desktop-nav" aria-label="التنقل الرئيسي">
-          {t.nav.map((item, index) => (
-            <InstantLink key={item} href={sectionLinks[index]}>
-              {item}
-            </InstantLink>
-          ))}
+        <nav className="gateway-nav" aria-label={isArabic ? "روابط ثانوية" : "Secondary links"}>
+          <InstantLink href="/company">{t.company}</InstantLink>
+          <InstantLink href="/brand">{t.brand}</InstantLink>
+          <InstantLink href="/apps">{t.appsGuide}</InstantLink>
         </nav>
 
-        <div className="header-actions">
-          <SessionMenu
-            signInLabel={isArabic ? "دخول" : "Sign in"}
-          />
+        <div className="gateway-actions">
+          <SessionMenu signInLabel={t.signIn} />
           <button
-            className="language-button"
+            type="button"
+            className="gateway-lang"
             onClick={() => setLanguage(isArabic ? "en" : "ar")}
-            aria-label={isArabic ? "التبديل إلى الإنجليزية" : "التبديل إلى العربية"}
+            aria-label={isArabic ? "Switch to English" : "التبديل إلى العربية"}
           >
             {isArabic ? "EN" : "عربي"}
           </button>
-
-          {!signedIn ? (
-          <div className="app-launcher-wrap" ref={launcherRef}>
-            <button
-              className="launcher-button"
-              onClick={() => setLauncherOpen((open) => !open)}
-              aria-expanded={launcherOpen}
-              aria-haspopup="menu"
-            >
-              <span className="grid-icon" aria-hidden="true">
-                {Array.from({ length: 9 }).map((_, index) => (
-                  <i key={index} />
-                ))}
-              </span>
-              <span>{t.apps}</span>
-            </button>
-
-            {launcherOpen && (
-              <div className="launcher-panel" role="menu">
-                <div className="launcher-heading">
-                  <span>{t.apps}</span>
-                  <small>BHD ECOSYSTEM</small>
-                </div>
-                <div className="launcher-grid">
-                  {products.slice(0, 5).map((product) => (
-                    <a
-                      key={product.name}
-                      href={product.href}
-                      role="menuitem"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <BhdAppIcon id={product.appId} title={isArabic ? product.nameAr : product.name} className="launcher-mark" />
-                      <span>{isArabic ? product.nameAr : product.name}</span>
-                    </a>
-                  ))}
-                </div>
-                <InstantLink className="launcher-all" href="/products" onClick={() => setLauncherOpen(false)}>
-                  {isArabic ? "عرض جميع المنتجات" : "View all products"}
-                  <span aria-hidden="true">←</span>
-                </InstantLink>
-              </div>
-            )}
-          </div>
-          ) : null}
-
-          <button
-            className="mobile-menu-button"
-            onClick={() => setMobileOpen((open) => !open)}
-            aria-expanded={mobileOpen}
-            aria-label={mobileOpen ? t.close : t.menu}
-          >
-            <span />
-            <span />
-          </button>
         </div>
-
-        {mobileOpen && (
-          <nav className="mobile-nav" aria-label="Mobile navigation">
-            {t.nav.map((item, index) => (
-              <InstantLink key={item} href={sectionLinks[index]} onClick={() => setMobileOpen(false)}>
-                {item}
-              </InstantLink>
-            ))}
-          </nav>
-        )}
       </header>
 
-      <section className="hero" id="home">
-        <div className="hero-image" aria-hidden="true" />
-        <div className="hero-wash" aria-hidden="true" />
-        <div className="hero-inner section-wrap">
-          <div className="hero-copy">
-            <p className="eyebrow"><span />{t.eyebrow}</p>
-            {isArabic ? (
-              <h1 className="brand-promise brand-promise-ar">
-                <span><b>ا</b>بنِ.</span>
-                <span><b>أ</b>حلامًا.</span>
-                <span><b>أ</b>كبر.</span>
-              </h1>
-            ) : (
-              <h1 className="brand-promise" aria-label="Build Higher Dreams">
-                <span><b>B</b>UILD.</span>
-                <span><b>H</b>IGHER.</span>
-                <span><b>D</b>REAMS.</span>
-              </h1>
-            )}
-            <p className="promise-translation">
-              {isArabic ? "ابنِ أحلامًا أكبر مع بن حمود للتطوير." : "Bin Hamood Development · One name, one promise."}
-            </p>
-            <p className="hero-lead">{t.lead}</p>
-            <div className="hero-actions">
-              <InstantLink className="primary-button" href="/#philosophy">
-                {t.primaryCta}
-                <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-              </InstantLink>
-              <InstantLink className="text-button" href="/products">
-                {t.secondaryCta}
-              </InstantLink>
-            </div>
-            <div className="trust-row" aria-label="BHD qualities">
-              {[t.trust, t.trust2, t.trust3].map((item) => (
-                <span key={item}><i />{item}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className="hero-brand-stage" aria-label="هوية شركة بن حمود للتطوير">
-            <div className="hero-brand-halo" aria-hidden="true" />
-            <figure className="hero-brand-image">
-              <Image
-                src="/images/bhd-philosophy-hero.webp"
-                alt="هوية شركة بن حمود للتطوير المستوحاة من العمارة العُمانية"
-                width={1200}
-                height={630}
-                sizes="(max-width: 820px) 96vw, 720px"
-                quality={90}
-                priority
-              />
-              <span className="hero-official-seal" aria-hidden="true">
-                <BrandLogo kind="mark" tone="light" />
-              </span>
-            </figure>
-            <div className="brand-float brand-float-products">
-              <strong>06</strong>
-              <small>{t.statProducts}</small>
-            </div>
-            <div className="brand-float brand-float-location">
-              <i aria-hidden="true" />
-              <span>{isArabic ? "مسقط · عُمان" : "Muscat · Oman"}</span>
-            </div>
-            <div className="brand-stage-caption">
-              <BrandLogo kind="mark" tone="ink" />
-              <p>{t.ecosystem}<small>{isArabic ? "منظومة واحدة · معيار واحد" : "ONE FAMILY · ONE STANDARD"}</small></p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="stats-band" aria-label="BHD at a glance">
-        <div className="section-wrap stats-grid">
-          <div><strong>B</strong><span>{t.statProducts}</span></div>
-          <div><strong>H</strong><span>{t.statIdentity}</span></div>
-          <div><strong>D</strong><span>{t.statDirection}</span></div>
-        </div>
-      </section>
-
-      <section className="brand-philosophy" id="philosophy">
-        <div className="section-wrap philosophy-grid">
-          <div className="philosophy-manifesto">
-            <p className="section-kicker light">{isArabic ? "فلسفة علامة BHD" : "BHD brand philosophy"}</p>
-            <h2>{isArabic ? "علامة واحدة. معنيان يصنعان قصة واحدة." : "One brand. Two meanings. One story."}</h2>
-            <p>
-              {isArabic
-                ? "BHD هو اسمنا المؤسسي ووعدنا الإنساني في الوقت نفسه. بن حمود للتطوير هي الجهة التي تبني، وابنِ أحلامًا أكبر هو السبب الذي نبني من أجله."
-                : "BHD is both our corporate name and our human promise. Bin Hamood Development is who builds; Build Higher Dreams is why we build."}
-            </p>
-            <div className="dual-meaning" dir={isArabic ? "rtl" : "ltr"}>
-              <span>
-                <b>BHD</b>
-                <small>{isArabic ? "بن حمود للتطوير" : "BIN HAMOOD DEVELOPMENT"}</small>
-              </span>
-              <i aria-hidden="true">=</i>
-              <span>
-                <b>BHD</b>
-                <small>{isArabic ? "ابنِ أحلامًا أكبر" : "BUILD HIGHER DREAMS"}</small>
-              </span>
-            </div>
-            <blockquote>
-              {isArabic ? "«لا نكتفي بتحقيق الحلم؛ نرفع سقف الحلم نفسه.»" : "“We do not only realize dreams. We raise the horizon of what can be dreamed.”"}
-            </blockquote>
-            <InstantLink className="philosophy-brand-link" href="/brand">
-              {isArabic ? "استكشف دليل الهوية المتكامل" : "Explore the complete brand system"}
+      <section className="gateway-hero">
+        <p className="gateway-eyebrow">{t.eyebrow}</p>
+        <p className="gateway-brand-signal">{t.brandLine}</p>
+        <h1>{t.title}</h1>
+        <p className="gateway-lead">{t.lead}</p>
+        <p className="gateway-hint">{ready ? (signedIn ? t.signedHint : t.guestHint) : "…"}</p>
+        {ready && !signedIn ? (
+          <div className="gateway-cta-row">
+            <InstantLink className="gateway-signin" href="/login?next=/">
+              {t.signIn}
               <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
             </InstantLink>
+            <InstantLink className="gateway-company-ghost" href="/company">
+              {t.companyCta}
+            </InstantLink>
           </div>
-
-          <div className="philosophy-principles">
-            <article>
-              <span>B</span>
-              <div><small>نبني</small><h3>{isArabic ? "نحوّل الفكرة إلى شيء حقيقي." : "Turn ideas into something real."}</h3><p>{isArabic ? "نبني المنتجات والأعمال والفرص بتصميم واضح وهندسة قابلة للنمو." : "We build products, businesses and opportunities with clear design and scalable engineering."}</p></div>
-            </article>
-            <article>
-              <span>H</span>
-              <div><small>نرتقي</small><h3>{isArabic ? "نرفع المعيار في كل مرة." : "Raise the standard every time."}</h3><p>{isArabic ? "نطمح إلى تقنية أفضل، وخدمة أرقى، وتجربة أوضح، ونتائج أبعد." : "We aim for better technology, finer service, clearer experiences and greater outcomes."}</p></div>
-            </article>
-            <article>
-              <span>D</span>
-              <div><small>الأحلام</small><h3>{isArabic ? "نمنح الطموح طريقًا إلى الواقع." : "Give ambition a path to reality."}</h3><p>{isArabic ? "للأفراد والعائلات والشركات والمجتمع؛ كل حلم جاد يستحق فرصة أن يُبنى." : "For people, families, businesses and society — every serious dream deserves the chance to be built."}</p></div>
-            </article>
-          </div>
-        </div>
+        ) : null}
       </section>
 
-      <section className="products-section section-wrap" id="products">
-        <div className="section-heading">
-          <div>
-            <p className="section-kicker">{t.productsEyebrow}</p>
-            <h2>{t.productsTitle}</h2>
-          </div>
-          <p>{t.productsLead}</p>
-        </div>
-
-        <div className="products-grid">
-          {products.map((product, index) => {
-            const isLive = product.statusEn !== "In development" && product.statusEn !== "Internal system";
+      <section className="gateway-grid-section" aria-label={isArabic ? "تطبيقات المجموعة" : "Group applications"}>
+        <div className="gateway-grid">
+          {apps.map((app, index) => {
+            const isPortal = app.id === "portal";
             return (
-              <article
-                key={product.name}
-                className={`product-card ${product.featured ? "product-featured" : ""}`}
-                style={{
-                  "--accent": product.accent,
-                  "--soft": product.soft,
-                } as React.CSSProperties}
+              <button
+                key={app.id}
+                type="button"
+                className={`gateway-tile${isPortal ? " gateway-tile-portal" : ""}`}
+                style={{ "--tile-accent": app.accent, "--tile-soft": app.soft, "--tile-delay": `${index * 45}ms` } as React.CSSProperties}
+                onClick={() => openGatewayApp(app)}
               >
-                <div className="product-card-head">
-                  <BhdAppIcon id={product.appId} title={isArabic ? product.nameAr : product.name} className="product-mark" />
-                  <span className="product-status"><i />{isArabic ? product.statusAr : product.statusEn}</span>
-                </div>
-                <div className="product-number">0{index + 1}</div>
-                <p className="product-category">{isArabic ? product.categoryAr : product.categoryEn}</p>
-                <h3>{isArabic ? product.nameAr : product.name}</h3>
-                <p className="product-description">
-                  {isArabic ? product.descriptionAr : product.descriptionEn}
-                </p>
-                <div className="product-card-footer">
-                  {isExternalProductHref(product.href) ? (
-                    <a href={product.href} target="_blank" rel="noopener noreferrer">
-                      {isLive ? t.open : t.explore}
-                      <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-                    </a>
-                  ) : (
-                    <InstantLink href={product.href}>
-                      {t.explore}
-                      <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-                    </InstantLink>
-                  )}
-                  <small>{t.bhdProduct}</small>
-                </div>
-              </article>
+                <BhdAppIcon id={app.id} title={isArabic ? app.nameAr : app.nameEn} className="gateway-tile-icon" />
+                <span className="gateway-tile-name">{isArabic ? app.nameAr : app.nameEn}</span>
+                <span className="gateway-tile-meta">
+                  {isPortal ? t.companyHint : t.openWorkspace}
+                </span>
+              </button>
             );
           })}
         </div>
       </section>
 
-      <section className="architecture-section" id="ecosystem">
-        <div className="section-wrap architecture-grid">
-          <div className="architecture-copy">
-            <p className="section-kicker light">{t.architectureEyebrow}</p>
-            <h2>{t.architectureTitle}</h2>
-            <p>{t.architectureLead}</p>
-            <div className="architecture-note">
-              <span className="note-lock">B</span>
-              <span>{t.architectureNote}</span>
-            </div>
-          </div>
-
-          <div className="architecture-map" aria-label={isArabic ? "بنية منظومة BHD" : "BHD ecosystem architecture"}>
-            <div className="map-apps">
-              <small>{t.appLayer}</small>
-              <div>
-                {products.slice(0, 5).map((product) => (
-                  <BhdAppIcon
-                    key={product.name}
-                    id={product.appId}
-                    title={isArabic ? product.nameAr : product.name}
-                    className="map-app-icon"
-                  />
-                ))}
-              </div>
-            </div>
-            <i className="map-line" />
-            <div className="map-middle">
-              <div><span>{isArabic ? "هـ" : "ID"}</span><strong>{t.identityLayer}</strong><small>{t.identityMeta}</small></div>
-              <div><span>{isArabic ? "ح" : "AC"}</span><strong>{t.accountLayer}</strong><small>{t.accountMeta}</small></div>
-            </div>
-            <i className="map-line short" />
-            <div className="map-portal"><span>{isArabic ? "ب" : "B"}</span><div><strong>{t.portalLayer}</strong><small>{t.portalMeta}</small></div></div>
-          </div>
-        </div>
-      </section>
-
-      <section className="account-section section-wrap">
-        <div className="account-visual" aria-hidden="true">
-          <div className="account-phone">
-            <div className="phone-top"><span>{isArabic ? "ب" : "B"}</span><small>{t.accountBadge}</small></div>
-            <div className="profile-ring">{isArabic ? "بح" : "BH"}</div>
-            <strong>{t.demoName}</strong>
-            <small>{t.demoAccount}</small>
-            <div className="phone-apps">
-              {products.slice(0, 4).map((product) => (
-                <BhdAppIcon key={product.name} id={product.appId} className="phone-app-icon" />
-              ))}
-            </div>
-            <div className="phone-secure"><i /> {t.secureSession}</div>
-          </div>
-          <div className="account-glow" />
-        </div>
-
-        <div className="account-copy">
-          <p className="section-kicker">{t.accountEyebrow}</p>
-          <h2>{t.accountTitle}</h2>
-          <p>{t.accountLead}</p>
-          <ul>
-            {t.accountPoints.map((point) => (
-              <li key={point}><span>✓</span>{point}</li>
-            ))}
-          </ul>
-          <InstantLink href={signedIn ? "/account" : "/login?next=/account"} className="primary-button">
-            {t.accountCta}
-            <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-          </InstantLink>
-        </div>
-      </section>
-
-      <section className="vision-section" id="vision">
-        <div className="vision-image" aria-hidden="true" />
-        <div className="vision-overlay" aria-hidden="true" />
-        <div className="section-wrap vision-inner">
-          <div className="vision-heading">
-            <p className="section-kicker light">{t.visionEyebrow}</p>
-            <h2>{t.visionTitle}</h2>
-            <p>{t.visionLead}</p>
-          </div>
-          <div className="vision-cards">
-            {t.visionCards.map(([title, description], index) => (
-              <article key={title}>
-                <span>0{index + 1}</span>
-                <h3>{title}</h3>
-                <p>{description}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="company-section section-wrap" id="company">
-        <div className="company-monogram" aria-hidden="true">
-          <BrandLogo kind="mark" tone="ink" className="company-official-mark" />
-        </div>
-        <div className="company-copy">
-          <p className="section-kicker">{t.companyEyebrow}</p>
-          <h2>{t.companyTitle}</h2>
-          <p>{t.companyLead}</p>
-          <InstantLink href="/products" className="outline-button">
-            {t.companyCta}
-            <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-          </InstantLink>
-        </div>
-      </section>
+      <div className="gateway-foot-cta">
+        <InstantLink className="gateway-company-link" href="/company">
+          {t.companyCta}
+          <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
+        </InstantLink>
+      </div>
 
       <SiteFooter promise={t.footerLine} rights={t.rights} />
-      <BhdAdvisor />
     </main>
   );
 }
