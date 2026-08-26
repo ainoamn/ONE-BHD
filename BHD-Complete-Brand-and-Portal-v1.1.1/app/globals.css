@@ -4605,7 +4605,7 @@ a.login-submit {
 
 .gateway-grid-section {
   width: min(980px, calc(100% - 32px));
-  margin: clamp(36px, 6vh, 64px) auto 28px;
+  margin: clamp(48px, 10vh, 96px) auto 28px;
 }
 
 .gateway-grid {

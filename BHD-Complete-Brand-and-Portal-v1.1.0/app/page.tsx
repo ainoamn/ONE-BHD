@@ -18,7 +18,6 @@ const copy = {
     appsGuide: "دليل البرامج",
     brandAria: "بن حمود للتطوير",
     openWorkspace: "فتح مساحة العمل",
-    companyCta: "بوابة بن حمود",
     companyHint: "الموقع التعريفي للشركة",
     footerLine: "ابنِ أحلامًا أكبر.",
     rights: "شركة بن حمود للتطوير. جميع الحقوق محفوظة.",
@@ -30,7 +29,6 @@ const copy = {
     appsGuide: "Apps guide",
     brandAria: "Bin Hamood Development",
     openWorkspace: "Open workspace",
-    companyCta: "Bin Hamood Portal",
     companyHint: "Company introductory site",
     footerLine: "Build Higher Dreams.",
     rights: "Bin Hamood Development. All rights reserved.",
@@ -43,8 +41,6 @@ function openGatewayApp(app: BhdApp) {
 
 export default function Home() {
   const [language, setLanguage] = useState<Language>("ar");
-  const [signedIn, setSignedIn] = useState(false);
-  const [ready, setReady] = useState(false);
   const t = copy[language];
   const isArabic = language === "ar";
   const apps = gatewayApps();
@@ -53,14 +49,6 @@ export default function Home() {
     document.documentElement.lang = language;
     document.documentElement.dir = isArabic ? "rtl" : "ltr";
   }, [language, isArabic]);
-
-  useEffect(() => {
-    fetch("/api/auth/me", { cache: "no-store" })
-      .then((response) => response.json())
-      .then((data: { user?: unknown }) => setSignedIn(Boolean(data.user)))
-      .catch(() => setSignedIn(false))
-      .finally(() => setReady(true));
-  }, []);
 
   return (
     <main
@@ -99,20 +87,6 @@ export default function Home() {
           </button>
         </div>
       </header>
-
-      <section className="gateway-hero gateway-hero-compact" aria-label={t.brandAria}>
-        {ready && !signedIn ? (
-          <div className="gateway-cta-row">
-            <InstantLink className="gateway-signin" href="/login?next=/">
-              {t.signIn}
-              <span aria-hidden="true">{isArabic ? "←" : "→"}</span>
-            </InstantLink>
-            <InstantLink className="gateway-company-ghost" href="/company">
-              {t.companyCta}
-            </InstantLink>
-          </div>
-        ) : null}
-      </section>
 
       <section className="gateway-grid-section" aria-label={isArabic ? "تطبيقات المجموعة" : "Group applications"}>
         <div className="gateway-grid">
