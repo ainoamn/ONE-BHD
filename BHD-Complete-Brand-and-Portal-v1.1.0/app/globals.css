@@ -2702,8 +2702,20 @@ a.login-submit {
 }
 
 .login-switch-out {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 42px;
+  margin-top: 8px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
   color: var(--emerald);
-  font-weight: 700;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 .login-status,

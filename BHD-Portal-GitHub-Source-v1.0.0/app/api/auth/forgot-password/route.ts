@@ -33,6 +33,21 @@ export async function POST(request: Request) {
         { status: 503 },
       );
     }
+    if (code === "EMAIL_DOMAIN_NOT_VERIFIED") {
+      return NextResponse.json(
+        {
+          message:
+            "نطاق المرسل غير موثّق في Resend. أكّد نطاق bhd-om.com ثم أعد المحاولة.",
+        },
+        { status: 503 },
+      );
+    }
+    if (code === "EMAIL_SEND_FAILED") {
+      return NextResponse.json(
+        { message: "مزوّد البريد رفض الإرسال. تحقق من مفتاح Resend ونطاق المرسل ثم أعد المحاولة." },
+        { status: 502 },
+      );
+    }
     if (code === "INVALID_INPUT") {
       return NextResponse.json({ message: "أدخل البريد أو اسم المستخدم." }, { status: 400 });
     }

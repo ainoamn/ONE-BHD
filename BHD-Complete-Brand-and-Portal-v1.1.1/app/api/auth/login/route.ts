@@ -17,7 +17,7 @@ function messageFor(code: string) {
     case "ACCOUNT_LOCKED":
       return "الحساب مقفل مؤقتًا بعد محاولات فاشلة. حاول بعد ربع ساعة.";
     case "SWITCH_REQUIRES_LOGOUT":
-      return "أنت داخل بحساب آخر. اخرج أولاً ثم ادخل بالحساب الجديد.";
+      return "جلسة نشطة بحساب آخر. اختر المتابعة أو الخروج ثم الدخول بالحساب الجديد.";
     default:
       return "تعذّر تسجيل الدخول.";
   }
@@ -39,7 +39,8 @@ export async function POST(request: Request) {
     const user = await loginWithPassword(body.identifier || "", body.password || "", {
       ip: getRequestIp(request),
     });
-    rejectAccountSwitch(await getCurrentSession(), user.id);
+    const current = await getCurrentSession();
+    rejectAccountSwitch(current, user.id);
     const token = await createSessionToken({
       sub: user.id,
       email: user.email,
@@ -51,7 +52,20 @@ export async function POST(request: Request) {
     return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
-    const status = code === "ACCOUNT_LOCKED" ? 403 : code === "SWITCH_REQUIRES_LOGOUT" ? 409 : 401;
+    if (code === "SWITCH_REQUIRES_LOGOUT") {
+      const current = await getCurrentSession();
+      return NextResponse.json(
+        {
+          code: "SWITCH_REQUIRES_LOGOUT",
+          message: messageFor(code),
+          activeSession: current
+            ? { name: current.name, email: current.email }
+            : null,
+        },
+        { status: 409 },
+      );
+    }
+    const status = code === "ACCOUNT_LOCKED" ? 403 : 401;
     return NextResponse.json({ message: messageFor(code) }, { status });
   }
 }

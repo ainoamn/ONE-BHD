@@ -55,11 +55,15 @@ const COPY = {
     privacy: "الخصوصية",
     terms: "والشروط",
     apps: "برامج المجموعة",
-    alreadyTitle: "حساب واحد في هذا المتصفح",
+    alreadyTitle: "جلسة نشطة حالياً",
     alreadyBody:
-      "لا يُسمح بفتح حساب BHD ثانٍ في نفس الجلسة. لتغيير الحساب اخرج ثم ادخل من جديد.",
-    continueAccount: "متابعة إلى الحساب",
-    switchOut: "خروج ثم دخول بحساب آخر",
+      "أنت مسجّل الدخول الآن بهذا الحساب. يمكنك المتابعة به، أو الخروج ثم الدخول بحساب BHD آخر.",
+    continueAccount: "المتابعة بهذا الحساب",
+    switchOut: "خروج والدخول بحساب آخر",
+    switchTitle: "تبديل حساب BHD",
+    switchBody:
+      "الجلسة الحالية مرتبطة بحساب مختلف عن البيانات التي أدخلتها. اختر المتابعة بالجلسة النشطة، أو أنهِها للدخول بالحساب الجديد.",
+    continueSession: "المتابعة بالجلسة الحالية",
     lang: "English",
     fail: "تعذّر إكمال العملية.",
     network: "تعذّر الاتصال بالخادم.",
@@ -106,10 +110,15 @@ const COPY = {
     privacy: "privacy",
     terms: "and terms",
     apps: "BHD programmes",
-    alreadyTitle: "One account in this browser",
-    alreadyBody: "A second BHD account cannot be opened in the same session. Sign out first, then sign in again.",
-    continueAccount: "Continue to account",
+    alreadyTitle: "Active session",
+    alreadyBody:
+      "You are currently signed in with this account. Continue with it, or sign out to use a different BHD account.",
+    continueAccount: "Continue with this account",
     switchOut: "Sign out and use another account",
+    switchTitle: "Switch BHD account",
+    switchBody:
+      "An active session belongs to a different account than the credentials you entered. Continue with the current session, or end it to sign in with the new account.",
+    continueSession: "Continue current session",
     lang: "العربية",
     fail: "Something went wrong.",
     network: "Could not reach the server.",
@@ -166,6 +175,15 @@ export function LoginForm() {
   const [country, setCountry] = useState("OM");
   const [zipCode, setZipCode] = useState("");
   const [existing, setExisting] = useState<{ name: string; email: string } | null | undefined>(undefined);
+  const [switchPrompt, setSwitchPrompt] = useState<{ name: string; email: string } | null>(null);
+
+  function logoutThenReload() {
+    const returnTo = `${window.location.origin}/login${window.location.search || ""}`;
+    const end = new URL("/oauth/end-session", window.location.origin);
+    end.searchParams.set("client_id", "bhd-portal");
+    end.searchParams.set("post_logout_redirect_uri", returnTo);
+    window.location.assign(end.toString());
+  }
 
   useEffect(() => {
     const local = searchParams.get("local");
@@ -253,8 +271,21 @@ export function LoginForm() {
               },
         ),
       });
-      const data = (await response.json()) as { message?: string };
+      const data = (await response.json()) as {
+        message?: string;
+        code?: string;
+        activeSession?: { name?: string; email?: string } | null;
+      };
       if (!response.ok) {
+        if (response.status === 409 && data.code === "SWITCH_REQUIRES_LOGOUT") {
+          const active = data.activeSession;
+          if (active?.email) {
+            setSwitchPrompt({ name: active.name || active.email, email: active.email });
+            setExisting({ name: active.name || active.email, email: active.email });
+            setError("");
+            return;
+          }
+        }
         setError(data.message || t.fail);
         return;
       }
@@ -305,22 +336,19 @@ export function LoginForm() {
           <section className="login-card">
             {existing ? (
               <div className="login-already">
-                <h2>{t.alreadyTitle}</h2>
+                <h2>{switchPrompt ? t.switchTitle : t.alreadyTitle}</h2>
                 <p>
                   <strong>{existing.name}</strong>
                   <br />
                   <small>{existing.email}</small>
                 </p>
-                <p>{t.alreadyBody}</p>
-                <InstantLink className="login-submit" href="/account">
-                  {t.continueAccount}
+                <p>{switchPrompt ? t.switchBody : t.alreadyBody}</p>
+                <InstantLink className="login-submit" href={nextPath && nextPath.startsWith("/") ? nextPath : "/account"}>
+                  {switchPrompt ? t.continueSession : t.continueAccount}
                 </InstantLink>
-                <a
-                  className="login-switch-out"
-                  href="/oauth/end-session?client_id=bhd-portal&post_logout_redirect_uri=https://id.bhd-om.com/login"
-                >
+                <button type="button" className="login-switch-out" onClick={logoutThenReload}>
                   {t.switchOut}
-                </a>
+                </button>
               </div>
             ) : (
               <>
