@@ -83,7 +83,8 @@ export function renderBrandedMailHtml(input: {
   issuer?: string;
 }) {
   const issuer = (input.issuer || DEFAULT_IDENTITY_ISSUER).replace(/\/$/, "");
-  const logoUrl = `${issuer}/brand/bhd-logo.svg`;
+  // PNG only — most clients (Outlook/Gmail) block or ignore SVG in <img>.
+  const logoUrl = `${issuer}/brand/bhd-logo-email.png`;
   const c = input.content;
 
   return `<!DOCTYPE html>
@@ -94,10 +95,15 @@ export function renderBrandedMailHtml(input: {
     <tr><td align="center">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #d7e2dc">
         <tr>
-          <td style="background:linear-gradient(160deg,#092d24 0%,#0c4a3c 55%,#174b70 100%);padding:28px 24px;text-align:center">
-            <img src="${logoUrl}" alt="BHD" width="168" style="display:block;margin:0 auto 10px;max-width:168px;height:auto;border:0" />
-            <div style="font-family:Tahoma,Arial,sans-serif;color:#9fd4c4;font-size:12px;font-weight:800;letter-spacing:0.04em">BIN HAMOOD DEVELOPMENT</div>
-            <div style="font-family:Tahoma,Arial,sans-serif;color:#ffffff;font-size:13px;margin-top:6px">هوية BHD الموحّدة · id.bhd-om.com</div>
+          <td style="background:linear-gradient(160deg,#092d24 0%,#0c4a3c 55%,#174b70 100%);padding:24px 20px 20px;text-align:center">
+            <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin:0 auto 12px">
+              <tr>
+                <td bgcolor="#ffffff" style="background:#ffffff;border-radius:16px;padding:14px 22px">
+                  <img src="${logoUrl}" alt="Bin Hamood Development" width="220" height="72" style="display:block;margin:0 auto;width:220px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none" />
+                </td>
+              </tr>
+            </table>
+            <div style="font-family:Tahoma,Arial,sans-serif;color:#ffffff;font-size:13px;line-height:1.5">هوية BHD الموحّدة · id.bhd-om.com</div>
           </td>
         </tr>
         <tr>
