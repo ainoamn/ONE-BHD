@@ -12,6 +12,19 @@
 | [BHD-PORTAL-FULL-AUDIT.md](BHD-PORTAL-FULL-AUDIT.md) | مراجعة شاملة للبوابة الحية: الفوائد، الخصائص، البناء، الإيجابيات والسلبيات، الأمان والتشفير، النواقص، المخاطر، طريقة العمل، الربط، والترقية |
 | [BHD-REPOSITORY-DOCUMENTATION.md](BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، سياسة الإصدارات، التشغيل، النشر، التحقق |
 
+### ملاحظات يوم 26 أغسطس 2026
+
+| الملف | الغرض |
+|---|---|
+| [notes/2026-08-26-session-handoff-identity-mail-locale.md](notes/2026-08-26-session-handoff-identity-mail-locale.md) | **تسليم الجلسة** — بريد الهوية، القوالب، الحذف، الشعار، RTL/موبايل، الإنجليزية، حماية نسيت كلمة المرور |
+| [notes/2026-08-26-branded-email-templates-admin.md](notes/2026-08-26-branded-email-templates-admin.md) | قوالب البريد + حذف المستخدم + تسريع الروابط |
+| [notes/2026-08-26-admin-client-registry.md](notes/2026-08-26-admin-client-registry.md) | تسجيل عملاء OAuth من الإدارة |
+| [notes/2026-08-26-unified-login-docs-page.md](notes/2026-08-26-unified-login-docs-page.md) | صفحة دليل الدخول الموحّد |
+| [notes/2026-08-26-identity-admin-console.md](notes/2026-08-26-identity-admin-console.md) | لوحة تشغيل الهوية |
+| [notes/2026-08-26-resend-email-verification.md](notes/2026-08-26-resend-email-verification.md) | تأكيد البريد عبر Resend |
+| [notes/2026-08-26-platform-admin-email.md](notes/2026-08-26-platform-admin-email.md) | أدمن المنصة عبر متغير البيئة |
+| [notes/2026-08-26-wazen-email-unverified-fix.md](notes/2026-08-26-wazen-email-unverified-fix.md) | إصلاح بريد الأدمن غير الموثّق مع وازن |
+
 وثائق إضافية في جذر المستودع ونسخ البوابة:
 
 - `BHD-Portal-Documentation-Arabic.md` — المرجع الهندسي العربي
