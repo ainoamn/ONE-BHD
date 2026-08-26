@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getIdentityClient, isAllowedRedirect } from "../../lib/identity/clients";
+import { resolveIdentityClient, isAllowedRedirect } from "../../lib/identity/clients";
 import { randomUrlToken } from "../../lib/identity/crypto";
 import { loginRedirectForAuthorize } from "../../lib/identity/safe-next";
 import { saveTicket } from "../../lib/identity/tickets";
@@ -36,7 +36,7 @@ export async function GET(request: Request) {
   const challenge = url.searchParams.get("code_challenge") || "";
   const method = url.searchParams.get("code_challenge_method") || "";
 
-  const client = getIdentityClient(clientId);
+  const client = await resolveIdentityClient(clientId);
   const origin = url.origin;
   if (!client || !isAllowedRedirect(client, redirectUri, origin)) {
     return new NextResponse("unauthorized_client or invalid redirect_uri", { status: 400 });

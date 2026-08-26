@@ -39,6 +39,22 @@ export async function ensureIdentitySchema(): Promise<void> {
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS last_login_ip text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS signup_ip text`);
       await getSql().unsafe(`ALTER TABLE bhd_contacts ADD COLUMN IF NOT EXISTS hometown text`);
+      await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_oauth_clients (
+          client_id text PRIMARY KEY,
+          name text NOT NULL,
+          origin text NOT NULL,
+          workspace_path text NOT NULL DEFAULT '/',
+          redirect_uris text NOT NULL,
+          post_logout_redirect_uris text NOT NULL,
+          client_secret text NOT NULL,
+          mode text NOT NULL DEFAULT 'browse',
+          enabled boolean NOT NULL DEFAULT true,
+          notes text,
+          created_at timestamptz NOT NULL DEFAULT now(),
+          updated_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
     })().catch((error) => {
       schemaReady = null;
       throw error;

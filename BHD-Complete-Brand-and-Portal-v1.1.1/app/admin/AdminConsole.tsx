@@ -68,6 +68,17 @@ type AdminUserDetail = AdminUser & {
 
 type TabId = "users" | "system" | "clients";
 
+type RegistryClient = {
+  clientId: string;
+  name: string;
+  source: string;
+  origin: string | null;
+  workspacePath: string | null;
+  mode: string;
+  redirectUris: string[];
+  enabled: boolean;
+};
+
 function formatDate(value: string | null | undefined) {
   if (!value) return "—";
   try {
@@ -108,6 +119,23 @@ export function AdminConsole({
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<AdminUserDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [registry, setRegistry] = useState<RegistryClient[]>([]);
+  const [regForm, setRegForm] = useState({
+    clientId: "bhd-",
+    name: "",
+    origin: "https://",
+    workspacePath: "/dashboard",
+    redirectUri: "",
+    mode: "browse" as "browse" | "sso",
+  });
+  const [issuedSecret, setIssuedSecret] = useState("");
+
+  const loadRegistry = useCallback(async () => {
+    const response = await fetch("/api/admin/clients", { cache: "no-store" });
+    const data = (await response.json()) as { clients?: RegistryClient[]; message?: string };
+    if (!response.ok) throw new Error(data.message || "تعذّر تحميل سجل العملاء.");
+    setRegistry(data.clients || []);
+  }, []);
 
   const load = useCallback(async (search = "") => {
     setError("");
@@ -121,7 +149,8 @@ export function AdminConsole({
     if (!usersRes.ok) throw new Error(usersData.message || "تعذّر تحميل الحسابات.");
     setOverview(overviewData);
     setUsers(usersData.users || []);
-  }, []);
+    await loadRegistry().catch(() => undefined);
+  }, [loadRegistry]);
 
   const loadDetail = useCallback(async (id: string) => {
     setDetailLoading(true);
@@ -223,6 +252,62 @@ export function AdminConsole({
     }
   }
 
+  async function registerClient(event: FormEvent) {
+    event.preventDefault();
+    setBusyId("register");
+    setError("");
+    setNotice("");
+    setIssuedSecret("");
+    try {
+      const redirectUri =
+        regForm.redirectUri.trim() || `${regForm.origin.replace(/\/$/, "")}/api/auth/bhd/callback`;
+      const response = await fetch("/api/admin/clients", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...regForm, redirectUri }),
+      });
+      const data = (await response.json()) as {
+        message?: string;
+        clientSecret?: string;
+        hint?: string;
+      };
+      if (!response.ok) {
+        setError(data.message || "تعذّر تسجيل العميل.");
+        return;
+      }
+      setIssuedSecret(data.clientSecret || "");
+      setNotice(data.hint || "تم تسجيل العميل.");
+      await loadRegistry();
+    } catch {
+      setError("تعذّر الاتصال بالخادم.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function setClientMode(clientId: string, mode: "browse" | "sso") {
+    setBusyId(clientId);
+    setError("");
+    try {
+      const response = await fetch("/api/admin/clients", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId, mode }),
+      });
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        setError(data.message || "تعذّر تحديث الوضع.");
+        return;
+      }
+      setNotice(mode === "sso" ? `تم تفعيل SSO لـ ${clientId}` : `أُرجع ${clientId} إلى browse`);
+      await loadRegistry();
+    } catch {
+      setError("تعذّر الاتصال بالخادم.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
   const stats = useMemo(
     () => [
       { label: "الحسابات", value: overview?.users ?? "—" },
@@ -288,7 +373,7 @@ export function AdminConsole({
             [
               ["users", "المستخدمون"],
               ["system", "النظام"],
-              ["clients", "العملاء OAuth"],
+              ["clients", "العملاء والربط"],
             ] as const
           ).map(([id, label]) => (
             <button
@@ -372,27 +457,134 @@ export function AdminConsole({
         ) : null}
 
         {tab === "clients" ? (
-          <section className="admin-panel">
-            <div className="admin-panel-head">
-              <div>
-                <p>Relying parties</p>
-                <h2>عملاء OAuth المسجّلون</h2>
+          <div className="admin-users-layout">
+            <section className="admin-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p>Registry</p>
+                  <h2>تسجيل منتج جديد يدوياً</h2>
+                </div>
               </div>
-            </div>
-            <ul className="admin-clients">
-              {(overview?.clients || []).map((client) => (
-                <li key={client.clientId}>
-                  <strong>{client.name}</strong>
-                  <code>{client.clientId}</code>
-                  <span>
-                    {client.productionRedirects[0]
-                      ? new URL(client.productionRedirects[0]).origin
-                      : "بانتظار نطاق الإنتاج"}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </section>
+              <p className="admin-footnote">
+                بعد أن ينفّذ المنتج مسارات <code>start/callback</code> من الدليل، سجّله هنا بدل تعديل الكود. ثم اختبر{" "}
+                <code>start → id.bhd-om.com</code> وفعّل <code>sso</code>.
+              </p>
+              <form className="admin-register-form" onSubmit={(event) => void registerClient(event)}>
+                <label>
+                  <span>client_id</span>
+                  <input
+                    value={regForm.clientId}
+                    onChange={(event) => setRegForm((current) => ({ ...current, clientId: event.target.value }))}
+                    placeholder="bhd-myapp"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>اسم المنتج</span>
+                  <input
+                    value={regForm.name}
+                    onChange={(event) => setRegForm((current) => ({ ...current, name: event.target.value }))}
+                    required
+                  />
+                </label>
+                <label>
+                  <span>أصل الموقع (origin)</span>
+                  <input
+                    value={regForm.origin}
+                    onChange={(event) => setRegForm((current) => ({ ...current, origin: event.target.value }))}
+                    placeholder="https://app.example.com"
+                    required
+                  />
+                </label>
+                <label>
+                  <span>workspacePath بعد الدخول</span>
+                  <input
+                    value={regForm.workspacePath}
+                    onChange={(event) => setRegForm((current) => ({ ...current, workspacePath: event.target.value }))}
+                    placeholder="/dashboard"
+                  />
+                </label>
+                <label className="full">
+                  <span>redirect_uri (اختياري — الافتراضي …/api/auth/bhd/callback)</span>
+                  <input
+                    value={regForm.redirectUri}
+                    onChange={(event) => setRegForm((current) => ({ ...current, redirectUri: event.target.value }))}
+                    placeholder="https://app.example.com/api/auth/bhd/callback"
+                  />
+                </label>
+                <label>
+                  <span>الوضع الابتدائي</span>
+                  <select
+                    value={regForm.mode}
+                    onChange={(event) =>
+                      setRegForm((current) => ({
+                        ...current,
+                        mode: event.target.value === "sso" ? "sso" : "browse",
+                      }))
+                    }
+                  >
+                    <option value="browse">browse — بانتظار اكتمال المسار</option>
+                    <option value="sso">sso — المسار جاهز ومُختبر</option>
+                  </select>
+                </label>
+                <button type="submit" className="admin-action" disabled={busyId === "register"}>
+                  تسجيل العميل
+                </button>
+              </form>
+              {issuedSecret ? (
+                <p className="admin-notice" role="status">
+                  client_secret (احفظه الآن): <code>{issuedSecret}</code>
+                </p>
+              ) : null}
+              <p className="admin-footnote">
+                API: <code>GET/POST/PATCH /api/admin/clients</code> (جلسة أدمن منصة فقط). الدليل التفصيلي:{" "}
+                <InstantLink href="/docs/unified-login#admin-api">/docs/unified-login</InstantLink>
+              </p>
+            </section>
+
+            <section className="admin-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p>Clients</p>
+                  <h2>الثابت + المسجّل</h2>
+                </div>
+              </div>
+              <ul className="admin-clients">
+                {(registry.length ? registry : (overview?.clients || []).map((client) => ({
+                  clientId: client.clientId,
+                  name: client.name,
+                  source: "static",
+                  origin: client.productionRedirects[0]
+                    ? new URL(client.productionRedirects[0]).origin
+                    : null,
+                  workspacePath: null,
+                  mode: "sso",
+                  redirectUris: client.productionRedirects,
+                  enabled: true,
+                }))).map((client) => (
+                  <li key={client.clientId}>
+                    <strong>{client.name}</strong>
+                    <code>{client.clientId}</code>
+                    <span>
+                      {client.origin || "—"} · {client.source} · {client.mode}
+                    </span>
+                    {client.source === "registered" ? (
+                      <button
+                        type="button"
+                        className="admin-action admin-action-secondary"
+                        disabled={busyId === client.clientId}
+                        onClick={() =>
+                          void setClientMode(client.clientId, client.mode === "sso" ? "browse" : "sso")
+                        }
+                      >
+                        {client.mode === "sso" ? "إرجاع browse" : "تفعيل SSO"}
+                      </button>
+                    ) : null}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          </div>
         ) : null}
 
         {tab === "users" ? (

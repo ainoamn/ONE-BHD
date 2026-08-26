@@ -23,7 +23,7 @@ export async function POST(request: Request) {
   const grantType = form.get("grant_type") || "";
   const clientId = form.get("client_id") || "";
   const clientSecret = form.get("client_secret") || "";
-  const client = resolveOAuthClient(clientId, clientSecret);
+  const client = await resolveOAuthClient(clientId, clientSecret);
   if (!client) {
     return NextResponse.json({ error: "invalid_client" }, { status: 401 });
   }

@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const form = new URLSearchParams(await request.text());
-  const client = verifyClientSecret(form.get("client_id") || "", form.get("client_secret") || "");
+  const client = await verifyClientSecret(form.get("client_id") || "", form.get("client_secret") || "");
   if (!client) {
     return NextResponse.json({ error: "invalid_client" }, { status: 401 });
   }

@@ -1,6 +1,6 @@
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
 import { authSecret } from "../auth/config";
-import { getIdentityClient, type IdentityClient } from "./clients";
+import { getIdentityClient, resolveIdentityClient, type IdentityClient } from "./clients";
 import { identityTokenSecret } from "./issuer";
 
 export function randomUrlToken(bytes = 32): string {
@@ -19,15 +19,18 @@ export function verifyPkce(verifier: string, challenge: string): boolean {
 }
 
 export function clientSecretFor(client: IdentityClient): string {
-  const fromEnv = process.env[client.secretEnv]?.trim();
-  if (fromEnv) return fromEnv;
+  if (client.storedSecret?.trim()) return client.storedSecret.trim();
+  if (client.secretEnv) {
+    const fromEnv = process.env[client.secretEnv]?.trim();
+    if (fromEnv) return fromEnv;
+  }
   const root = authSecret();
   if (!root) return "";
   return createHmac("sha256", root).update(`bhd-oauth:${client.clientId}`).digest("base64url");
 }
 
-export function verifyClientSecret(clientId: string, secret: string): IdentityClient | null {
-  const client = getIdentityClient(clientId);
+export async function verifyClientSecret(clientId: string, secret: string): Promise<IdentityClient | null> {
+  const client = await resolveIdentityClient(clientId);
   if (!client || !secret) return null;
   const expected = clientSecretFor(client);
   if (!expected || expected.length !== secret.length) return null;
@@ -35,9 +38,13 @@ export function verifyClientSecret(clientId: string, secret: string): IdentityCl
   return client;
 }
 
-export function resolveOAuthClient(clientId: string, secret: string): IdentityClient | null {
+/**
+ * Confidential secret if provided; first-party clients may complete
+ * authorization_code with PKCE alone until per-client secrets are set.
+ */
+export async function resolveOAuthClient(clientId: string, secret: string): Promise<IdentityClient | null> {
   if (secret) return verifyClientSecret(clientId, secret);
-  return getIdentityClient(clientId) ?? null;
+  return (await resolveIdentityClient(clientId)) ?? null;
 }
 
 export function signingKey(): Uint8Array {
@@ -47,3 +54,6 @@ export function signingKey(): Uint8Array {
   }
   return new TextEncoder().encode(secret);
 }
+
+/** @deprecated sync static-only — prefer resolveIdentityClient */
+export { getIdentityClient };

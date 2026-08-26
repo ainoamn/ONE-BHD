@@ -85,8 +85,28 @@ export const oauthTickets = pgTable("bhd_oauth_tickets", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/**
+ * OAuth clients registered from /admin (beyond the frozen IDENTITY_CLIENTS list).
+ * Enables linking a new product without editing code — after the product implements start/callback.
+ */
+export const registeredClients = pgTable("bhd_oauth_clients", {
+  clientId: text("client_id").primaryKey(),
+  name: text("name").notNull(),
+  origin: text("origin").notNull(),
+  workspacePath: text("workspace_path").notNull().default("/"),
+  redirectUris: text("redirect_uris").notNull(),
+  postLogoutRedirectUris: text("post_logout_redirect_uris").notNull(),
+  clientSecret: text("client_secret").notNull(),
+  mode: text("mode").notNull().default("browse"),
+  enabled: boolean("enabled").notNull().default(true),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type BhdUser = typeof users.$inferSelect;
 export type NewBhdUser = typeof users.$inferInsert;
 export type BhdContact = typeof contacts.$inferSelect;
 export type NewBhdContact = typeof contacts.$inferInsert;
 export type BhdOauthTicket = typeof oauthTickets.$inferSelect;
+export type BhdRegisteredClient = typeof registeredClients.$inferSelect;

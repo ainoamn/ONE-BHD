@@ -1,9 +1,19 @@
+import { eq } from "drizzle-orm";
+import { getDb, isDatabaseConfigured, ensureIdentitySchema } from "../../../db";
+import { registeredClients, type BhdRegisteredClient } from "../../../db/schema";
+
 export type IdentityClient = {
   clientId: string;
   name: string;
   secretEnv: string;
   redirectUris: string[];
   postLogoutRedirectUris: string[];
+  /** Present for admin-registered clients (DB). */
+  storedSecret?: string;
+  origin?: string;
+  workspacePath?: string;
+  mode?: "browse" | "sso";
+  source?: "static" | "registered";
 };
 
 export const IDENTITY_CLIENTS: IdentityClient[] = [
@@ -123,9 +133,78 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
   },
 ];
 
-export function getIdentityClient(clientId: string): IdentityClient | undefined {
+function parseJsonList(raw: string): string[] {
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed.map((item) => String(item).trim()).filter(Boolean);
+  } catch {
+    return raw
+      .split(/[\n,]+/)
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+}
+
+function fromRegisteredRow(row: BhdRegisteredClient): IdentityClient {
+  return {
+    clientId: row.clientId,
+    name: row.name,
+    secretEnv: "",
+    storedSecret: row.clientSecret,
+    redirectUris: parseJsonList(row.redirectUris),
+    postLogoutRedirectUris: parseJsonList(row.postLogoutRedirectUris),
+    origin: row.origin,
+    workspacePath: row.workspacePath,
+    mode: row.mode === "sso" ? "sso" : "browse",
+    source: "registered",
+  };
+}
+
+export function getStaticIdentityClient(clientId: string): IdentityClient | undefined {
   const resolved = clientId === "bhd-ain-oman" || clientId === "bhd-baitak" ? "bhd-r" : clientId;
-  return IDENTITY_CLIENTS.find((client) => client.clientId === resolved);
+  const hit = IDENTITY_CLIENTS.find((client) => client.clientId === resolved);
+  return hit ? { ...hit, source: "static" } : undefined;
+}
+
+/** Sync lookup for static clients only (portal start/callback). */
+export function getIdentityClient(clientId: string): IdentityClient | undefined {
+  return getStaticIdentityClient(clientId);
+}
+
+/** Static + admin-registered clients. */
+export async function resolveIdentityClient(clientId: string): Promise<IdentityClient | undefined> {
+  const staticClient = getStaticIdentityClient(clientId);
+  if (staticClient) return staticClient;
+  if (!isDatabaseConfigured()) return undefined;
+  try {
+    await ensureIdentitySchema();
+    const db = getDb();
+    const [row] = await db
+      .select()
+      .from(registeredClients)
+      .where(eq(registeredClients.clientId, clientId.trim()))
+      .limit(1);
+    if (!row || !row.enabled) return undefined;
+    return fromRegisteredRow(row);
+  } catch {
+    return undefined;
+  }
+}
+
+export async function listIdentityClients(): Promise<IdentityClient[]> {
+  const staticList = IDENTITY_CLIENTS.map((client) => ({ ...client, source: "static" as const }));
+  if (!isDatabaseConfigured()) return staticList;
+  try {
+    await ensureIdentitySchema();
+    const db = getDb();
+    const rows = await db.select().from(registeredClients);
+    const registered = rows.filter((row) => row.enabled).map(fromRegisteredRow);
+    const staticIds = new Set(staticList.map((client) => client.clientId));
+    return [...staticList, ...registered.filter((client) => !staticIds.has(client.clientId))];
+  } catch {
+    return staticList;
+  }
 }
 
 export function isAllowedRedirect(client: IdentityClient, redirectUri: string, requestOrigin?: string): boolean {
