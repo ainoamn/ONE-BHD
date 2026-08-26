@@ -258,6 +258,7 @@ export function AdminConsole({
             <InstantLink href="/">الرئيسية</InstantLink>
             <InstantLink href="/account">الحساب</InstantLink>
             <InstantLink href="/apps">البرامج</InstantLink>
+            <InstantLink href="/docs/unified-login">التوثيق</InstantLink>
             <button type="button" className="admin-signout" onClick={() => void signOutAdmin()}>
               خروج
             </button>
@@ -355,6 +356,18 @@ export function AdminConsole({
               صلاحية هذه اللوحة عبر <code>BHD_PLATFORM_ADMIN_EMAILS</code> فقط. خطط الاشتراك المدفوعة داخل قواعد
               المنتجات؛ هنا تظهر ارتباطات SSO الفعلية لكل مستخدم.
             </p>
+            <div className="admin-docs-cta">
+              <div>
+                <p>Integration</p>
+                <h3>دليل ربط البرامج بالدخول الموحّد</h3>
+                <span>
+                  تنزيل مواصفات SSO والمشغّل، ظهور الأيقونات في الهيدر/الفوتر، واعتماد الدخول والتنقّل بين المواقع.
+                </span>
+              </div>
+              <InstantLink className="admin-action" href="/docs/unified-login">
+                فتح التوثيق
+              </InstantLink>
+            </div>
           </section>
         ) : null}
 
