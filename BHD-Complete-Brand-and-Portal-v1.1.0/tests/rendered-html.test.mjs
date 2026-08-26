@@ -232,7 +232,9 @@ test("uses the official BHD logo assets across the portal", async () => {
   assert.match(brandLogo, /official-logo/);
   assert.match(home, /BrandLogo/);
   assert.match(home, /gateway-shell/);
-  assert.match(home, /بن حمود للتطوير/);
+  assert.match(home, /hidePrograms/);
+  assert.doesNotMatch(home, /بوابتك إلى كل تطبيقات/);
+  assert.doesNotMatch(home, /منظومة بن حمود للتطوير/);
   assert.match(company, /BUILD[\s\S]*HIGHER[\s\S]*DREAMS/);
   assert.match(company, /<b>ا<\/b>بنِ\./);
   assert.match(company, /<b>أ<\/b>حلامًا\./);

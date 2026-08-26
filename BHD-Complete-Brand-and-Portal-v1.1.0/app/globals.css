@@ -4511,6 +4511,14 @@ a.login-submit {
   animation: gateway-rise 700ms ease both;
 }
 
+.gateway-hero-compact {
+  margin: clamp(18px, 5vh, 40px) auto 0;
+}
+
+.gateway-hero-compact .gateway-cta-row {
+  margin-top: 0;
+}
+
 @keyframes gateway-rise {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }

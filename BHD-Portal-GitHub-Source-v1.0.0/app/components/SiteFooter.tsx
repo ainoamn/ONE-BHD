@@ -8,14 +8,18 @@ import { isExternalProductHref, products } from "../lib/products";
 type SiteFooterProps = {
   promise?: string;
   rights?: string;
+  /** إخفاء شبكة برامجنا — للبوابة الرئيسية حتى لا تتكرر أيقونات التطبيقات. */
+  hidePrograms?: boolean;
 };
 
 export function SiteFooter({
   promise = "ابنِ أحلامًا أكبر.",
   rights = "شركة بن حمود للتطوير. جميع الحقوق محفوظة.",
+  hidePrograms = false,
 }: SiteFooterProps) {
   return (
     <footer className="site-footer">
+      {!hidePrograms ? (
       <div className="section-wrap footer-programs">
         <div className="footer-programs-head">
           <p>برامجنا</p>
@@ -47,6 +51,7 @@ export function SiteFooter({
           )}
         </div>
       </div>
+      ) : null}
       <div className="section-wrap footer-top">
         <div className="footer-brand">
           <BrandLogo tone="light" className="footer-official-logo" />
