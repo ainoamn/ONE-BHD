@@ -72,6 +72,7 @@ export function AccountConsole() {
   const [saved, setSaved] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [resending, setResending] = useState(false);
 
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
@@ -219,6 +220,36 @@ export function AccountConsole() {
                   {user.facebookLinked ? <span>مرتبط بفيسبوك</span> : null}
                   {user.hasPassword ? <span>دخول بكلمة مرور</span> : null}
                 </div>
+                {!user.emailVerified ? (
+                  <div className="account-verify-banner">
+                    <p>وازن والمنتجات الأخرى ترفض الدخول حتى يُؤكَّد البريد. أرسلنا رابطاً أو اطلب إرسالاً جديداً.</p>
+                    <button
+                      type="button"
+                      className="primary-button"
+                      disabled={resending}
+                      onClick={async () => {
+                        setResending(true);
+                        setError("");
+                        setSaved("");
+                        try {
+                          const response = await fetch("/api/auth/resend-verification", { method: "POST" });
+                          const payload = (await response.json()) as { message?: string };
+                          if (!response.ok) {
+                            setError(payload.message || "تعذّر إرسال رابط التأكيد.");
+                            return;
+                          }
+                          setSaved(payload.message || "أُرسل رابط التأكيد.");
+                        } catch {
+                          setError("تعذّر الاتصال بالخادم.");
+                        } finally {
+                          setResending(false);
+                        }
+                      }}
+                    >
+                      {resending ? "جاري الإرسال…" : "إرسال رابط تأكيد البريد"}
+                    </button>
+                  </div>
+                ) : null}
               </div>
               <dl>
                 <div>

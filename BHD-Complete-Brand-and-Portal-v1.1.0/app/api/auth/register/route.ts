@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
 import { applySessionCookies, createSessionToken, getCurrentSession } from "../../../lib/auth/session";
+import { issueEmailVerification, isResendConfigured } from "../../../lib/auth/email-verification";
 import { registerWithPassword, type RegisterInput } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -41,13 +42,30 @@ export async function POST(request: Request) {
     }
     const body = (await request.json()) as RegisterInput;
     const user = await registerWithPassword(body);
+
+    let verificationEmailSent = false;
+    if (isResendConfigured()) {
+      try {
+        await issueEmailVerification(user.id, user.email, request);
+        verificationEmailSent = true;
+      } catch (error) {
+        console.error("verification email after register failed", error);
+      }
+    }
+
     const token = await createSessionToken({
       sub: user.id,
       email: user.email,
       name: user.name,
       picture: user.picture,
     });
-    const response = NextResponse.json({ user });
+    const response = NextResponse.json({
+      user,
+      verificationEmailSent,
+      message: verificationEmailSent
+        ? "تم إنشاء الحساب. راجع بريدك لتأكيد العنوان."
+        : "تم إنشاء الحساب. أكّد بريدك لاحقاً من صفحة الحساب.",
+    });
     applySessionCookies(response.cookies, token);
     return response;
   } catch (error) {

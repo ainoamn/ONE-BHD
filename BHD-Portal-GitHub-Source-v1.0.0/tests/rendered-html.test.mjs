@@ -51,6 +51,10 @@ test("keeps the login surface private and wires identity APIs", async () => {
   assert.match(loginForm, /login-social/);
   assert.match(loginForm, /بوابة BHD/);
   assert.match(loginForm, /login-brand-name/);
+  await access(new URL("app/lib/auth/mail.ts", root));
+  await access(new URL("app/api/auth/verify-email/route.ts", root));
+  await access(new URL("app/api/auth/resend-verification/route.ts", root));
+  await access(new URL("app/verify-email/page.tsx", root));
   assert.match(loginForm, /بن حمود للتطوير/);
   assert.match(loginForm, /Bin Hamood Development/);
   assert.match(loginForm, /من هنا تبدأ الخطوة نحو أحلام أكبر/);

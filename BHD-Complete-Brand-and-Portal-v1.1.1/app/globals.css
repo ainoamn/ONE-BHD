@@ -4745,3 +4745,63 @@ a.login-submit {
     animation: none;
   }
 }
+
+.verify-email-screen {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(12, 116, 89, 0.12), transparent 40%),
+    #f7faf8;
+}
+
+.verify-email-card {
+  width: min(480px, 100%);
+  background: #fff;
+  border: 1px solid #d7e2dc;
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.verify-email-logo { height: 40px; width: auto; margin-inline: auto 0; }
+
+.verify-email-card h1 {
+  margin: 18px 0 8px;
+  font-size: 22px;
+}
+
+.verify-email-card p {
+  margin: 0 0 18px;
+  color: #5d7169;
+  line-height: 1.7;
+}
+
+.verify-email-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.account-verify-banner {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #fff6e8;
+  border: 1px solid #ecd7b0;
+  text-align: start;
+}
+
+.account-verify-banner p {
+  margin: 0 0 10px;
+  color: #6a542e;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.account-verify-banner .primary-button {
+  font-size: 13px;
+  padding: 9px 14px;
+}
