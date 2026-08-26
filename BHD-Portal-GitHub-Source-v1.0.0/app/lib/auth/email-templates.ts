@@ -83,27 +83,23 @@ export function renderBrandedMailHtml(input: {
   issuer?: string;
 }) {
   const issuer = (input.issuer || DEFAULT_IDENTITY_ISSUER).replace(/\/$/, "");
-  // PNG only — most clients (Outlook/Gmail) block or ignore SVG in <img>.
-  const logoUrl = `${issuer}/brand/bhd-logo-email.png`;
+  // Single baked PNG (dark site header + logo). Outlook strips CSS gradients and often
+  // blocks SVG; a full-width header image is the reliable path.
+  const headerUrl = `${issuer}/brand/bhd-email-header.png`;
   const c = input.content;
 
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
-<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /></head>
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width" /><meta name="color-scheme" content="light" /></head>
 <body style="margin:0;padding:0;background:#eef3f0">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#eef3f0;padding:24px 12px">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" bgcolor="#eef3f0" style="background-color:#eef3f0;padding:24px 12px">
     <tr><td align="center">
       <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border-radius:20px;overflow:hidden;border:1px solid #d7e2dc">
         <tr>
-          <td style="background:linear-gradient(160deg,#092d24 0%,#0c4a3c 55%,#174b70 100%);padding:24px 20px 20px;text-align:center">
-            <table role="presentation" cellspacing="0" cellpadding="0" align="center" style="margin:0 auto 12px">
-              <tr>
-                <td bgcolor="#ffffff" style="background:#ffffff;border-radius:16px;padding:14px 22px">
-                  <img src="${logoUrl}" alt="Bin Hamood Development" width="220" height="72" style="display:block;margin:0 auto;width:220px;max-width:100%;height:auto;border:0;outline:none;text-decoration:none" />
-                </td>
-              </tr>
-            </table>
-            <div style="font-family:Tahoma,Arial,sans-serif;color:#ffffff;font-size:13px;line-height:1.5">هوية BHD الموحّدة · id.bhd-om.com</div>
+          <td bgcolor="#0c4a3c" style="background-color:#0c4a3c;padding:0;text-align:center;line-height:0;font-size:0">
+            <a href="${issuer}" style="text-decoration:none;border:0;display:block">
+              <img src="${headerUrl}" alt="Bin Hamood Development — هوية BHD الموحّدة" width="600" style="display:block;width:100%;max-width:600px;height:auto;border:0;outline:none;text-decoration:none" />
+            </a>
           </td>
         </tr>
         <tr>
@@ -112,7 +108,7 @@ export function renderBrandedMailHtml(input: {
             <p style="margin:0 0 18px;font-size:15px;line-height:1.8;color:#3f574d">${c.body}</p>
             <table role="presentation" cellspacing="0" cellpadding="0" style="margin:0 auto 18px">
               <tr>
-                <td align="center" bgcolor="#0c7459" style="border-radius:999px">
+                <td align="center" bgcolor="#0c7459" style="border-radius:999px;background-color:#0c7459">
                   <a href="${input.actionUrl}" style="display:inline-block;padding:14px 26px;font-family:Tahoma,Arial,sans-serif;font-size:15px;font-weight:800;color:#ffffff;text-decoration:none">${c.cta}</a>
                 </td>
               </tr>
@@ -131,7 +127,7 @@ export function renderBrandedMailHtml(input: {
           </td>
         </tr>
         <tr>
-          <td style="background:#f4f7f5;padding:16px 24px;text-align:center;font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#6b7d75;line-height:1.6">
+          <td bgcolor="#f4f7f5" style="background-color:#f4f7f5;padding:16px 24px;text-align:center;font-family:Tahoma,Arial,sans-serif;font-size:11px;color:#6b7d75;line-height:1.6">
             شركة بن حمود للتطوير · مسقط · سلطنة عُمان<br />
             <a href="${issuer}" style="color:#0c7459;text-decoration:none;font-weight:700">${issuer.replace(/^https:\/\//, "")}</a>
           </td>
