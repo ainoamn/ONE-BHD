@@ -2,13 +2,13 @@
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import { BhdAdvisor } from "./components/BhdAdvisor";
-import { BrandLogo } from "./components/BrandLogo";
-import { InstantLink } from "./components/InstantLink";
-import { SessionMenu } from "./components/auth/SessionMenu";
-import { SiteFooter } from "./components/SiteFooter";
-import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
-import { isExternalProductHref, products } from "./lib/products";
+import { BhdAdvisor } from "../components/BhdAdvisor";
+import { BrandLogo } from "../components/BrandLogo";
+import { InstantLink } from "../components/InstantLink";
+import { SessionMenu } from "../components/auth/SessionMenu";
+import { SiteFooter } from "../components/SiteFooter";
+import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
+import { isExternalProductHref, products } from "../lib/products";
 
 type Language = "ar" | "en";
 
