@@ -2,6 +2,8 @@
 
 import { InstantLink } from "../InstantLink";
 import { BhdAppSwitcher } from "../bhd/BhdAppSwitcher";
+import type { UiLocale } from "../../lib/ui-locale";
+import { readStoredUiLocale } from "../../lib/ui-locale";
 import { useCallback, useEffect, useState } from "react";
 
 type User = {
@@ -18,11 +20,21 @@ type MeResponse = {
 type Props = {
   signInLabel: string;
   signOutLabel?: string;
+  locale?: UiLocale;
 };
 
-export function SessionMenu({ signInLabel }: Props) {
+export function SessionMenu({ signInLabel, locale }: Props) {
   const [user, setUser] = useState<User | null | undefined>(undefined);
   const [platformAdmin, setPlatformAdmin] = useState(false);
+  const [resolvedLocale, setResolvedLocale] = useState<UiLocale>(locale || "ar");
+
+  useEffect(() => {
+    if (locale) {
+      setResolvedLocale(locale);
+      return;
+    }
+    setResolvedLocale(readStoredUiLocale() || "ar");
+  }, [locale]);
 
   useEffect(() => {
     let cancelled = false;
@@ -63,5 +75,12 @@ export function SessionMenu({ signInLabel }: Props) {
     );
   }
 
-  return <BhdAppSwitcher user={user} platformAdmin={platformAdmin} onSignOut={signOut} />;
+  return (
+    <BhdAppSwitcher
+      user={user}
+      platformAdmin={platformAdmin}
+      onSignOut={signOut}
+      locale={resolvedLocale}
+    />
+  );
 }

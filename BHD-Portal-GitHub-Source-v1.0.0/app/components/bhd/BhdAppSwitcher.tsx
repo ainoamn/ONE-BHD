@@ -2,6 +2,7 @@
 
 import { BHD_APPS, launchUrlForApp, type BhdApp } from "../../lib/bhd/apps";
 import { DEFAULT_IDENTITY_ISSUER } from "../../lib/identity/issuer";
+import type { UiLocale } from "../../lib/ui-locale";
 import { BhdAppIcon } from "./BhdAppIcon";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
@@ -12,6 +13,25 @@ export type BhdSwitcherUser = {
 };
 
 type Panel = "apps" | "account" | null;
+
+const COPY = {
+  ar: {
+    appsAria: "تطبيقات BHD",
+    accountAria: "الحساب",
+    appsTitle: "تطبيقات BHD",
+    account: "الحساب",
+    admin: "الإدارة",
+    signOut: "خروج",
+  },
+  en: {
+    appsAria: "BHD apps",
+    accountAria: "Account",
+    appsTitle: "BHD apps",
+    account: "Account",
+    admin: "Admin",
+    signOut: "Sign out",
+  },
+} as const;
 
 function stripSlash(value: string) {
   return value.replace(/\/$/, "");
@@ -56,10 +76,12 @@ export function BhdAppSwitcher({
   user,
   onSignOut,
   platformAdmin = false,
+  locale = "ar",
 }: {
   user: BhdSwitcherUser;
   onSignOut: () => void | Promise<void>;
   platformAdmin?: boolean;
+  locale?: UiLocale;
 }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [origin, setOrigin] = useState("");
@@ -67,6 +89,8 @@ export function BhdAppSwitcher({
   const rootRef = useRef<HTMLDivElement>(null);
   const appsId = useId();
   const accountId = useId();
+  const t = COPY[locale];
+  const isArabic = locale === "ar";
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -119,7 +143,7 @@ export function BhdAppSwitcher({
       <button
         type="button"
         className="bhd-switcher-grid"
-        aria-label="تطبيقات BHD"
+        aria-label={t.appsAria}
         aria-haspopup="dialog"
         aria-expanded={panel === "apps"}
         aria-controls={panel === "apps" ? appsId : undefined}
@@ -135,7 +159,7 @@ export function BhdAppSwitcher({
       <button
         type="button"
         className="bhd-switcher-avatar"
-        aria-label="الحساب"
+        aria-label={t.accountAria}
         aria-haspopup="dialog"
         aria-expanded={panel === "account"}
         aria-controls={panel === "account" ? accountId : undefined}
@@ -156,13 +180,14 @@ export function BhdAppSwitcher({
       </button>
 
       {panel === "apps" ? (
-        <div className="bhd-switcher-card" id={appsId} role="dialog" aria-label="تطبيقات BHD">
+        <div className="bhd-switcher-card" id={appsId} role="dialog" aria-label={t.appsAria}>
           <div className="bhd-switcher-card-head">
-            <p>تطبيقات BHD</p>
+            <p>{t.appsTitle}</p>
           </div>
           <div className="bhd-switcher-grid-apps">
             {BHD_APPS.map((app) => {
               const current = origin ? isCurrentApp(app, origin) : false;
+              const label = isArabic ? app.nameAr : app.nameEn;
               return (
                 <button
                   key={app.id}
@@ -175,10 +200,10 @@ export function BhdAppSwitcher({
                 >
                   <BhdAppIcon
                     id={app.id}
-                    title={app.nameAr}
+                    title={label}
                     className={current ? "bhd-switcher-mark is-current" : "bhd-switcher-mark"}
                   />
-                  <span>{app.nameAr}</span>
+                  <span>{label}</span>
                 </button>
               );
             })}
@@ -187,7 +212,7 @@ export function BhdAppSwitcher({
       ) : null}
 
       {panel === "account" ? (
-        <div className="bhd-switcher-card bhd-switcher-account" id={accountId} role="dialog" aria-label="الحساب">
+        <div className="bhd-switcher-card bhd-switcher-account" id={accountId} role="dialog" aria-label={t.accountAria}>
           <div className="bhd-switcher-account-row">
             {showPicture ? (
               <img
@@ -207,15 +232,15 @@ export function BhdAppSwitcher({
             </div>
           </div>
           <a className="bhd-switcher-account-link" href={accountPageUrl(origin)}>
-            الحساب
+            {t.account}
           </a>
           {platformAdmin ? (
             <a className="bhd-switcher-account-link" href="/admin">
-              الإدارة
+              {t.admin}
             </a>
           ) : null}
           <button type="button" className="bhd-switcher-signout" onClick={() => void onSignOut()}>
-            خروج
+            {t.signOut}
           </button>
         </div>
       ) : null}

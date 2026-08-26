@@ -1756,6 +1756,12 @@ h3 {
   gap: 10px;
 }
 
+.inner-lang {
+  color: var(--ink);
+  background: rgba(9, 45, 36, 0.06);
+  border: 1px solid #d7e2dc;
+}
+
 .inner-mobile-nav { display: none; position: relative; justify-self: end; }
 .inner-mobile-nav summary {
   display: inline-flex;

@@ -9,8 +9,14 @@ import { SessionMenu } from "../components/auth/SessionMenu";
 import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { isExternalProductHref, products } from "../lib/products";
+import type { UiLocale } from "../lib/ui-locale";
+import {
+  applyDocumentLocale,
+  readStoredUiLocale,
+  writeStoredUiLocale,
+} from "../lib/ui-locale";
 
-type Language = "ar" | "en";
+type Language = UiLocale;
 
 const copy = {
   ar: {
@@ -161,6 +167,7 @@ const copy = {
 
 export default function CompanyPortal() {
   const [language, setLanguage] = useState<Language>("ar");
+  const [ready, setReady] = useState(false);
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -169,9 +176,16 @@ export default function CompanyPortal() {
   const isArabic = language === "ar";
 
   useEffect(() => {
-    document.documentElement.lang = language;
-    document.documentElement.dir = isArabic ? "rtl" : "ltr";
-  }, [language, isArabic]);
+    const stored = readStoredUiLocale();
+    if (stored) setLanguage(stored);
+    setReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    writeStoredUiLocale(language);
+    applyDocumentLocale(language);
+  }, [language, ready]);
 
   useEffect(() => {
     fetch("/api/auth/me", { cache: "no-store" })
@@ -215,6 +229,7 @@ export default function CompanyPortal() {
         <div className="header-actions">
           <SessionMenu
             signInLabel={isArabic ? "دخول" : "Sign in"}
+            locale={language}
           />
           <button
             className="language-button"
@@ -574,7 +589,7 @@ export default function CompanyPortal() {
         </div>
       </section>
 
-      <SiteFooter promise={t.footerLine} rights={t.rights} />
+      <SiteFooter promise={t.footerLine} rights={t.rights} locale={language} />
       <BhdAdvisor />
     </main>
   );
