@@ -63,6 +63,7 @@ export function BhdAppSwitcher({
 }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [origin, setOrigin] = useState("");
+  const [pictureBroken, setPictureBroken] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const appsId = useId();
   const accountId = useId();
@@ -70,6 +71,10 @@ export function BhdAppSwitcher({
   useEffect(() => {
     setOrigin(window.location.origin);
   }, []);
+
+  useEffect(() => {
+    setPictureBroken(false);
+  }, [user.picture]);
 
   const close = useCallback(() => setPanel(null), []);
 
@@ -107,6 +112,7 @@ export function BhdAppSwitcher({
   }
 
   const initial = user.name.trim().slice(0, 1) || "B";
+  const showPicture = Boolean(user.picture) && !pictureBroken;
 
   return (
     <div className="bhd-switcher-slot" ref={rootRef}>
@@ -135,7 +141,18 @@ export function BhdAppSwitcher({
         aria-controls={panel === "account" ? accountId : undefined}
         onClick={() => setPanel((current) => (current === "account" ? null : "account"))}
       >
-        {user.picture ? <img src={user.picture} alt="" width={32} height={32} /> : <span>{initial}</span>}
+        {showPicture ? (
+          <img
+            src={user.picture || undefined}
+            alt=""
+            width={32}
+            height={32}
+            referrerPolicy="no-referrer"
+            onError={() => setPictureBroken(true)}
+          />
+        ) : (
+          <span>{initial}</span>
+        )}
       </button>
 
       {panel === "apps" ? (
@@ -172,7 +189,18 @@ export function BhdAppSwitcher({
       {panel === "account" ? (
         <div className="bhd-switcher-card bhd-switcher-account" id={accountId} role="dialog" aria-label="الحساب">
           <div className="bhd-switcher-account-row">
-            {user.picture ? <img src={user.picture} alt="" width={44} height={44} /> : <span className="bhd-switcher-account-initial">{initial}</span>}
+            {showPicture ? (
+              <img
+                src={user.picture || undefined}
+                alt=""
+                width={44}
+                height={44}
+                referrerPolicy="no-referrer"
+                onError={() => setPictureBroken(true)}
+              />
+            ) : (
+              <span className="bhd-switcher-account-initial">{initial}</span>
+            )}
             <div>
               <strong>{user.name}</strong>
               <small>{user.email}</small>
