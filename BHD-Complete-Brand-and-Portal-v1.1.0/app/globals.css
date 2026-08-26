@@ -2719,6 +2719,57 @@ a.login-submit {
   font-size: 13px;
 }
 
+.login-notice {
+  margin: 0;
+  color: #0c5c45;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
+.login-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -6px;
+}
+
+.login-forgot-link,
+.login-forgot-back {
+  border: 0;
+  background: transparent;
+  color: #0c7459;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.login-forgot-back {
+  margin-top: 4px;
+  text-align: center;
+}
+
+.login-forgot-intro {
+  margin: 0 0 14px;
+  display: grid;
+  gap: 6px;
+}
+
+.login-forgot-intro h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.login-forgot-intro p {
+  margin: 0;
+  color: #5d7169;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
 .session-signin,
 .session-signout {
   border: 1px solid rgba(9, 45, 36, 0.14);

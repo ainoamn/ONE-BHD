@@ -9,7 +9,7 @@ import { BHD_APPS } from "../lib/bhd/apps";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
-type Mode = "login" | "register";
+type Mode = "login" | "register" | "forgot";
 type Lang = "ar" | "en";
 
 const COPY = {
@@ -27,6 +27,11 @@ const COPY = {
     register: "إنشاء حساب",
     identifier: "البريد أو اسم المستخدم",
     password: "كلمة المرور",
+    forgot: "نسيت كلمة المرور؟",
+    forgotTitle: "إعادة تعيين كلمة المرور",
+    forgotLead: "أدخل بريدك أو اسم المستخدم وسنرسل رابط التعيين إن وُجد الحساب.",
+    forgotSubmit: "إرسال رابط إعادة التعيين",
+    backToLogin: "العودة لتسجيل الدخول",
     name: "الاسم الكامل",
     email: "البريد الإلكتروني",
     username: "اسم المستخدم (اختياري)",
@@ -73,6 +78,11 @@ const COPY = {
     register: "Create account",
     identifier: "Email or username",
     password: "Password",
+    forgot: "Forgot password?",
+    forgotTitle: "Reset your password",
+    forgotLead: "Enter your email or username and we will send a reset link if the account exists.",
+    forgotSubmit: "Send reset link",
+    backToLogin: "Back to sign in",
     name: "Full name",
     email: "Email",
     username: "Username (optional)",
@@ -140,6 +150,7 @@ export function LoginForm() {
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [showMore, setShowMore] = useState(false);
 
   const [identifier, setIdentifier] = useState("");
@@ -204,7 +215,23 @@ export function LoginForm() {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setNotice("");
     try {
+      if (mode === "forgot") {
+        const response = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ identifier }),
+        });
+        const data = (await response.json()) as { message?: string };
+        if (!response.ok) {
+          setError(data.message || t.fail);
+          return;
+        }
+        setNotice(data.message || "");
+        return;
+      }
+
       const response = await fetch(mode === "login" ? "/api/auth/login" : "/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -301,11 +328,12 @@ export function LoginForm() {
                   <button
                     type="button"
                     role="tab"
-                    aria-selected={mode === "login"}
-                    className={mode === "login" ? "is-active" : ""}
+                    aria-selected={mode === "login" || mode === "forgot"}
+                    className={mode === "login" || mode === "forgot" ? "is-active" : ""}
                     onClick={() => {
                       setMode("login");
                       setError("");
+                      setNotice("");
                     }}
                   >
                     {t.login}
@@ -318,11 +346,19 @@ export function LoginForm() {
                     onClick={() => {
                       setMode("register");
                       setError("");
+                      setNotice("");
                     }}
                   >
                     {t.register}
                   </button>
                 </div>
+
+                {mode === "forgot" ? (
+                  <div className="login-forgot-intro">
+                    <h2>{t.forgotTitle}</h2>
+                    <p>{t.forgotLead}</p>
+                  </div>
+                ) : null}
 
                 <form className="login-form" onSubmit={(event) => void onSubmit(event)}>
                   {mode === "register" ? (
@@ -347,17 +383,36 @@ export function LoginForm() {
                     </label>
                   )}
 
-                  <label>
-                    <span>{t.password}</span>
-                    <input
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete={mode === "login" ? "current-password" : "new-password"}
-                      required
-                      minLength={8}
-                    />
-                  </label>
+                  {mode !== "forgot" ? (
+                    <label>
+                      <span>{t.password}</span>
+                      <input
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        autoComplete={mode === "login" ? "current-password" : "new-password"}
+                        required
+                        minLength={8}
+                      />
+                    </label>
+                  ) : null}
+
+                  {mode === "login" ? (
+                    <div className="login-forgot-row">
+                      <button
+                        type="button"
+                        className="login-forgot-link"
+                        onClick={() => {
+                          setMode("forgot");
+                          setError("");
+                          setNotice("");
+                          setPassword("");
+                        }}
+                      >
+                        {t.forgot}
+                      </button>
+                    </div>
+                  ) : null}
 
                   {mode === "register" ? (
                     <>
@@ -404,12 +459,39 @@ export function LoginForm() {
                       {error || facebookMessage}
                     </p>
                   ) : null}
+                  {notice ? (
+                    <p className="login-notice" role="status">
+                      {notice}
+                    </p>
+                  ) : null}
 
                   <button type="submit" className="login-submit" disabled={loading}>
-                    {loading ? t.loading : mode === "login" ? t.submitLogin : t.submitRegister}
+                    {loading
+                      ? t.loading
+                      : mode === "login"
+                        ? t.submitLogin
+                        : mode === "forgot"
+                          ? t.forgotSubmit
+                          : t.submitRegister}
                   </button>
+
+                  {mode === "forgot" ? (
+                    <button
+                      type="button"
+                      className="login-forgot-back"
+                      onClick={() => {
+                        setMode("login");
+                        setError("");
+                        setNotice("");
+                      }}
+                    >
+                      {t.backToLogin}
+                    </button>
+                  ) : null}
                 </form>
 
+                {mode !== "forgot" ? (
+                  <>
                 <div className="login-divider">
                   <span>{t.or}</span>
                 </div>
@@ -431,6 +513,8 @@ export function LoginForm() {
                   {t.footnote} <InstantLink href="/privacy">{t.privacy}</InstantLink>{" "}
                   <InstantLink href="/terms">{t.terms}</InstantLink>.
                 </p>
+                  </>
+                ) : null}
               </>
             )}
           </section>

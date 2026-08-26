@@ -1,6 +1,6 @@
 import { createHash, randomBytes } from "node:crypto";
-import { and, eq, isNull } from "drizzle-orm";
-import { getDb } from "../../../db";
+import { and, eq, isNull, or } from "drizzle-orm";
+import { getDb, isDatabaseConfigured } from "../../../db";
 import { oauthTickets, users } from "../../../db/schema";
 import { identityIssuer } from "../identity/issuer";
 import { hashPassword, isStrongPassword } from "./passwords";
@@ -60,6 +60,31 @@ export async function issuePasswordReset(userId: string, email: string, request?
   });
 
   return { expiresAt };
+}
+
+/**
+ * Self-service forgot-password. Callers should show a generic success message either way.
+ */
+export async function requestPasswordResetByIdentifier(identifier: string, request?: Request) {
+  if (!isDatabaseConfigured()) throw new Error("DATABASE_URL_MISSING");
+  if (!isResendConfigured()) throw new Error("RESEND_NOT_CONFIGURED");
+
+  const raw = identifier.trim().toLowerCase();
+  if (!raw || raw.length > 120) throw new Error("INVALID_INPUT");
+
+  const db = getDb();
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(or(eq(users.email, raw), eq(users.username, raw)))
+    .limit(1);
+
+  if (!user || !user.isActive) {
+    return { sent: false as const };
+  }
+
+  await issuePasswordReset(user.id, user.email, request);
+  return { sent: true as const, email: user.email };
 }
 
 export async function consumePasswordResetToken(token: string, newPassword: string) {
