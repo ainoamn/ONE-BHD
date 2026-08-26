@@ -31,6 +31,13 @@ const COPY = {
     forgotTitle: "إعادة تعيين كلمة المرور",
     forgotLead: "أدخل بريدك أو اسم المستخدم وسنرسل رابط التعيين إن وُجد الحساب.",
     forgotSubmit: "إرسال رابط إعادة التعيين",
+    forgotResend: "إعادة إرسال الرابط",
+    forgotSentTitle: "تم إرسال الطلب",
+    forgotSentBody:
+      "إن وُجد حساب بهذا البريد أو اسم المستخدم، أرسلنا رابط إعادة تعيين كلمة المرور. راجع صندوق الوارد خلال دقائق.",
+    forgotSpam: "إن لم يظهر الرسالة، ابحث في البريد العشوائي أو «غير هام».",
+    forgotWait: "إن لم يصل الرابط، انتظر دقيقة كاملة قبل إعادة المحاولة.",
+    forgotCooldown: "يمكنك إعادة الإرسال بعد {n} ثانية",
     backToLogin: "العودة لتسجيل الدخول",
     name: "الاسم الكامل",
     email: "البريد الإلكتروني",
@@ -86,6 +93,13 @@ const COPY = {
     forgotTitle: "Reset your password",
     forgotLead: "Enter your email or username and we will send a reset link if the account exists.",
     forgotSubmit: "Send reset link",
+    forgotResend: "Resend link",
+    forgotSentTitle: "Request sent",
+    forgotSentBody:
+      "If an account exists with this email or username, we sent a password reset link. Check your inbox within a few minutes.",
+    forgotSpam: "If you do not see it, check Spam or Junk folders.",
+    forgotWait: "If the link does not arrive, wait a full minute before trying again.",
+    forgotCooldown: "You can resend in {n}s",
     backToLogin: "Back to sign in",
     name: "Full name",
     email: "Email",
@@ -160,6 +174,8 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const [cooldownSec, setCooldownSec] = useState(0);
   const [showMore, setShowMore] = useState(false);
 
   const [identifier, setIdentifier] = useState("");
@@ -221,7 +237,20 @@ export function LoginForm() {
     };
   }, []);
 
+  useEffect(() => {
+    if (cooldownSec <= 0) return;
+    const timer = window.setTimeout(() => setCooldownSec((n) => Math.max(0, n - 1)), 1000);
+    return () => window.clearTimeout(timer);
+  }, [cooldownSec]);
+
   const apps = useMemo(() => BHD_APPS.filter((app) => app.id !== "account"), []);
+
+  function resetForgotUi() {
+    setForgotSent(false);
+    setCooldownSec(0);
+    setNotice("");
+    setError("");
+  }
 
   async function finishOk() {
     const next = nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/";
@@ -236,6 +265,10 @@ export function LoginForm() {
     setNotice("");
     try {
       if (mode === "forgot") {
+        if (cooldownSec > 0) {
+          setError(t.forgotCooldown.replace("{n}", String(cooldownSec)));
+          return;
+        }
         const response = await fetch("/api/auth/forgot-password", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -246,7 +279,9 @@ export function LoginForm() {
           setError(data.message || t.fail);
           return;
         }
-        setNotice(data.message || "");
+        setNotice("");
+        setForgotSent(true);
+        setCooldownSec(60);
         return;
       }
 
@@ -360,8 +395,7 @@ export function LoginForm() {
                     className={mode === "login" || mode === "forgot" ? "is-active" : ""}
                     onClick={() => {
                       setMode("login");
-                      setError("");
-                      setNotice("");
+                      resetForgotUi();
                     }}
                   >
                     {t.login}
@@ -373,15 +407,14 @@ export function LoginForm() {
                     className={mode === "register" ? "is-active" : ""}
                     onClick={() => {
                       setMode("register");
-                      setError("");
-                      setNotice("");
+                      resetForgotUi();
                     }}
                   >
                     {t.register}
                   </button>
                 </div>
 
-                {mode === "forgot" ? (
+                {mode === "forgot" && !forgotSent ? (
                   <div className="login-forgot-intro">
                     <h2>{t.forgotTitle}</h2>
                     <p>{t.forgotLead}</p>
@@ -407,7 +440,13 @@ export function LoginForm() {
                   ) : (
                     <label>
                       <span>{t.identifier}</span>
-                      <input value={identifier} onChange={(e) => setIdentifier(e.target.value)} autoComplete="username" required />
+                      <input
+                        value={identifier}
+                        onChange={(e) => setIdentifier(e.target.value)}
+                        autoComplete="username"
+                        required
+                        readOnly={mode === "forgot" && forgotSent && cooldownSec > 0}
+                      />
                     </label>
                   )}
 
@@ -432,8 +471,7 @@ export function LoginForm() {
                         className="login-forgot-link"
                         onClick={() => {
                           setMode("forgot");
-                          setError("");
-                          setNotice("");
+                          resetForgotUi();
                           setPassword("");
                         }}
                       >
@@ -487,21 +525,45 @@ export function LoginForm() {
                       {error || facebookMessage}
                     </p>
                   ) : null}
-                  {notice ? (
-                    <p className="login-notice" role="status">
+                  {notice && mode !== "forgot" ? (
+                    <p className="login-form-notice" role="status">
                       {notice}
                     </p>
                   ) : null}
 
-                  <button type="submit" className="login-submit" disabled={loading}>
-                    {loading
-                      ? t.loading
-                      : mode === "login"
-                        ? t.submitLogin
-                        : mode === "forgot"
-                          ? t.forgotSubmit
-                          : t.submitRegister}
-                  </button>
+                  {mode === "forgot" && forgotSent ? (
+                    <div className="login-forgot-sent" role="status">
+                      <strong className="login-forgot-sent-title">{t.forgotSentTitle}</strong>
+                      <p className="login-forgot-sent-body">{t.forgotSentBody}</p>
+                      <ul className="login-forgot-sent-tips">
+                        <li>{t.forgotSpam}</li>
+                        <li>{t.forgotWait}</li>
+                      </ul>
+                      {cooldownSec > 0 ? (
+                        <p className="login-forgot-cooldown" aria-live="polite">
+                          {t.forgotCooldown.replace("{n}", String(cooldownSec))}
+                        </p>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  {mode === "forgot" && forgotSent && cooldownSec > 0 ? null : (
+                    <button
+                      type="submit"
+                      className="login-submit"
+                      disabled={loading || (mode === "forgot" && cooldownSec > 0)}
+                    >
+                      {loading
+                        ? t.loading
+                        : mode === "login"
+                          ? t.submitLogin
+                          : mode === "forgot"
+                            ? forgotSent
+                              ? t.forgotResend
+                              : t.forgotSubmit
+                            : t.submitRegister}
+                    </button>
+                  )}
 
                   {mode === "forgot" ? (
                     <button
@@ -509,8 +571,7 @@ export function LoginForm() {
                       className="login-forgot-back"
                       onClick={() => {
                         setMode("login");
-                        setError("");
-                        setNotice("");
+                        resetForgotUi();
                       }}
                     >
                       {t.backToLogin}
