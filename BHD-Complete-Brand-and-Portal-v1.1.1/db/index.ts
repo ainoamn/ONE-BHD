@@ -36,6 +36,8 @@ export async function ensureIdentitySchema(): Promise<void> {
       );
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS gender text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS birth_date text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS last_login_ip text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS signup_ip text`);
       await getSql().unsafe(`ALTER TABLE bhd_contacts ADD COLUMN IF NOT EXISTS hometown text`);
     })().catch((error) => {
       schemaReady = null;

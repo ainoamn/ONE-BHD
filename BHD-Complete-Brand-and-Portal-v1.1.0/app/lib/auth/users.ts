@@ -32,6 +32,11 @@ export type RegisterInput = {
   city?: string;
   country?: string;
   zipCode?: string;
+  signupIp?: string | null;
+};
+
+export type LoginMeta = {
+  ip?: string | null;
 };
 
 export function requireDatabase() {
@@ -212,6 +217,8 @@ export async function registerWithPassword(input: RegisterInput): Promise<Public
       emailVerified: false,
       mustCompleteProfile: !(input.phone && input.city),
       lastLoginAt: new Date(),
+      lastLoginIp: input.signupIp || null,
+      signupIp: input.signupIp || null,
       updatedAt: new Date(),
     })
     .returning();
@@ -231,7 +238,11 @@ export async function registerWithPassword(input: RegisterInput): Promise<Public
   return toPublicUser(user);
 }
 
-export async function loginWithPassword(identifier: string, password: string): Promise<PublicUser> {
+export async function loginWithPassword(
+  identifier: string,
+  password: string,
+  meta?: LoginMeta,
+): Promise<PublicUser> {
   requireDatabase();
   const raw = identifier.trim().toLowerCase();
   if (!raw || !password) throw new Error("INVALID_INPUT");
@@ -260,12 +271,14 @@ export async function loginWithPassword(identifier: string, password: string): P
     throw new Error(lockedUntil ? "ACCOUNT_LOCKED" : "INVALID_CREDENTIALS");
   }
 
+  const ip = meta?.ip?.trim() || null;
   const [updated] = await db
     .update(users)
     .set({
       loginAttempts: 0,
       lockedUntil: null,
       lastLoginAt: new Date(),
+      ...(ip ? { lastLoginIp: ip } : {}),
       updatedAt: new Date(),
       ...(isPlatformAdminEmail(user.email) ? { emailVerified: true } : {}),
     })
@@ -280,10 +293,12 @@ export async function loginOrRegisterWithGoogle(input: {
   email: string;
   name: string;
   picture: string | null;
+  ip?: string | null;
 }): Promise<PublicUser> {
   requireDatabase();
   const email = normalizeEmail(input.email);
   const db = getDb();
+  const ip = input.ip?.trim() || null;
 
   let user = await findUserByGoogleOrEmail(input.googleId, email);
 
@@ -299,6 +314,7 @@ export async function loginOrRegisterWithGoogle(input: {
         loginAttempts: 0,
         lockedUntil: null,
         lastLoginAt: new Date(),
+        ...(ip ? { lastLoginIp: ip } : {}),
         updatedAt: new Date(),
       })
       .where(eq(users.id, user.id))
@@ -315,6 +331,8 @@ export async function loginOrRegisterWithGoogle(input: {
         emailVerified: true,
         mustCompleteProfile: true,
         lastLoginAt: new Date(),
+        lastLoginIp: ip,
+        signupIp: ip,
         updatedAt: new Date(),
       })
       .returning();
@@ -339,11 +357,13 @@ export async function loginOrRegisterWithFacebook(input: {
   birthDate: string | null;
   city: string | null;
   hometown: string | null;
+  ip?: string | null;
 }): Promise<PublicUser> {
   requireDatabase();
   await ensureIdentitySchema();
   const email = normalizeEmail(input.email);
   const db = getDb();
+  const ip = input.ip?.trim() || null;
 
   let user = await findUserByFacebookOrEmail(input.facebookId, email);
 
@@ -361,6 +381,7 @@ export async function loginOrRegisterWithFacebook(input: {
         loginAttempts: 0,
         lockedUntil: null,
         lastLoginAt: new Date(),
+        ...(ip ? { lastLoginIp: ip } : {}),
         updatedAt: new Date(),
       })
       .where(eq(users.id, user.id))
@@ -379,6 +400,8 @@ export async function loginOrRegisterWithFacebook(input: {
         emailVerified: true,
         mustCompleteProfile: true,
         lastLoginAt: new Date(),
+        lastLoginIp: ip,
+        signupIp: ip,
         updatedAt: new Date(),
       })
       .returning();
@@ -471,6 +494,21 @@ export async function listLinkedClientIds(userId: string): Promise<string[]> {
   } catch {
     return [];
   }
+}
+
+/** Record SSO / portal activity IP without changing credentials. */
+export async function touchUserLogin(userId: string, meta?: LoginMeta): Promise<void> {
+  if (!isDatabaseConfigured()) return;
+  const ip = meta?.ip?.trim() || null;
+  const db = getDb();
+  await db
+    .update(users)
+    .set({
+      lastLoginAt: new Date(),
+      ...(ip ? { lastLoginIp: ip } : {}),
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, userId));
 }
 
 export async function updateOwnProfile(

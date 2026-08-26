@@ -6,6 +6,7 @@ import {
 } from "../../../lib/auth/config";
 import { verifyGoogleIdToken } from "../../../lib/auth/google";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
+import { getRequestIp } from "../../../lib/auth/request-ip";
 import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../lib/auth/session";
 import { loginOrRegisterWithGoogle } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
       email: google.email,
       name: google.name,
       picture: google.picture,
+      ip: getRequestIp(request),
     });
     rejectAccountSwitch(await getCurrentSession(), user.id);
     const token = await createSessionToken({

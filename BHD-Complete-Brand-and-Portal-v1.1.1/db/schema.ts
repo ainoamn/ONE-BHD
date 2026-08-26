@@ -32,6 +32,8 @@ export const users = pgTable("bhd_users", {
   emailVerified: boolean("email_verified").notNull().default(false),
   mustCompleteProfile: boolean("must_complete_profile").notNull().default(false),
   lastLoginAt: timestamp("last_login_at", { withTimezone: true }),
+  lastLoginIp: text("last_login_ip"),
+  signupIp: text("signup_ip"),
   loginAttempts: integer("login_attempts").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

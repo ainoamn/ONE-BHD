@@ -9,6 +9,7 @@ import {
   readFacebookOAuthState,
 } from "../../../../lib/auth/facebook";
 import { allowRequest, clientKey } from "../../../../lib/auth/rate-limit";
+import { getRequestIp } from "../../../../lib/auth/request-ip";
 import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../../lib/auth/session";
 import { loginOrRegisterWithFacebook } from "../../../../lib/auth/users";
 import { isSafeNextPath } from "../../../../lib/identity/safe-next";
@@ -43,7 +44,7 @@ export async function GET(request: Request) {
 
   try {
     const facebook = await exchangeFacebookCode(code, oauth.redirectUri);
-    const user = await loginOrRegisterWithFacebook(facebook);
+    const user = await loginOrRegisterWithFacebook({ ...facebook, ip: getRequestIp(request) });
     rejectAccountSwitch(await getCurrentSession(), user.id);
     const token = await createSessionToken({
       sub: user.id,

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
+import { getRequestIp } from "../../../lib/auth/request-ip";
 import { applySessionCookies, createSessionToken, getCurrentSession } from "../../../lib/auth/session";
 import { issueEmailVerification, isResendConfigured } from "../../../lib/auth/email-verification";
 import { registerWithPassword, type RegisterInput } from "../../../lib/auth/users";
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
       throw new Error("SWITCH_REQUIRES_LOGOUT");
     }
     const body = (await request.json()) as RegisterInput;
-    const user = await registerWithPassword(body);
+    const user = await registerWithPassword({ ...body, signupIp: getRequestIp(request) });
 
     let verificationEmailSent = false;
     if (isResendConfigured()) {

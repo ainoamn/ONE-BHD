@@ -4,8 +4,10 @@ import { randomUrlToken } from "../../lib/identity/crypto";
 import { loginRedirectForAuthorize } from "../../lib/identity/safe-next";
 import { saveTicket } from "../../lib/identity/tickets";
 import { allowRequest, clientKey } from "../../lib/auth/rate-limit";
+import { getRequestIp } from "../../lib/auth/request-ip";
 import { getCurrentSession } from "../../lib/auth/session";
 import { authSecret } from "../../lib/auth/config";
+import { touchUserLogin } from "../../lib/auth/users";
 
 export const runtime = "nodejs";
 
@@ -47,6 +49,8 @@ export async function GET(request: Request) {
   if (!session) {
     return NextResponse.redirect(loginRedirectForAuthorize(url.origin, url.searchParams));
   }
+
+  await touchUserLogin(session.sub, { ip: getRequestIp(request) }).catch(() => undefined);
 
   const jti = randomUrlToken();
   await saveTicket({

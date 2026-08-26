@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
+import { getRequestIp } from "../../../lib/auth/request-ip";
 import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../lib/auth/session";
 import { loginWithPassword } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
@@ -35,7 +36,9 @@ export async function POST(request: Request) {
 
   try {
     const body = (await request.json()) as { identifier?: string; password?: string };
-    const user = await loginWithPassword(body.identifier || "", body.password || "");
+    const user = await loginWithPassword(body.identifier || "", body.password || "", {
+      ip: getRequestIp(request),
+    });
     rejectAccountSwitch(await getCurrentSession(), user.id);
     const token = await createSessionToken({
       sub: user.id,
