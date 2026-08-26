@@ -2,6 +2,7 @@
 
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
+import { SessionMenu } from "../components/auth/SessionMenu";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 
 type Overview = {
@@ -234,6 +235,14 @@ export function AdminConsole({
     [overview],
   );
 
+  async function signOutAdmin() {
+    await fetch("/api/auth/logout", { method: "POST" });
+    const end = new URL("/oauth/end-session", window.location.origin);
+    end.searchParams.set("client_id", "bhd-portal");
+    end.searchParams.set("post_logout_redirect_uri", `${window.location.origin}/login`);
+    window.location.assign(end.toString());
+  }
+
   return (
     <div className="admin-screen admin-screen-v2">
       <header className="admin-topbar">
@@ -244,10 +253,20 @@ export function AdminConsole({
           <p>BHD Identity Control Plane</p>
           <h1>لوحة تشغيل الهوية</h1>
         </div>
-        <div className="admin-operator">
-          <strong>{operatorName}</strong>
-          <span>{operatorEmail}</span>
-          <InstantLink href="/account">الحساب</InstantLink>
+        <div className="admin-topbar-actions">
+          <nav className="admin-top-nav" aria-label="تنقل الهوية">
+            <InstantLink href="/">الرئيسية</InstantLink>
+            <InstantLink href="/account">الحساب</InstantLink>
+            <InstantLink href="/apps">البرامج</InstantLink>
+            <button type="button" className="admin-signout" onClick={() => void signOutAdmin()}>
+              خروج
+            </button>
+          </nav>
+          <div className="admin-operator">
+            <strong>{operatorName}</strong>
+            <span>{operatorEmail}</span>
+          </div>
+          <SessionMenu signInLabel="دخول" />
         </div>
       </header>
 

@@ -3761,6 +3761,62 @@ a.login-submit {
   text-decoration: none;
 }
 
+.admin-topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px 18px;
+}
+
+.admin-top-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.admin-top-nav a,
+.admin-signout {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.08);
+  color: #e8f6f1;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-top-nav a:hover,
+.admin-signout:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.admin-signout {
+  border-color: rgba(255, 180, 180, 0.35);
+  color: #ffd7d7;
+}
+
+.admin-topbar .bhd-switcher-grid,
+.admin-topbar .bhd-switcher-avatar {
+  color: #fff;
+}
+
+.admin-topbar .bhd-switcher-grid i {
+  background: #e8f6f1;
+}
+
+.admin-topbar .bhd-switcher-avatar span {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
 .admin-main {
   width: min(1180px, calc(100% - 32px));
   margin: 28px auto 48px;
@@ -4009,6 +4065,10 @@ a.login-submit {
     grid-template-columns: 1fr;
   }
   .admin-operator { justify-items: start; }
+  .admin-topbar-actions {
+    justify-content: flex-start;
+    width: 100%;
+  }
   .admin-panel-head { display: grid; }
 }
 
