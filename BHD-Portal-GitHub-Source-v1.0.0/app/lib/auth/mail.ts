@@ -44,6 +44,9 @@ export async function sendResendEmail(input: SendEmailInput) {
       subject: input.subject,
       html: input.html,
       text: input.text,
+      headers: {
+        "X-Entity-Ref-ID": `bhd-${Date.now()}`,
+      },
     }),
   });
 

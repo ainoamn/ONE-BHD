@@ -55,6 +55,17 @@ export async function ensureIdentitySchema(): Promise<void> {
           updated_at timestamptz NOT NULL DEFAULT now()
         )
       `);
+      await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_email_templates (
+          kind text PRIMARY KEY,
+          subject text NOT NULL,
+          headline text NOT NULL,
+          body text NOT NULL,
+          cta text NOT NULL,
+          footnote text NOT NULL,
+          updated_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
     })().catch((error) => {
       schemaReady = null;
       throw error;

@@ -104,6 +104,17 @@ export const registeredClients = pgTable("bhd_oauth_clients", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/** Editable copy for transactional identity emails (admin-managed). */
+export const emailTemplates = pgTable("bhd_email_templates", {
+  kind: text("kind").primaryKey(),
+  subject: text("subject").notNull(),
+  headline: text("headline").notNull(),
+  body: text("body").notNull(),
+  cta: text("cta").notNull(),
+  footnote: text("footnote").notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type BhdUser = typeof users.$inferSelect;
 export type NewBhdUser = typeof users.$inferInsert;
 export type BhdContact = typeof contacts.$inferSelect;

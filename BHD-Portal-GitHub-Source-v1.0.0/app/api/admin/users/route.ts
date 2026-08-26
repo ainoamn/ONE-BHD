@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   adminResendVerification,
   adminSendPasswordReset,
+  deleteAdminUser,
   getAdminUserDetail,
   listAdminUsers,
   setUserActive,
@@ -113,4 +114,27 @@ export async function POST(request: Request) {
     const hit = map[code] || { status: 500, message: "تعذّر تنفيذ الإجراء." };
     return NextResponse.json({ message: hit.message }, { status: hit.status });
   }
+}
+
+export async function DELETE(request: Request) {
+  const gate = await requirePlatformAdmin();
+  if (!gate.ok) return gateJson(gate);
+
+  const url = new URL(request.url);
+  const id = url.searchParams.get("id")?.trim() || "";
+  if (!id) {
+    return NextResponse.json({ message: "طلب غير صالح." }, { status: 400 });
+  }
+  if (id === gate.session.sub) {
+    return NextResponse.json({ message: "لا يمكن حذف حسابك الإداري الحالي." }, { status: 400 });
+  }
+
+  const ok = await deleteAdminUser(id);
+  if (!ok) {
+    return NextResponse.json({ message: "الحساب غير موجود." }, { status: 404 });
+  }
+  return NextResponse.json(
+    { ok: true, message: "حُذف الحساب نهائياً من سجلات الهوية (مع التذاكر والبطاقات المرتبطة)." },
+    { headers: { "Cache-Control": "no-store" } },
+  );
 }

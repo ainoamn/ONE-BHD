@@ -66,7 +66,7 @@ type AdminUserDetail = AdminUser & {
   }>;
 };
 
-type TabId = "users" | "system" | "clients";
+type TabId = "users" | "system" | "clients" | "emails";
 
 type RegistryClient = {
   clientId: string;
@@ -129,6 +129,43 @@ export function AdminConsole({
     mode: "browse" as "browse" | "sso",
   });
   const [issuedSecret, setIssuedSecret] = useState("");
+  const [mailKind, setMailKind] = useState<"password_reset" | "email_verify">("password_reset");
+  const [mailForm, setMailForm] = useState({
+    subject: "",
+    headline: "",
+    body: "",
+    cta: "",
+    footnote: "",
+  });
+  const [mailPreview, setMailPreview] = useState("");
+
+  const loadEmails = useCallback(async (kind: "password_reset" | "email_verify" = mailKind) => {
+    const response = await fetch(`/api/admin/emails?preview=${kind}`, { cache: "no-store" });
+    const data = (await response.json()) as {
+      templates?: Array<{
+        kind: string;
+        subject: string;
+        headline: string;
+        body: string;
+        cta: string;
+        footnote: string;
+      }>;
+      previewHtml?: string;
+      message?: string;
+    };
+    if (!response.ok) throw new Error(data.message || "تعذّر تحميل قوالب البريد.");
+    const current = data.templates?.find((row) => row.kind === kind);
+    if (current) {
+      setMailForm({
+        subject: current.subject,
+        headline: current.headline,
+        body: current.body,
+        cta: current.cta,
+        footnote: current.footnote,
+      });
+    }
+    setMailPreview(data.previewHtml || "");
+  }, [mailKind]);
 
   const loadRegistry = useCallback(async () => {
     const response = await fetch("/api/admin/clients", { cache: "no-store" });
@@ -150,7 +187,8 @@ export function AdminConsole({
     setOverview(overviewData);
     setUsers(usersData.users || []);
     await loadRegistry().catch(() => undefined);
-  }, [loadRegistry]);
+    await loadEmails().catch(() => undefined);
+  }, [loadRegistry, loadEmails]);
 
   const loadDetail = useCallback(async (id: string) => {
     setDetailLoading(true);
@@ -285,6 +323,57 @@ export function AdminConsole({
     }
   }
 
+  async function saveMailTemplate(event: FormEvent) {
+    event.preventDefault();
+    setBusyId("mail");
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch("/api/admin/emails", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ kind: mailKind, ...mailForm }),
+      });
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        setError(data.message || "تعذّر حفظ القالب.");
+        return;
+      }
+      setNotice("تم حفظ قالب البريد.");
+      await loadEmails(mailKind);
+    } catch {
+      setError("تعذّر الاتصال بالخادم.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
+  async function deleteUser(user: AdminUser) {
+    if (user.email === operatorEmail) return;
+    const ok = window.confirm(
+      `حذف نهائي لـ ${user.email}؟ سيُمسح من قاعدة الهوية ويمكنه التسجيل من جديد. لا يمكن التراجع.`,
+    );
+    if (!ok) return;
+    setBusyId(user.id);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`/api/admin/users?id=${encodeURIComponent(user.id)}`, { method: "DELETE" });
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        setError(data.message || "تعذّر الحذف.");
+        return;
+      }
+      setNotice(data.message || "تم الحذف.");
+      if (selectedId === user.id) setSelectedId(null);
+      await load(query);
+    } catch {
+      setError("تعذّر الاتصال بالخادم.");
+    } finally {
+      setBusyId("");
+    }
+  }
+
   async function setClientMode(clientId: string, mode: "browse" | "sso") {
     setBusyId(clientId);
     setError("");
@@ -372,6 +461,7 @@ export function AdminConsole({
           {(
             [
               ["users", "المستخدمون"],
+              ["emails", "قوالب البريد"],
               ["system", "النظام"],
               ["clients", "العملاء والربط"],
             ] as const
@@ -380,7 +470,10 @@ export function AdminConsole({
               key={id}
               type="button"
               className={tab === id ? "is-active" : undefined}
-              onClick={() => setTab(id)}
+              onClick={() => {
+                setTab(id);
+                if (id === "emails") void loadEmails(mailKind).catch(() => undefined);
+              }}
             >
               {label}
             </button>
@@ -395,6 +488,119 @@ export function AdminConsole({
             </article>
           ))}
         </section>
+
+        {tab === "emails" ? (
+          <div className="admin-emails-layout">
+            <section className="admin-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p>Transactional mail</p>
+                  <h2>صياغة رسائل الهوية</h2>
+                </div>
+                <span className={overview?.resendConfigured ? "admin-pill is-ok" : "admin-pill"}>
+                  {overview?.resendConfigured ? "Resend جاهز" : "Resend غير مفعّل"}
+                </span>
+              </div>
+              <p className="admin-footnote">
+                الشعار وشبكة برامج المجموعة ثابتان في القالب. هنا تعدّل النصوص فقط. روابط الأزرار تذهب مباشرة إلى{" "}
+                <code>id.bhd-om.com</code> دون تتبّع نقرات Resend لتفادي التأخير عبر Outlook Safe Links.
+              </p>
+              <div className="admin-mail-kind-tabs" role="tablist" aria-label="نوع الرسالة">
+                {(
+                  [
+                    ["password_reset", "إعادة كلمة المرور"],
+                    ["email_verify", "تفعيل البريد"],
+                  ] as const
+                ).map(([id, label]) => (
+                  <button
+                    key={id}
+                    type="button"
+                    role="tab"
+                    aria-selected={mailKind === id}
+                    className={mailKind === id ? "is-active" : undefined}
+                    onClick={() => {
+                      setMailKind(id);
+                      void loadEmails(id).catch((err) =>
+                        setError(err instanceof Error ? err.message : "تعذّر التحميل."),
+                      );
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <form className="admin-mail-form" onSubmit={(event) => void saveMailTemplate(event)}>
+                <label>
+                  موضوع الرسالة
+                  <input
+                    value={mailForm.subject}
+                    onChange={(e) => setMailForm((s) => ({ ...s, subject: e.target.value }))}
+                    required
+                    maxLength={180}
+                  />
+                </label>
+                <label>
+                  العنوان داخل الرسالة
+                  <input
+                    value={mailForm.headline}
+                    onChange={(e) => setMailForm((s) => ({ ...s, headline: e.target.value }))}
+                    required
+                    maxLength={120}
+                  />
+                </label>
+                <label>
+                  نص الرسالة
+                  <textarea
+                    value={mailForm.body}
+                    onChange={(e) => setMailForm((s) => ({ ...s, body: e.target.value }))}
+                    required
+                    rows={4}
+                    maxLength={2000}
+                  />
+                </label>
+                <label>
+                  نص الزر
+                  <input
+                    value={mailForm.cta}
+                    onChange={(e) => setMailForm((s) => ({ ...s, cta: e.target.value }))}
+                    required
+                    maxLength={80}
+                  />
+                </label>
+                <label>
+                  ملاحظة أسفل الزر
+                  <textarea
+                    value={mailForm.footnote}
+                    onChange={(e) => setMailForm((s) => ({ ...s, footnote: e.target.value }))}
+                    rows={2}
+                    maxLength={400}
+                  />
+                </label>
+                <button type="submit" className="admin-action" disabled={busyId === "mail"}>
+                  {busyId === "mail" ? "جارٍ الحفظ…" : "حفظ القالب"}
+                </button>
+              </form>
+            </section>
+            <section className="admin-panel admin-mail-preview-panel">
+              <div className="admin-panel-head">
+                <div>
+                  <p>Live preview</p>
+                  <h2>معاينة كما تصل للعميل</h2>
+                </div>
+              </div>
+              {mailPreview ? (
+                <iframe
+                  className="admin-mail-preview"
+                  title="معاينة البريد"
+                  srcDoc={mailPreview}
+                  sandbox=""
+                />
+              ) : (
+                <p className="admin-muted">لا توجد معاينة بعد.</p>
+              )}
+            </section>
+          </div>
+        ) : null}
 
         {tab === "system" ? (
           <section className="admin-panel">
@@ -814,6 +1020,14 @@ export function AdminConsole({
                       onClick={() => void patchUser(detail.id, { isActive: !detail.isActive })}
                     >
                       {detail.isActive ? "إيقاف الحساب" : "تفعيل الحساب"}
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-action admin-action-danger"
+                      disabled={busyId === detail.id || detail.email === operatorEmail}
+                      onClick={() => void deleteUser(detail)}
+                    >
+                      حذف نهائي من الهوية
                     </button>
                   </div>
                 </>

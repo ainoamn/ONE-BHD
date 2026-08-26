@@ -5103,10 +5103,82 @@ a.login-submit {
   background: #174b70;
 }
 
+.admin-action-danger {
+  background: #8b2e2e;
+}
+
 .admin-action-ghost {
   background: transparent;
   color: #0c4a3c;
   border: 1px solid #d7e2dc;
+}
+
+.admin-emails-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.admin-mail-kind-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.admin-mail-kind-tabs button {
+  border: 1px solid #d7e2dc;
+  background: #f7faf8;
+  color: #0c4a3c;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-mail-kind-tabs button.is-active {
+  background: #0c4a3c;
+  border-color: #0c4a3c;
+  color: #fff;
+}
+
+.admin-mail-form {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-mail-form label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #3f574d;
+}
+
+.admin-mail-form input,
+.admin-mail-form textarea {
+  width: 100%;
+  border: 1px solid #d7e2dc;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font: inherit;
+  color: #092d24;
+  background: #fff;
+}
+
+.admin-mail-preview {
+  width: 100%;
+  min-height: 640px;
+  border: 1px solid #d7e2dc;
+  border-radius: 16px;
+  background: #eef3f0;
+}
+
+@media (max-width: 980px) {
+  .admin-emails-layout {
+    grid-template-columns: 1fr;
+  }
 }
 
 .admin-meta-dense {

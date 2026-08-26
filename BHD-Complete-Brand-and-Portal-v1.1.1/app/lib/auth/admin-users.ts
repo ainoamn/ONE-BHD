@@ -215,6 +215,15 @@ export async function setUserEmailVerified(userId: string, emailVerified: boolea
   return updated ? toAdminUser(updated) : null;
 }
 
+/** Permanent delete — contacts and oauth tickets cascade. */
+export async function deleteAdminUser(userId: string): Promise<boolean> {
+  requireDatabase();
+  await ensureIdentitySchema();
+  const db = getDb();
+  const deleted = await db.delete(users).where(eq(users.id, userId)).returning({ id: users.id });
+  return deleted.length > 0;
+}
+
 export async function adminResendVerification(userId: string, request?: Request) {
   requireDatabase();
   if (!isResendConfigured()) throw new Error("RESEND_NOT_CONFIGURED");

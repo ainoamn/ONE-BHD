@@ -3,7 +3,8 @@ import { and, eq, isNull } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { oauthTickets, users } from "../../../db/schema";
 import { identityIssuer } from "../identity/issuer";
-import { sendResendEmail } from "./mail";
+import { sendResendEmail, resendApiKey } from "./mail";
+import { buildTransactionalMail } from "./email-template-store";
 
 const VERIFY_KIND = "email_verify";
 const VERIFY_TTL_MS = 1000 * 60 * 60 * 24; // 24h
@@ -13,7 +14,7 @@ function hashToken(token: string) {
 }
 
 export function isResendConfigured() {
-  return Boolean(process.env.RESEND_API_KEY?.trim());
+  return Boolean(resendApiKey());
 }
 
 export async function issueEmailVerification(userId: string, email: string, request?: Request) {
@@ -35,24 +36,13 @@ export async function issueEmailVerification(userId: string, email: string, requ
 
   const base = identityIssuer(request);
   const verifyUrl = `${base}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
+  const mail = await buildTransactionalMail("email_verify", verifyUrl, base);
 
   await sendResendEmail({
     to: email,
-    subject: "تأكيد بريد حساب BHD",
-    html: `
-      <div dir="rtl" style="font-family:Tahoma,Arial,sans-serif;line-height:1.7;color:#092d24">
-        <h2 style="margin:0 0 12px">تأكيد البريد الإلكتروني</h2>
-        <p>مرحباً، لتفعيل حسابك في هوية BHD اضغط الزر أدناه. الرابط صالح لمدة 24 ساعة.</p>
-        <p style="margin:24px 0">
-          <a href="${verifyUrl}" style="display:inline-block;background:#0c7459;color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700">
-            تأكيد البريد
-          </a>
-        </p>
-        <p style="font-size:13px;color:#5d7169">إن لم تطلب إنشاء حساب، تجاهل هذه الرسالة.</p>
-        <p style="font-size:12px;color:#7b8983;word-break:break-all">${verifyUrl}</p>
-      </div>
-    `,
-    text: `تأكيد بريد حساب BHD\n\nافتح الرابط خلال 24 ساعة:\n${verifyUrl}\n`,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
   });
 
   return { expiresAt };
