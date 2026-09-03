@@ -7,7 +7,9 @@
 | البند | القيمة |
 |---|---|
 | الفرع | `main` |
-| آخر commit في هذه الجولة | `d6f207f` — Cooldown password-reset… |
+| آخر commit توثيق التسليم | `b1af63d` — Document session handoff… |
+| آخر commit وظيفي في الجلسة | `d6f207f` — Cooldown password-reset… |
+| نقطة الدخول للجهاز الآخر | [`docs/CONTINUE-FROM-OTHER-PC.md`](../CONTINUE-FROM-OTHER-PC.md) |
 | Remote | `https://github.com/ainoamn/ONE-BHD.git` |
 | النشر | Vercel مشروع `one-bhd` · جذر النشر `BHD-Complete-Brand-and-Portal-v1.1.0` |
 | الإنتاج | `https://id.bhd-om.com` (ونطاقات البوابة المرتبطة) |

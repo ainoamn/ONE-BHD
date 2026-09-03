@@ -13,6 +13,7 @@
 
 | الوثيقة | المحتوى |
 |---|---|
+| [`docs/CONTINUE-FROM-OTHER-PC.md`](docs/CONTINUE-FROM-OTHER-PC.md) | **استكمال من جهاز آخر** — ملخص الجلسة الأخيرة وأوامر `git pull` |
 | [`docs/BHD-IDENTITY-SSO.md`](docs/BHD-IDENTITY-SSO.md) | **هوية BHD الموحّدة** — مواصفة OIDC للتنفيذ كما هي في كل المواقع |
 | [`docs/BHD-NEON-DATABASE.md`](docs/BHD-NEON-DATABASE.md) | ربط Neon: الجداول، المتغيرات، و`drizzle-kit push` |
 | [`docs/BHD-REPOSITORY-DOCUMENTATION.md`](docs/BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، الإصدارات، التشغيل، النشر، والتحقق |
