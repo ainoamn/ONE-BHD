@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { BHD_APPS } from "../../lib/bhd/apps";
 import { authSecret } from "../../lib/auth/config";
 import { allowRequest, clientKey } from "../../lib/auth/rate-limit";
-import { applySessionCookies, createSessionToken, getCurrentSession } from "../../lib/auth/session";
+import { getCurrentSession } from "../../lib/auth/session";
 import { getAccountProfile, listLinkedClientIds, updateOwnProfile } from "../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../db";
 
@@ -99,22 +99,14 @@ export async function PATCH(request: Request) {
       newPassword?: string;
     };
     const user = await updateOwnProfile(session.sub, body);
-    const token = await createSessionToken({
-      sub: user.id,
-      email: user.email,
-      name: user.name,
-      picture: user.picture,
-    });
     const profile = await getAccountProfile(user.id);
     const linkedClientIds = await listLinkedClientIds(user.id);
-    const response = noStore({
+    return noStore({
       user: profile?.user || user,
       contact: profile?.contact || null,
       sites: linkedSites(linkedClientIds),
       subscriptions: [],
     });
-    applySessionCookies(response.cookies, token);
-    return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
     const messages: Record<string, [string, number]> = {

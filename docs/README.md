@@ -16,6 +16,12 @@
 | [BHD-PORTAL-FULL-AUDIT.md](BHD-PORTAL-FULL-AUDIT.md) | مراجعة شاملة للبوابة الحية: الفوائد، الخصائص، البناء، الإيجابيات والسلبيات، الأمان والتشفير، النواقص، المخاطر، طريقة العمل، الربط، والترقية |
 | [BHD-REPOSITORY-DOCUMENTATION.md](BHD-REPOSITORY-DOCUMENTATION.md) | بنية المستودع، سياسة الإصدارات، التشغيل، النشر، التحقق |
 
+### ملاحظات يوم 4 أكتوبر 2026
+
+| الملف | الغرض |
+|---|---|
+| [notes/2026-10-04-session-until-logout.md](notes/2026-10-04-session-until-logout.md) | تطبيق `BHD-SESSION-POLICY` على الهوية: حذف KeepAlive، بلا Set-Cookie خارج الدخول/الخروج |
+
 ### ملاحظات يوم 26 أغسطس 2026
 
 | الملف | الغرض |
