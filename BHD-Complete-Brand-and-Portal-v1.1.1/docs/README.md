@@ -5,6 +5,7 @@
 | الملف | الغرض |
 |---|---|
 | [CONTINUE-FROM-OTHER-PC.md](CONTINUE-FROM-OTHER-PC.md) | **نقطة الدخول** لسحب العمل ومتابعة هذه الجلسة على كمبيوتر آخر |
+| [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) | **سياسة الجلسة:** البقاء حتى الخروج الصريح — بلا خمول وبلا تحديث تلقائي وبلا جوجل إلا على `/login` |
 | [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات والتنقل الصامت، وتقنيات كل موقع بعد التثبيت |
 | [BHD-PRODUCT-SSO-ADMIN.md](BHD-PRODUCT-SSO-ADMIN.md) | **دليل تنفيذ المنتج:** SSO صامت + أدمن محلي لكل موقع (يُنسخ إلى مستودع المنتج) |
 | [BHD-APP-SWITCHER.md](BHD-APP-SWITCHER.md) | **المواصفة المعتمدة** لمشغّل التطبيقات بعد الدخول (تسع نقاط بجانب الحساب وشعارات التطبيقات). تُنسخ كما هي مع `lib/bhd/apps.ts` |

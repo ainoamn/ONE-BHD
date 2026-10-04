@@ -53,6 +53,7 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
           onSuccess={(credential) => void handleSuccess(credential)}
           onError={() => setError(locale === "en" ? "Google sign-in failed." : "تعذّر تسجيل الدخول عبر Google.")}
           useOneTap={false}
+          auto_select={false}
           type="icon"
           shape="circle"
           theme="outline"

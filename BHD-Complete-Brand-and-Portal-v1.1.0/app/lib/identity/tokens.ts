@@ -4,7 +4,8 @@ import { identityIssuer } from "./issuer";
 
 const ACCESS_TTL_SEC = 10 * 60;
 const ID_TTL_SEC = 10 * 60;
-const REFRESH_TTL_SEC = 30 * 24 * 60 * 60;
+/** Align with identity cookie: product stays signed in until explicit logout. */
+const REFRESH_TTL_SEC = 60 * 60 * 24 * 400;
 
 export type IdentityClaims = {
   sub: string;

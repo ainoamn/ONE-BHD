@@ -41,13 +41,13 @@ export function SessionMenu({ signInLabel, locale }: Props) {
     fetch("/api/auth/me", { cache: "no-store" })
       .then((response) => response.json())
       .then((data: MeResponse) => {
-        if (!cancelled) {
-          setUser(data.user ?? null);
-          setPlatformAdmin(Boolean(data.platformAdmin));
-        }
+        if (cancelled) return;
+        setUser(data.user ?? null);
+        setPlatformAdmin(Boolean(data.platformAdmin));
       })
       .catch(() => {
-        if (!cancelled) setUser(null);
+        // Network blip after tab restore is not a logout.
+        if (!cancelled) setUser((current) => (current === undefined ? null : current));
       });
     return () => {
       cancelled = true;

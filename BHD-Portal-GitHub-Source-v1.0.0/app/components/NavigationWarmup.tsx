@@ -20,18 +20,25 @@ const priorityRoutes = [
   "/contact",
   "/company",
   "/apps",
-  "/login",
-  "/account",
 ];
 
+/** Prefetch only after the user actually uses the page — never on tab restore. */
 export function NavigationWarmup() {
   const router = useRouter();
 
   useEffect(() => {
-    const timer = window.setTimeout(() => {
+    if (window.location.pathname.startsWith("/login")) return;
+
+    const run = () => {
       priorityRoutes.forEach((route) => router.prefetch(route));
-    }, 200);
-    return () => window.clearTimeout(timer);
+    };
+
+    window.addEventListener("pointerdown", run, { once: true, passive: true });
+    window.addEventListener("keydown", run, { once: true });
+    return () => {
+      window.removeEventListener("pointerdown", run);
+      window.removeEventListener("keydown", run);
+    };
   }, [router]);
 
   return null;

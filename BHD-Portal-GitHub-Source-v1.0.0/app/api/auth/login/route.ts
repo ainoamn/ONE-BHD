@@ -30,7 +30,8 @@ export async function POST(request: Request) {
   if (!isDatabaseConfigured()) {
     return NextResponse.json({ message: messageFor("DATABASE_URL_MISSING") }, { status: 503 });
   }
-  if (!allowRequest(`login:${clientKey(request)}`)) {
+  const current = await getCurrentSession();
+  if (!current && !allowRequest(`login:${clientKey(request)}`)) {
     return NextResponse.json({ message: "محاولات كثيرة. انتظر دقيقة." }, { status: 429 });
   }
 
@@ -39,7 +40,6 @@ export async function POST(request: Request) {
     const user = await loginWithPassword(body.identifier || "", body.password || "", {
       ip: getRequestIp(request),
     });
-    const current = await getCurrentSession();
     rejectAccountSwitch(current, user.id);
     const token = await createSessionToken({
       sub: user.id,

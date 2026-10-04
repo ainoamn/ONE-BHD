@@ -303,7 +303,7 @@ export async function loginOrRegisterWithGoogle(input: {
   let user = await findUserByGoogleOrEmail(input.googleId, email);
 
   if (user) {
-    assertUnlocked(user);
+    if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
     const [updated] = await db
       .update(users)
       .set({
@@ -368,7 +368,7 @@ export async function loginOrRegisterWithFacebook(input: {
   let user = await findUserByFacebookOrEmail(input.facebookId, email);
 
   if (user) {
-    assertUnlocked(user);
+    if (!user.isActive) throw new Error("ACCOUNT_DISABLED");
     const [updated] = await db
       .update(users)
       .set({

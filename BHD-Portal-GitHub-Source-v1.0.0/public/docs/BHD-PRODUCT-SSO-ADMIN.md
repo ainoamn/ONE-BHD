@@ -79,6 +79,16 @@
 
 اسمح بهذه المسارات في تحقق `returnTo` الآمن. الإدارة تبقى عبر `admin-entry` فقط.
 
+### 3.7 جلسة المنتج (إلزامي)
+
+انسخ [`BHD-SESSION-POLICY.md`](BHD-SESSION-POLICY.md) ونفّذه:
+
+- [ ] لا خمول 48 ساعة ولا `SessionKeepAlive`
+- [ ] كوكي الجلسة المحلية 400 يوم، تُمسح عند «خروج» فقط
+- [ ] `GET /api/auth/me` بلا `Set-Cookie`
+- [ ] لا جوجل محلي ولا One Tap
+- [ ] لا `router.refresh()` عند عودة التبويب
+
 ### 3.6 بعد نجاح المسار الحي
 
 - [ ] تحقق: `GET {origin}/api/auth/bhd/start` يعيد 302 إلى `id.bhd-om.com`
@@ -99,6 +109,7 @@
 
 ## 5. مراجع
 
+- [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) — الجلسة حتى الخروج الصريح (بلا خمول وبلا جوجل في المنتج)
 - [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) — القسم 0.7 و4 و4.9
 - [BHD-IDENTITY-SSO.md](BHD-IDENTITY-SSO.md) — بروتوكول OIDC
 - [BHD-APP-SWITCHER.md](BHD-APP-SWITCHER.md) — المشغّل والكتالوج المجمد

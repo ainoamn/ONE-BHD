@@ -27,7 +27,8 @@ export async function POST(request: Request) {
     );
   }
 
-  if (!allowRequest(`google:${clientKey(request)}`)) {
+  const session = await getCurrentSession();
+  if (!session && !allowRequest(`google:${clientKey(request)}`, 8, 60_000)) {
     return NextResponse.json({ message: "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة." }, { status: 429 });
   }
 
@@ -52,7 +53,10 @@ export async function POST(request: Request) {
       picture: google.picture,
       ip: getRequestIp(request),
     });
-    rejectAccountSwitch(await getCurrentSession(), user.id);
+    if (session?.sub === user.id) {
+      return NextResponse.json({ user });
+    }
+    rejectAccountSwitch(session, user.id);
     const token = await createSessionToken({
       sub: user.id,
       email: user.email,
