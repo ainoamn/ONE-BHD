@@ -124,27 +124,40 @@ test("warms internal routes and keeps the smart guide private by design", async 
   assert.match(warmup, /\/about/);
   assert.match(warmup, /\/brand/);
   assert.match(instantLink, /prefetch/);
+  assert.match(instantLink, /needsDocumentNavigation/);
+  assert.match(instantLink, /\/oauth/);
   assert.match(advisor, /يعمل هذا الدليل محليًا/);
 });
 
-test("enforces idle sign-out, one session, programs footer, and shared brand chrome", async () => {
-  const [config, keepAlive, footer, apps, layout, middleware, session] = await Promise.all([
+test("completes SSO login with a hard navigation and does not prefetch authorize", async () => {
+  const [loginForm, authorize, warmup] = await Promise.all([
+    readFile(new URL("app/login/LoginForm.tsx", root), "utf8"),
+    readFile(new URL("app/oauth/authorize/route.ts", root), "utf8"),
+    readFile(new URL("app/components/NavigationWarmup.tsx", root), "utf8"),
+  ]);
+  assert.match(loginForm, /location\.replace/);
+  assert.match(loginForm, /isOauthContinue/);
+  assert.doesNotMatch(loginForm, /router\.push\(next\)/);
+  assert.match(authorize, /void touchUserLogin/);
+  assert.match(warmup, /path === "\/login"/);
+});
+
+test("keeps sessions until logout, one session, programs footer, and shared brand chrome", async () => {
+  const [config, footer, apps, layout, middleware, session] = await Promise.all([
     readFile(new URL("app/lib/auth/config.ts", root), "utf8"),
-    readFile(new URL("app/components/auth/SessionKeepAlive.tsx", root), "utf8"),
     readFile(new URL("app/components/SiteFooter.tsx", root), "utf8"),
     readFile(new URL("app/apps/page.tsx", root), "utf8"),
     readFile(new URL("app/layout.tsx", root), "utf8"),
     readFile(new URL("middleware.ts", root), "utf8"),
     readFile(new URL("app/lib/auth/session.ts", root), "utf8"),
   ]);
-  assert.match(config, /SESSION_IDLE_MAX_AGE_SEC = 60 \* 60 \* 48/);
-  assert.match(keepAlive, /\/api\/auth\/me/);
+  assert.match(config, /SESSION_MAX_AGE_SEC = 60 \* 60 \* 24 \* 400/);
   assert.match(footer, /برامجنا/);
   assert.match(footer, /عن الشركة/);
   assert.match(footer, /هوية الشركة/);
   assert.match(apps, /كيف يعمل/);
   assert.match(apps, /الفوائد/);
-  assert.match(layout, /SessionKeepAlive/);
+  assert.doesNotMatch(layout, /SessionKeepAlive/);
   assert.match(middleware, /id\.bhd-om\.com/);
   assert.match(session, /SWITCH_REQUIRES_LOGOUT/);
   await access(new URL("docs/BHD-UNIFIED-LOGIN-AND-APPS.md", root));

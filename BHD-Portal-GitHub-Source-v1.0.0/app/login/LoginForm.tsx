@@ -62,6 +62,8 @@ const COPY = {
     privacy: "الخصوصية",
     terms: "والشروط",
     apps: "برامج المجموعة",
+    continuing: "جاري إكمال الدخول…",
+    continuingLead: "ننقلك الآن إلى التطبيق.",
     alreadyTitle: "جلسة نشطة حالياً",
     alreadyBody:
       "أنت مسجّل الدخول الآن بهذا الحساب. يمكنك المتابعة به، أو الخروج ثم الدخول بحساب BHD آخر.",
@@ -124,6 +126,8 @@ const COPY = {
     privacy: "privacy",
     terms: "and terms",
     apps: "BHD programmes",
+    continuing: "Finishing sign-in…",
+    continuingLead: "Taking you to the app now.",
     alreadyTitle: "Active session",
     alreadyBody:
       "You are currently signed in with this account. Continue with it, or sign out to use a different BHD account.",
@@ -163,10 +167,22 @@ function facebookCopy(code: string | null, lang: Lang) {
   return code ? (lang === "en" ? en : ar)[code] || "" : "";
 }
 
+function safeNextPath(nextPath: string | null): string {
+  if (nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")) return nextPath;
+  return "/";
+}
+
+function isOauthContinue(path: string): boolean {
+  const pathname = path.split(/[?#]/)[0] || "/";
+  return pathname === "/oauth" || pathname.startsWith("/oauth/") || pathname.startsWith("/api/");
+}
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
+  const nextSafe = useMemo(() => safeNextPath(nextPath), [nextPath]);
+  const oauthContinue = isOauthContinue(nextSafe);
   const [lang, setLang] = useState<Lang>("ar");
   const t = COPY[lang];
   const facebookMessage = facebookCopy(searchParams.get("fb"), lang);
@@ -238,6 +254,11 @@ export function LoginForm() {
   }, []);
 
   useEffect(() => {
+    if (!oauthContinue || !existing) return;
+    window.location.replace(nextSafe);
+  }, [oauthContinue, existing, nextSafe]);
+
+  useEffect(() => {
     if (cooldownSec <= 0) return;
     const timer = window.setTimeout(() => setCooldownSec((n) => Math.max(0, n - 1)), 1000);
     return () => window.clearTimeout(timer);
@@ -252,9 +273,12 @@ export function LoginForm() {
     setError("");
   }
 
-  async function finishOk() {
-    const next = nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//") ? nextPath : "/";
-    router.push(next);
+  function finishOk() {
+    if (isOauthContinue(nextSafe)) {
+      window.location.replace(nextSafe);
+      return;
+    }
+    router.push(nextSafe);
     router.refresh();
   }
 
@@ -324,11 +348,12 @@ export function LoginForm() {
         setError(data.message || t.fail);
         return;
       }
-      await finishOk();
+      finishOk();
+      if (isOauthContinue(nextSafe)) return;
     } catch {
       setError(t.network);
     } finally {
-      setLoading(false);
+      if (!isOauthContinue(nextSafe)) setLoading(false);
     }
   }
 
@@ -369,7 +394,13 @@ export function LoginForm() {
           </aside>
 
           <section className="login-card">
-            {existing ? (
+            {oauthContinue && (existing === undefined || existing) && !switchPrompt ? (
+              <div className="login-handoff" role="status" aria-live="polite">
+                <span className="login-handoff-mark" aria-hidden="true" />
+                <h2>{t.continuing}</h2>
+                <p>{t.continuingLead}</p>
+              </div>
+            ) : existing ? (
               <div className="login-already">
                 <h2>{switchPrompt ? t.switchTitle : t.alreadyTitle}</h2>
                 <p>
@@ -378,7 +409,7 @@ export function LoginForm() {
                   <small>{existing.email}</small>
                 </p>
                 <p>{switchPrompt ? t.switchBody : t.alreadyBody}</p>
-                <InstantLink className="login-submit" href={nextPath && nextPath.startsWith("/") ? nextPath : "/account"}>
+                <InstantLink className="login-submit" href={nextSafe === "/" ? "/account" : nextSafe}>
                   {switchPrompt ? t.continueSession : t.continueAccount}
                 </InstantLink>
                 <button type="button" className="login-switch-out" onClick={logoutThenReload}>

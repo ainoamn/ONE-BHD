@@ -50,7 +50,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(loginRedirectForAuthorize(url.origin, url.searchParams));
   }
 
-  await touchUserLogin(session.sub, { ip: getRequestIp(request) }).catch(() => undefined);
+  void touchUserLogin(session.sub, { ip: getRequestIp(request) }).catch(() => undefined);
 
   const jti = randomUrlToken();
   await saveTicket({

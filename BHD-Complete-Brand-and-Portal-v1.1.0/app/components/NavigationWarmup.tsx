@@ -27,7 +27,8 @@ export function NavigationWarmup() {
   const router = useRouter();
 
   useEffect(() => {
-    if (window.location.pathname.startsWith("/login")) return;
+    const path = window.location.pathname;
+    if (path === "/login" || path.startsWith("/login/") || path.startsWith("/oauth") || path.startsWith("/api/")) return;
 
     const run = () => {
       priorityRoutes.forEach((route) => router.prefetch(route));
