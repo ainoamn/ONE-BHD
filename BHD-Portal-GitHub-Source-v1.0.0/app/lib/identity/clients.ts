@@ -137,10 +137,16 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_HR",
     redirectUris: [
       "https://hr.bhd-om.com/api/auth/bhd/callback",
+      "https://bhd-hr.vercel.app/api/auth/bhd/callback",
       "http://localhost:3000/api/auth/bhd/callback",
       "http://127.0.0.1:3000/api/auth/bhd/callback",
     ],
-    postLogoutRedirectUris: ["https://hr.bhd-om.com/", "http://localhost:3000/", "http://127.0.0.1:3000/"],
+    postLogoutRedirectUris: [
+      "https://hr.bhd-om.com/",
+      "https://bhd-hr.vercel.app/",
+      "http://localhost:3000/",
+      "http://127.0.0.1:3000/",
+    ],
   },
 ];
 
