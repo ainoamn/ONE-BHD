@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { authSecret } from "../../../lib/auth/config";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
 import { getRequestIp } from "../../../lib/auth/request-ip";
-import { applyIdentityLogin, getCurrentSession, readSessionRoster, upsertRoster } from "../../../lib/auth/session";
+import { applyIdentityLogin, getCurrentSession, portalSessionFromUser, readSessionRoster, upsertRoster } from "../../../lib/auth/session";
 import { loginWithPassword } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -38,12 +38,7 @@ export async function POST(request: Request) {
     const user = await loginWithPassword(body.identifier || "", body.password || "", {
       ip: getRequestIp(request),
     });
-    const next = {
-      sub: user.id,
-      email: user.email,
-      name: user.name,
-      picture: user.picture,
-    };
+    const next = portalSessionFromUser(user, "password");
     const roster = await readSessionRoster();
     const response = NextResponse.json({ user, accounts: upsertRoster(roster, next) });
     await applyIdentityLogin(response.cookies, next, roster);

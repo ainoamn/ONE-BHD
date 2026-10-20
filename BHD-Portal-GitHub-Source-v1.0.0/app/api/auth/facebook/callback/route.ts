@@ -10,7 +10,7 @@ import {
 } from "../../../../lib/auth/facebook";
 import { allowRequest, clientKey } from "../../../../lib/auth/rate-limit";
 import { getRequestIp } from "../../../../lib/auth/request-ip";
-import { applyIdentityLogin, readSessionRoster } from "../../../../lib/auth/session";
+import { applyIdentityLogin, portalSessionFromUser, readSessionRoster } from "../../../../lib/auth/session";
 import { loginOrRegisterWithFacebook } from "../../../../lib/auth/users";
 import { isSafeNextPath } from "../../../../lib/identity/safe-next";
 
@@ -49,12 +49,7 @@ export async function GET(request: Request) {
     const response = NextResponse.redirect(new URL(next, origin));
     await applyIdentityLogin(
       response.cookies,
-      {
-        sub: user.id,
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-      },
+      portalSessionFromUser(user, "facebook"),
       await readSessionRoster(),
     );
     clearFacebookCookie(response);

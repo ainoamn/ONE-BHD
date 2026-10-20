@@ -10,7 +10,13 @@ type User = {
   id?: string;
   email: string;
   name: string;
+  username?: string | null;
+  phone?: string | null;
   picture: string | null;
+  providers?: Array<"password" | "google" | "facebook" | "whatsapp">;
+  googleLinked?: boolean;
+  facebookLinked?: boolean;
+  hasPassword?: boolean;
 };
 
 type MeResponse = {

@@ -12,12 +12,68 @@ export const ROSTER_COOKIE = "bhd_id_roster";
 export const MAX_ROSTER_ACCOUNTS = 8;
 const ROSTER_ISSUER = "bhd-roster";
 
+export type AuthProvider = "password" | "google" | "facebook" | "whatsapp";
+
 export type PortalSession = {
   sub: string;
   email: string;
   name: string;
   picture: string | null;
+  username?: string | null;
+  phone?: string | null;
+  providers?: AuthProvider[];
 };
+
+const PROVIDERS: AuthProvider[] = ["password", "google", "facebook", "whatsapp"];
+
+function asProviders(value: unknown): AuthProvider[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is AuthProvider => typeof item === "string" && PROVIDERS.includes(item as AuthProvider));
+}
+
+export function inferProviders(input: {
+  picture?: string | null;
+  googleLinked?: boolean;
+  facebookLinked?: boolean;
+  hasPassword?: boolean;
+  providers?: AuthProvider[];
+  via?: AuthProvider;
+}): AuthProvider[] {
+  const found = new Set<AuthProvider>(input.providers || []);
+  if (input.googleLinked) found.add("google");
+  if (input.facebookLinked) found.add("facebook");
+  if (input.hasPassword) found.add("password");
+  if (input.via) found.add(input.via);
+  const picture = input.picture || "";
+  if (picture.includes("googleusercontent.com")) found.add("google");
+  if (picture.includes("fbcdn.net") || picture.includes("facebook.com")) found.add("facebook");
+  return PROVIDERS.filter((item) => found.has(item));
+}
+
+export function portalSessionFromUser(
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    picture: string | null;
+    username?: string | null;
+    phone?: string | null;
+    googleLinked?: boolean;
+    facebookLinked?: boolean;
+    hasPassword?: boolean;
+  },
+  via?: AuthProvider,
+): PortalSession {
+  return {
+    sub: user.id,
+    email: user.email,
+    name: user.name,
+    picture: user.picture,
+    username: user.username || null,
+    phone: user.phone || null,
+    providers: inferProviders({ ...user, via }),
+  };
+}
 
 function secretKey() {
   const secret = authSecret();
@@ -32,6 +88,9 @@ export async function createSessionToken(session: PortalSession): Promise<string
     email: session.email,
     name: session.name,
     picture: session.picture,
+    username: session.username || null,
+    phone: session.phone || null,
+    providers: session.providers || [],
   })
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setSubject(session.sub)
@@ -51,11 +110,18 @@ export async function readSessionToken(token: string): Promise<PortalSession | n
     const email = typeof payload.email === "string" ? payload.email : "";
     const sub = typeof payload.sub === "string" ? payload.sub : "";
     if (!email || !sub) return null;
+    const picture = typeof payload.picture === "string" ? payload.picture : null;
     return {
       sub,
       email,
       name: typeof payload.name === "string" ? payload.name : email,
-      picture: typeof payload.picture === "string" ? payload.picture : null,
+      picture,
+      username: typeof payload.username === "string" ? payload.username : null,
+      phone: typeof payload.phone === "string" ? payload.phone : null,
+      providers: inferProviders({
+        picture,
+        providers: asProviders(payload.providers),
+      }),
     };
   } catch {
     return null;
@@ -80,9 +146,23 @@ export async function getCurrentSession(): Promise<PortalSession | null> {
   return readSessionToken(token);
 }
 
+export function mergePortalSession(prev: PortalSession | undefined, next: PortalSession): PortalSession {
+  return {
+    ...next,
+    username: next.username || prev?.username || null,
+    phone: next.phone || prev?.phone || null,
+    providers: inferProviders({
+      picture: next.picture || prev?.picture,
+      providers: [...(prev?.providers || []), ...(next.providers || [])],
+    }),
+  };
+}
+
 export function upsertRoster(roster: PortalSession[], next: PortalSession): PortalSession[] {
+  const prev = roster.find((item) => item.sub === next.sub);
+  const merged = mergePortalSession(prev, next);
   const rest = roster.filter((item) => item.sub !== next.sub);
-  return [next, ...rest].slice(0, MAX_ROSTER_ACCOUNTS);
+  return [merged, ...rest].slice(0, MAX_ROSTER_ACCOUNTS);
 }
 
 async function signRoster(accounts: PortalSession[]): Promise<string> {
@@ -106,11 +186,18 @@ export async function readRosterToken(token: string | undefined): Promise<Portal
       const sub = typeof row.sub === "string" ? row.sub : "";
       const email = typeof row.email === "string" ? row.email : "";
       if (!sub || !email) continue;
+      const picture = typeof row.picture === "string" ? row.picture : null;
       accounts.push({
         sub,
         email,
         name: typeof row.name === "string" ? row.name : email,
-        picture: typeof row.picture === "string" ? row.picture : null,
+        picture,
+        username: typeof row.username === "string" ? row.username : null,
+        phone: typeof row.phone === "string" ? row.phone : null,
+        providers: inferProviders({
+          picture,
+          providers: asProviders(row.providers),
+        }),
       });
     }
     return accounts;
@@ -142,7 +229,7 @@ export async function applyIdentityLogin(
   roster: PortalSession[],
 ) {
   const merged = upsertRoster(roster, next);
-  const token = await createSessionToken(next);
+  const token = await createSessionToken(merged[0] || next);
   applySessionCookies(store, token);
   store.set(ROSTER_COOKIE, await signRoster(merged), sessionCookieOptions());
   return merged;

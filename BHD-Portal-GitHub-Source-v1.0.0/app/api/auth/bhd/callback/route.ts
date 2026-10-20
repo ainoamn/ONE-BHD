@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { clientSecretFor } from "../../../../lib/identity/crypto";
 import { getIdentityClient } from "../../../../lib/identity/clients";
 import { identityIssuer, oauthStateCookie } from "../../../../lib/identity/issuer";
-import { applyIdentityLogin, readSessionRoster } from "../../../../lib/auth/session";
+import { applyIdentityLogin, portalSessionFromUser, readSessionRoster } from "../../../../lib/auth/session";
 import { isSafeNextPath } from "../../../../lib/identity/safe-next";
 import { jwtVerify } from "jose";
 import { signingKey } from "../../../../lib/identity/crypto";
@@ -81,12 +81,12 @@ export async function GET(request: Request) {
   const response = NextResponse.redirect(new URL(dest, url.origin));
   await applyIdentityLogin(
     response.cookies,
-    {
-      sub: payload.sub,
+    portalSessionFromUser({
+      id: payload.sub,
       email: payload.email,
       name: typeof payload.name === "string" ? payload.name : payload.email,
       picture: typeof payload.picture === "string" ? payload.picture : null,
-    },
+    }),
     await readSessionRoster(),
   );
   response.cookies.set(STATE_COOKIE, "", { ...oauthStateCookie(), maxAge: 0 });

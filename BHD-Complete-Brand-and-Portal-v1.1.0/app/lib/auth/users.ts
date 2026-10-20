@@ -18,6 +18,9 @@ export type PublicUser = {
   picture: string | null;
   emailVerified: boolean;
   mustCompleteProfile: boolean;
+  googleLinked: boolean;
+  facebookLinked: boolean;
+  hasPassword: boolean;
 };
 
 export type RegisterInput = {
@@ -57,6 +60,9 @@ export function toPublicUser(user: BhdUser): PublicUser {
     picture: user.avatar,
     emailVerified: user.emailVerified,
     mustCompleteProfile: user.mustCompleteProfile,
+    googleLinked: Boolean(user.googleId),
+    facebookLinked: Boolean(user.facebookId),
+    hasPassword: Boolean(user.passwordHash),
   };
 }
 
