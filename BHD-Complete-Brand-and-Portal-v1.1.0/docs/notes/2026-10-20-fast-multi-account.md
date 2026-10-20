@@ -12,6 +12,6 @@
 
 قائمة التبديل تعرض **صورة دائرية + البريد** في صف واحد (مثل جوجل)، مع شارة المصدر على زاوية الصورة. الاسم وحده ممنوع لأنه يتكرر.
 
-تبديل الحساب يحدّث الرأس من JSON بلا إعادة تحميل. فتح موقع آخر يذهب إلى `workspacePath` مباشرة (`preconnect`/`prefetch`)؛ `start` فقط عند غياب جلسة المنتج.
+عزل الحساب: بعد `POST /switch` تُعاد الصفحة ببيانات الحساب الجديد. المنتج يُعاد ربطه بـ `start?returnTo`. `/login?add=1` للإضافة فقط. الرابط المباشر يستخدم `BhdSilentSso`.
 
-انسخ إلى كل موقع: [`BHD-ACCOUNT-SWITCHER.md`](../BHD-ACCOUNT-SWITCHER.md) مع `BhdAppSwitcher` و`lib/bhd/apps.ts`.
+انسخ [`BHD-ACCOUNT-SWITCHER.md`](../BHD-ACCOUNT-SWITCHER.md) مع `BhdAppSwitcher` و`BhdSilentSso` و`lib/identity/client.ts`.

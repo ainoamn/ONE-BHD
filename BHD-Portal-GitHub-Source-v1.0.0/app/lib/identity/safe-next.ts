@@ -2,7 +2,8 @@ export function isSafeNextPath(value: string | null | undefined): value is strin
   if (!value) return false;
   if (!value.startsWith("/")) return false;
   if (value.startsWith("//") || value.includes("\\")) return false;
-  if (value.includes("://")) return false;
+  const path = value.split(/[?#]/)[0] || "/";
+  if (path.includes("://")) return false;
   return true;
 }
 

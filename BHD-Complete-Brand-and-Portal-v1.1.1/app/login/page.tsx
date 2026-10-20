@@ -23,9 +23,10 @@ export default async function LoginPage({
 }) {
   const params = await searchParams;
   const next = safeNext(params.next);
-  if (params.add !== "1" && next && isOauthContinue(next)) {
-    const session = await getCurrentSession();
-    if (session) redirect(next);
+  const session = await getCurrentSession();
+  if (session && params.add !== "1") {
+    if (next && isOauthContinue(next)) redirect(next);
+    redirect(next || "/account");
   }
 
   return (

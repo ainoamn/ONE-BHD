@@ -51,7 +51,7 @@ export async function GET(request: Request) {
   const client = getIdentityClient("bhd-portal");
   if (!client) return clear;
   const issuer = identityIssuer(request);
-  const tokenRes = await fetch(`${url.origin}/oauth/token`, {
+  const tokenRes = await fetch(`${issuer}/oauth/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({

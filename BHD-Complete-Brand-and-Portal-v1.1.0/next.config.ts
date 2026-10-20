@@ -12,7 +12,7 @@ const contentSecurityPolicy = [
   "font-src 'self' data:",
   "style-src 'self' 'unsafe-inline'",
   "script-src 'self' 'unsafe-inline' https://accounts.google.com",
-  "connect-src 'self' https://accounts.google.com",
+  "connect-src 'self' https://id.bhd-om.com https://accounts.google.com",
   "worker-src 'self' blob:",
   "manifest-src 'self'",
   "upgrade-insecure-requests",

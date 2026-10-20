@@ -12,8 +12,8 @@ export async function POST(request: Request) {
   const headers = new Headers(productCorsHeaders(request));
   let sub = "";
   try {
-    const body = (await request.json()) as { sub?: string };
-    sub = typeof body.sub === "string" ? body.sub.trim() : "";
+    const body = (await request.json()) as { sub?: string; email?: string };
+    sub = (typeof body.sub === "string" ? body.sub : body.email || "").trim();
   } catch {
     return NextResponse.json({ message: "طلب غير صالح." }, { status: 400, headers });
   }
@@ -22,7 +22,7 @@ export async function POST(request: Request) {
   }
 
   const roster = await readSessionRoster();
-  const target = roster.find((item) => item.sub === sub);
+  const target = roster.find((item) => item.sub === sub || item.email === sub);
   if (!target) {
     return NextResponse.json({ message: "هذا الحساب غير محفوظ في هذه الجلسة." }, { status: 404, headers });
   }
@@ -35,6 +35,6 @@ export async function POST(request: Request) {
     },
     { headers },
   );
-  await applyIdentitySwitch(response.cookies, sub, roster);
+  await applyIdentitySwitch(response.cookies, target.sub, roster);
   return response;
 }

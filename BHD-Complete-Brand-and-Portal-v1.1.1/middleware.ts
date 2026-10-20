@@ -8,6 +8,7 @@ const IDENTITY_PREFIXES = [
   "/account",
   "/admin",
   "/oauth",
+  "/auth",
   "/callback",
   "/api/auth",
   "/api/account",
@@ -21,6 +22,15 @@ export function middleware(request: NextRequest) {
   }
 
   const path = request.nextUrl.pathname;
+  if (
+    path === "/api/auth/bhd" ||
+    path.startsWith("/api/auth/bhd/") ||
+    path === "/api/auth/me" ||
+    path === "/api/auth/switch" ||
+    path === "/api/auth/logout"
+  ) {
+    return NextResponse.next();
+  }
   const isIdentity = IDENTITY_PREFIXES.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
   if (!isIdentity) return NextResponse.next();
 
@@ -40,6 +50,8 @@ export const config = {
     "/admin",
     "/admin/:path*",
     "/oauth/:path*",
+    "/auth",
+    "/auth/:path*",
     "/callback",
     "/callback/:path*",
     "/api/auth/:path*",
