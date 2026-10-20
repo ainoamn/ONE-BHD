@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { resolveOAuthClient, verifyPkce, randomUrlToken } from "../../lib/identity/crypto";
 import { identityIssuer } from "../../lib/identity/issuer";
-import { consumeTicket, saveTicket } from "../../lib/identity/tickets";
+import { consumeTicket, saveTicketSoon } from "../../lib/identity/tickets";
 import { signAccessToken, signIdToken, tokenTtl } from "../../lib/identity/tokens";
 import { getUserById, getSelfContact } from "../../lib/auth/users";
 import { authSecret } from "../../lib/auth/config";
 import { ensurePlatformAdminEmailVerified } from "../../lib/auth/platform-admin";
+import { withTimeout } from "../../lib/fast";
 
 export const runtime = "nodejs";
 
@@ -42,33 +43,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "invalid_grant" }, { status: 400 });
     }
 
-    const user = await getUserById(ticket.userId);
-    if (!user) {
+    const user = await withTimeout(getUserById(ticket.userId), 800);
+    const email = user?.email || ticket.payload.email;
+    const name = user?.name || ticket.payload.name || email;
+    if (!email) {
       return NextResponse.json({ error: "invalid_grant" }, { status: 400 });
     }
-    const emailVerified = await ensurePlatformAdminEmailVerified(user);
-    const self = await getSelfContact(user.id);
+    const emailVerified = user ? (await withTimeout(ensurePlatformAdminEmailVerified(user), 400)) || false : false;
+    const self = user ? await withTimeout(getSelfContact(user.id), 400) : null;
     const idToken = await signIdToken({
       issuer,
       audience: clientId,
       nonce: ticket.payload.nonce,
       claims: {
-        sub: user.id,
-        email: user.email,
-        name: user.name,
-        picture: user.picture,
-        preferred_username: user.username,
-        phone_number: self?.phone || user.phone,
+        sub: user?.id || ticket.userId,
+        email,
+        name,
+        picture: user?.picture || ticket.payload.picture || null,
+        preferred_username: user?.username,
+        phone_number: self?.phone || user?.phone,
         email_verified: emailVerified,
       },
     });
-    const accessToken = await signAccessToken({ issuer, audience: clientId, sub: user.id });
+    const accessToken = await signAccessToken({ issuer, audience: clientId, sub: user?.id || ticket.userId });
     const refreshJti = randomUrlToken();
-    await saveTicket({
+    saveTicketSoon({
       jti: refreshJti,
       kind: "refresh",
       clientId,
-      userId: user.id,
+      userId: user?.id || ticket.userId,
       expiresAt: new Date(Date.now() + tokenTtl.refresh * 1000),
       payload: { nonce: ticket.payload.nonce },
     });
@@ -88,36 +91,39 @@ export async function POST(request: Request) {
     if (!ticket || ticket.clientId !== clientId) {
       return NextResponse.json({ error: "invalid_grant" }, { status: 400 });
     }
-    const user = await getUserById(ticket.userId);
-    if (!user) {
+    const user = await withTimeout(getUserById(ticket.userId), 800);
+    if (!user && !ticket.payload.email) {
       return NextResponse.json({ error: "invalid_grant" }, { status: 400 });
     }
-    const emailVerified = await ensurePlatformAdminEmailVerified(user);
-    const self = await getSelfContact(user.id);
+    const emailVerified = user ? (await withTimeout(ensurePlatformAdminEmailVerified(user), 400)) || false : false;
+    const self = user ? await withTimeout(getSelfContact(user.id), 400) : null;
     const nextRefresh = randomUrlToken();
-    await saveTicket({
+    saveTicketSoon({
       jti: nextRefresh,
       kind: "refresh",
       clientId,
-      userId: user.id,
+      userId: user?.id || ticket.userId,
       expiresAt: new Date(Date.now() + tokenTtl.refresh * 1000),
       payload: ticket.payload,
     });
+    const sub = user?.id || ticket.userId;
+    const email = user?.email || ticket.payload.email;
+    const name = user?.name || ticket.payload.name || email;
     return NextResponse.json({
       token_type: "Bearer",
       expires_in: tokenTtl.access,
-      access_token: await signAccessToken({ issuer, audience: clientId, sub: user.id }),
+      access_token: await signAccessToken({ issuer, audience: clientId, sub }),
       id_token: await signIdToken({
         issuer,
         audience: clientId,
         nonce: ticket.payload.nonce || randomUrlToken(16),
         claims: {
-          sub: user.id,
-          email: user.email,
-          name: user.name,
-          picture: user.picture,
-          preferred_username: user.username,
-          phone_number: self?.phone || user.phone,
+          sub,
+          email,
+          name,
+          picture: user?.picture || ticket.payload.picture || null,
+          preferred_username: user?.username,
+          phone_number: self?.phone || user?.phone,
           email_verified: emailVerified,
         },
       }),

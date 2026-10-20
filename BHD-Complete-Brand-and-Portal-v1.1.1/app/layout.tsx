@@ -110,7 +110,6 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
   return (
     <html lang="ar" dir="rtl" className={`${plexArabic.variable} ${inter.variable}`}>
       <head>
-        <link rel="preload" href="/images/bhd-philosophy-hero.webp" as="image" type="image/webp" />
         <link rel="preload" href="/brand/bhd-logo.svg" as="image" type="image/svg+xml" />
       </head>
       <body className={plexArabic.className}>

@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
-import { getCurrentSession } from "../../../lib/auth/session";
-import { getSelfContact, getUserById } from "../../../lib/auth/users";
-import { isDatabaseConfigured } from "../../../../db";
+import { getCurrentSession, readSessionRoster } from "../../../lib/auth/session";
 import { isPlatformAdminEmail } from "../../../lib/auth/platform-admin";
 
 export const runtime = "nodejs";
@@ -10,32 +8,29 @@ function json(body: unknown) {
   return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
 }
 
+function publicFromSession(session: { sub: string; name: string; email: string; picture: string | null }) {
+  return {
+    id: session.sub,
+    name: session.name,
+    email: session.email,
+    username: null,
+    phone: null,
+    picture: session.picture,
+    emailVerified: true,
+    mustCompleteProfile: false,
+  };
+}
+
 export async function GET() {
   const session = await getCurrentSession();
   if (!session) {
-    return json({ user: null });
+    return json({ user: null, accounts: [] });
   }
 
-  if (isDatabaseConfigured()) {
-    const user = await getUserById(session.sub);
-    if (!user) {
-      return json({ user: null });
-    }
-    const contact = await getSelfContact(user.id);
-    return json({ user, contact, platformAdmin: isPlatformAdminEmail(user.email) });
-  }
-
+  const accounts = await readSessionRoster();
   return json({
-    user: {
-      id: session.sub,
-      name: session.name,
-      email: session.email,
-      username: null,
-      phone: null,
-      picture: session.picture,
-      emailVerified: true,
-      mustCompleteProfile: false,
-    },
+    user: publicFromSession(session),
+    accounts: accounts.map(publicFromSession),
     contact: null,
     platformAdmin: isPlatformAdminEmail(session.email),
   });

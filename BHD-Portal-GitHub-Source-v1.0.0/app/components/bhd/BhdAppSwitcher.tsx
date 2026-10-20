@@ -7,6 +7,7 @@ import { BhdAppIcon } from "./BhdAppIcon";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export type BhdSwitcherUser = {
+  id?: string;
   name: string;
   email: string;
   picture: string | null;
@@ -21,7 +22,10 @@ const COPY = {
     appsTitle: "تطبيقات BHD",
     account: "الحساب",
     admin: "الإدارة",
-    signOut: "خروج",
+    signOut: "خروج من هذا الحساب",
+    signOutAll: "خروج من كل الحسابات",
+    addAccount: "إضافة حساب",
+    switchTo: "تبديل إلى",
   },
   en: {
     appsAria: "BHD apps",
@@ -29,7 +33,10 @@ const COPY = {
     appsTitle: "BHD apps",
     account: "Account",
     admin: "Admin",
-    signOut: "Sign out",
+    signOut: "Sign out of this account",
+    signOutAll: "Sign out of all accounts",
+    addAccount: "Add account",
+    switchTo: "Switch to",
   },
 } as const;
 
@@ -74,12 +81,20 @@ function openApp(app: BhdApp, pageOrigin: string) {
 
 export function BhdAppSwitcher({
   user,
+  accounts = [],
   onSignOut,
+  onSignOutAll,
+  onSwitchAccount,
+  onAddAccount,
   platformAdmin = false,
   locale = "ar",
 }: {
   user: BhdSwitcherUser;
+  accounts?: BhdSwitcherUser[];
   onSignOut: () => void | Promise<void>;
+  onSignOutAll?: () => void | Promise<void>;
+  onSwitchAccount?: (sub: string) => void | Promise<void>;
+  onAddAccount?: () => void;
   platformAdmin?: boolean;
   locale?: UiLocale;
 }) {
@@ -239,9 +254,31 @@ export function BhdAppSwitcher({
               {t.admin}
             </a>
           ) : null}
+          {accounts
+            .filter((item) => (item.id || item.email) !== (user.id || user.email))
+            .map((item) => (
+              <button
+                key={item.id || item.email}
+                type="button"
+                className="bhd-switcher-account-link"
+                onClick={() => item.id && void onSwitchAccount?.(item.id)}
+              >
+                {t.switchTo}: {item.name}
+              </button>
+            ))}
+          {onAddAccount ? (
+            <button type="button" className="bhd-switcher-account-link" onClick={onAddAccount}>
+              {t.addAccount}
+            </button>
+          ) : null}
           <button type="button" className="bhd-switcher-signout" onClick={() => void onSignOut()}>
             {t.signOut}
           </button>
+          {onSignOutAll ? (
+            <button type="button" className="bhd-switcher-signout bhd-switcher-signout-all" onClick={() => void onSignOutAll()}>
+              {t.signOutAll}
+            </button>
+          ) : null}
         </div>
       ) : null}
     </div>

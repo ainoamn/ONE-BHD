@@ -6,7 +6,7 @@ import { FacebookSignInButton } from "../components/auth/FacebookSignInButton";
 import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { BHD_APPS } from "../lib/bhd/apps";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Mode = "login" | "register" | "forgot";
@@ -65,13 +65,12 @@ const COPY = {
     continuing: "جاري إكمال الدخول…",
     continuingLead: "ننقلك الآن إلى التطبيق.",
     alreadyTitle: "جلسة نشطة حالياً",
-    alreadyBody:
-      "أنت مسجّل الدخول الآن بهذا الحساب. يمكنك المتابعة به، أو الخروج ثم الدخول بحساب BHD آخر.",
+    alreadyBody: "يمكنك المتابعة بهذا الحساب، أو إضافة حساب آخر من الأعلى دون انتظار.",
     continueAccount: "المتابعة بهذا الحساب",
-    switchOut: "خروج والدخول بحساب آخر",
+    switchOut: "خروج من هذا الحساب",
+    addAccount: "إضافة حساب آخر",
     switchTitle: "تبديل حساب BHD",
-    switchBody:
-      "الجلسة الحالية مرتبطة بحساب مختلف عن البيانات التي أدخلتها. اختر المتابعة بالجلسة النشطة، أو أنهِها للدخول بالحساب الجديد.",
+    switchBody: "أضف الحساب الجديد من النموذج. التبديل بعد الدخول يتم من رأس الصفحة فوراً.",
     continueSession: "المتابعة بالجلسة الحالية",
     lang: "English",
     fail: "تعذّر إكمال العملية.",
@@ -129,13 +128,12 @@ const COPY = {
     continuing: "Finishing sign-in…",
     continuingLead: "Taking you to the app now.",
     alreadyTitle: "Active session",
-    alreadyBody:
-      "You are currently signed in with this account. Continue with it, or sign out to use a different BHD account.",
+    alreadyBody: "Continue with this account, or add another from the header without waiting.",
     continueAccount: "Continue with this account",
-    switchOut: "Sign out and use another account",
+    switchOut: "Sign out of this account",
+    addAccount: "Add another account",
     switchTitle: "Switch BHD account",
-    switchBody:
-      "An active session belongs to a different account than the credentials you entered. Continue with the current session, or end it to sign in with the new account.",
+    switchBody: "Add the new account from the form. Switching afterwards is instant from the header.",
     continueSession: "Continue current session",
     lang: "العربية",
     fail: "Something went wrong.",
@@ -151,7 +149,7 @@ function facebookCopy(code: string | null, lang: Lang) {
     email: "يلزم السماح لفيسبوك بمشاركة البريد الإلكتروني.",
     locked: "هذا الحساب غير متاح للدخول.",
     rate: "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة.",
-    switch: "أنت داخل بحساب آخر. اخرج أولاً ثم ادخل بالحساب الجديد.",
+    switch: "أضف الحساب الجديد من النموذج أو بدّل من رأس الصفحة.",
     failed: "تعذّر التحقق من حساب فيسبوك.",
   };
   const en: Record<string, string> = {
@@ -161,7 +159,7 @@ function facebookCopy(code: string | null, lang: Lang) {
     email: "Facebook must share your email address.",
     locked: "This account cannot sign in.",
     rate: "Too many attempts. Wait a minute and try again.",
-    switch: "You are already signed in. Sign out first to use another account.",
+    switch: "Add the new account from the form or switch from the header.",
     failed: "Facebook could not be verified.",
   };
   return code ? (lang === "en" ? en : ar)[code] || "" : "";
@@ -178,7 +176,6 @@ function isOauthContinue(path: string): boolean {
 }
 
 export function LoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
   const nextSafe = useMemo(() => safeNextPath(nextPath), [nextPath]);
@@ -206,15 +203,16 @@ export function LoginForm() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("OM");
   const [zipCode, setZipCode] = useState("");
-  const [existing, setExisting] = useState<{ name: string; email: string } | null | undefined>(undefined);
-  const [switchPrompt, setSwitchPrompt] = useState<{ name: string; email: string } | null>(null);
+  const [existing, setExisting] = useState<{ name: string; email: string } | null>(null);
+  const [adding, setAdding] = useState(false);
 
-  function logoutThenReload() {
-    const returnTo = `${window.location.origin}/login${window.location.search || ""}`;
-    const end = new URL("/oauth/end-session", window.location.origin);
-    end.searchParams.set("client_id", "bhd-portal");
-    end.searchParams.set("post_logout_redirect_uri", returnTo);
-    window.location.assign(end.toString());
+  async function logoutThenReload() {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ all: false }),
+    });
+    window.location.replace(`/login${window.location.search || ""}`);
   }
 
   useEffect(() => {
@@ -235,6 +233,10 @@ export function LoginForm() {
     document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
     window.localStorage.setItem("bhd-login-lang", lang);
   }, [lang]);
+
+  useEffect(() => {
+    if (searchParams.get("add") === "1") setAdding(true);
+  }, [searchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -274,12 +276,7 @@ export function LoginForm() {
   }
 
   function finishOk() {
-    if (isOauthContinue(nextSafe)) {
-      window.location.replace(nextSafe);
-      return;
-    }
-    router.push(nextSafe);
-    router.refresh();
+    window.location.replace(nextSafe);
   }
 
   async function onSubmit(event: FormEvent) {
@@ -336,15 +333,6 @@ export function LoginForm() {
         activeSession?: { name?: string; email?: string } | null;
       };
       if (!response.ok) {
-        if (response.status === 409 && data.code === "SWITCH_REQUIRES_LOGOUT") {
-          const active = data.activeSession;
-          if (active?.email) {
-            setSwitchPrompt({ name: active.name || active.email, email: active.email });
-            setExisting({ name: active.name || active.email, email: active.email });
-            setError("");
-            return;
-          }
-        }
         setError(data.message || t.fail);
         return;
       }
@@ -394,30 +382,38 @@ export function LoginForm() {
           </aside>
 
           <section className="login-card">
-            {oauthContinue && (existing === undefined || existing) && !switchPrompt ? (
+            {oauthContinue && existing && !adding ? (
               <div className="login-handoff" role="status" aria-live="polite">
                 <span className="login-handoff-mark" aria-hidden="true" />
                 <h2>{t.continuing}</h2>
                 <p>{t.continuingLead}</p>
               </div>
-            ) : existing ? (
+            ) : existing && !adding ? (
               <div className="login-already">
-                <h2>{switchPrompt ? t.switchTitle : t.alreadyTitle}</h2>
+                <h2>{t.alreadyTitle}</h2>
                 <p>
                   <strong>{existing.name}</strong>
                   <br />
                   <small>{existing.email}</small>
                 </p>
-                <p>{switchPrompt ? t.switchBody : t.alreadyBody}</p>
+                <p>{t.alreadyBody}</p>
                 <InstantLink className="login-submit" href={nextSafe === "/" ? "/account" : nextSafe}>
-                  {switchPrompt ? t.continueSession : t.continueAccount}
+                  {t.continueAccount}
                 </InstantLink>
-                <button type="button" className="login-switch-out" onClick={logoutThenReload}>
+                <button type="button" className="login-switch-out" onClick={() => setAdding(true)}>
+                  {t.addAccount}
+                </button>
+                <button type="button" className="login-switch-out" onClick={() => void logoutThenReload()}>
                   {t.switchOut}
                 </button>
               </div>
             ) : (
               <>
+                {existing && adding ? (
+                  <button type="button" className="login-switch-out" onClick={() => setAdding(false)}>
+                    {t.continueAccount}
+                  </button>
+                ) : null}
                 <div className="login-card-tabs" role="tablist">
                   <button
                     type="button"

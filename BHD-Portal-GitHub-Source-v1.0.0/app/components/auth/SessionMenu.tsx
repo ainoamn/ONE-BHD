@@ -7,6 +7,7 @@ import { readStoredUiLocale } from "../../lib/ui-locale";
 import { useCallback, useEffect, useState } from "react";
 
 type User = {
+  id?: string;
   email: string;
   name: string;
   picture: string | null;
@@ -14,6 +15,7 @@ type User = {
 
 type MeResponse = {
   user?: User | null;
+  accounts?: User[];
   platformAdmin?: boolean;
 };
 
@@ -24,9 +26,11 @@ type Props = {
 };
 
 export function SessionMenu({ signInLabel, locale }: Props) {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [user, setUser] = useState<User | null>(null);
+  const [accounts, setAccounts] = useState<User[]>([]);
   const [platformAdmin, setPlatformAdmin] = useState(false);
   const [resolvedLocale, setResolvedLocale] = useState<UiLocale>(locale || "ar");
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     if (locale) {
@@ -43,27 +47,47 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       .then((data: MeResponse) => {
         if (cancelled) return;
         setUser(data.user ?? null);
+        setAccounts(data.accounts || (data.user ? [data.user] : []));
         setPlatformAdmin(Boolean(data.platformAdmin));
+        setReady(true);
       })
       .catch(() => {
-        // Network blip after tab restore is not a logout.
-        if (!cancelled) setUser((current) => (current === undefined ? null : current));
+        if (!cancelled) setReady(true);
       });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  const signOut = useCallback(async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
-    const post = `${window.location.origin}/`;
-    const end = new URL("/oauth/end-session", window.location.origin);
-    end.searchParams.set("client_id", "bhd-portal");
-    end.searchParams.set("post_logout_redirect_uri", post);
-    window.location.assign(end.toString());
+  const signOut = useCallback(async (all = false) => {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ all }),
+    });
+    if (all) {
+      const post = `${window.location.origin}/`;
+      const end = new URL("/oauth/end-session", window.location.origin);
+      end.searchParams.set("client_id", "bhd-portal");
+      end.searchParams.set("post_logout_redirect_uri", post);
+      end.searchParams.set("all", "1");
+      window.location.assign(end.toString());
+      return;
+    }
+    window.location.replace(window.location.pathname);
   }, []);
 
-  if (user === undefined) {
+  const switchAccount = useCallback(async (sub: string) => {
+    const response = await fetch("/api/auth/switch", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sub }),
+    });
+    if (!response.ok) return;
+    window.location.replace(window.location.pathname);
+  }, []);
+
+  if (!ready) {
     return <span className="session-menu session-menu-loading" aria-hidden="true" />;
   }
 
@@ -78,8 +102,14 @@ export function SessionMenu({ signInLabel, locale }: Props) {
   return (
     <BhdAppSwitcher
       user={user}
+      accounts={accounts}
       platformAdmin={platformAdmin}
-      onSignOut={signOut}
+      onSignOut={() => signOut(false)}
+      onSignOutAll={() => signOut(true)}
+      onSwitchAccount={(sub) => void switchAccount(sub)}
+      onAddAccount={() => {
+        window.location.assign("/login?add=1");
+      }}
       locale={resolvedLocale}
     />
   );

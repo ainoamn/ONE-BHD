@@ -1,16 +1,36 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { GoogleOAuthRoot } from "../components/auth/GoogleOAuthRoot";
+import { getCurrentSession } from "../lib/auth/session";
 import { LoginForm } from "./LoginForm";
 
 export const metadata: Metadata = { title: "بوابة BHD | من هنا تبدأ الخطوة نحو أحلام أكبر" };
 
-export default function LoginPage() {
+function isOauthContinue(path: string) {
+  const pathname = path.split(/[?#]/)[0] || "/";
+  return pathname === "/oauth" || pathname.startsWith("/oauth/") || pathname.startsWith("/api/");
+}
+
+function safeNext(nextPath: string | undefined) {
+  if (nextPath && nextPath.startsWith("/") && !nextPath.startsWith("//")) return nextPath;
+  return "";
+}
+
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string; add?: string }>;
+}) {
+  const params = await searchParams;
+  const next = safeNext(params.next);
+  if (params.add !== "1" && next && isOauthContinue(next)) {
+    const session = await getCurrentSession();
+    if (session) redirect(next);
+  }
+
   return (
-    <GoogleOAuthRoot>
-      <Suspense fallback={null}>
-        <LoginForm />
-      </Suspense>
-    </GoogleOAuthRoot>
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }

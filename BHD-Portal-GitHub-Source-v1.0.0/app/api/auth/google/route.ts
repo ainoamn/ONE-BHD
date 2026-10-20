@@ -7,7 +7,7 @@ import {
 import { verifyGoogleIdToken } from "../../../lib/auth/google";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
 import { getRequestIp } from "../../../lib/auth/request-ip";
-import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../lib/auth/session";
+import { applyIdentityLogin, getCurrentSession, readSessionRoster, upsertRoster } from "../../../lib/auth/session";
 import { loginOrRegisterWithGoogle } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
 
@@ -53,27 +53,18 @@ export async function POST(request: Request) {
       picture: google.picture,
       ip: getRequestIp(request),
     });
-    if (session?.sub === user.id) {
-      return NextResponse.json({ user });
-    }
-    rejectAccountSwitch(session, user.id);
-    const token = await createSessionToken({
+    const next = {
       sub: user.id,
       email: user.email,
       name: user.name,
       picture: user.picture,
-    });
-    const response = NextResponse.json({ user });
-    applySessionCookies(response.cookies, token);
+    };
+    const roster = await readSessionRoster();
+    const response = NextResponse.json({ user, accounts: upsertRoster(roster, next) });
+    await applyIdentityLogin(response.cookies, next, roster);
     return response;
   } catch (error) {
     const code = error instanceof Error ? error.message : "";
-    if (code === "SWITCH_REQUIRES_LOGOUT") {
-      return NextResponse.json(
-        { message: "أنت داخل بحساب آخر. اخرج أولاً ثم ادخل بالحساب الجديد." },
-        { status: 409 },
-      );
-    }
     if (code === "ACCOUNT_LOCKED" || code === "ACCOUNT_DISABLED") {
       return NextResponse.json({ message: "هذا الحساب غير متاح للدخول." }, { status: 403 });
     }

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { resolveIdentityClient, isAllowedRedirect } from "../../lib/identity/clients";
-import { randomUrlToken } from "../../lib/identity/crypto";
 import { loginRedirectForAuthorize } from "../../lib/identity/safe-next";
-import { saveTicket } from "../../lib/identity/tickets";
+import { issueAuthorizationCode } from "../../lib/identity/tickets";
 import { allowRequest, clientKey } from "../../lib/auth/rate-limit";
 import { getRequestIp } from "../../lib/auth/request-ip";
 import { getCurrentSession } from "../../lib/auth/session";
@@ -52,13 +51,9 @@ export async function GET(request: Request) {
 
   void touchUserLogin(session.sub, { ip: getRequestIp(request) }).catch(() => undefined);
 
-  const jti = randomUrlToken();
-  await saveTicket({
-    jti,
-    kind: "code",
+  const code = await issueAuthorizationCode({
     clientId,
     userId: session.sub,
-    expiresAt: new Date(Date.now() + 60_000),
     payload: {
       redirect_uri: redirectUri,
       nonce,
@@ -70,7 +65,7 @@ export async function GET(request: Request) {
   });
 
   const next = new URL(redirectUri);
-  next.searchParams.set("code", jti);
+  next.searchParams.set("code", code);
   next.searchParams.set("state", state);
   return NextResponse.redirect(next);
 }

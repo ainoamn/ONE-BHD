@@ -10,7 +10,7 @@ import {
 } from "../../../../lib/auth/facebook";
 import { allowRequest, clientKey } from "../../../../lib/auth/rate-limit";
 import { getRequestIp } from "../../../../lib/auth/request-ip";
-import { applySessionCookies, createSessionToken, getCurrentSession, rejectAccountSwitch } from "../../../../lib/auth/session";
+import { applyIdentityLogin, readSessionRoster } from "../../../../lib/auth/session";
 import { loginOrRegisterWithFacebook } from "../../../../lib/auth/users";
 import { isSafeNextPath } from "../../../../lib/identity/safe-next";
 
@@ -45,21 +45,22 @@ export async function GET(request: Request) {
   try {
     const facebook = await exchangeFacebookCode(code, oauth.redirectUri);
     const user = await loginOrRegisterWithFacebook({ ...facebook, ip: getRequestIp(request) });
-    rejectAccountSwitch(await getCurrentSession(), user.id);
-    const token = await createSessionToken({
-      sub: user.id,
-      email: user.email,
-      name: user.name,
-      picture: user.picture,
-    });
     const next = isSafeNextPath(oauth.next) ? oauth.next : "/";
     const response = NextResponse.redirect(new URL(next, origin));
-    applySessionCookies(response.cookies, token);
+    await applyIdentityLogin(
+      response.cookies,
+      {
+        sub: user.id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+      },
+      await readSessionRoster(),
+    );
     clearFacebookCookie(response);
     return response;
   } catch (error) {
     const message = error instanceof Error ? error.message : "";
-    if (message === "SWITCH_REQUIRES_LOGOUT") return fail("switch");
     if (message === "ACCOUNT_LOCKED" || message === "ACCOUNT_DISABLED") return fail("locked");
     if (message === "FACEBOOK_EMAIL_REQUIRED") return fail("email");
     return fail("failed");

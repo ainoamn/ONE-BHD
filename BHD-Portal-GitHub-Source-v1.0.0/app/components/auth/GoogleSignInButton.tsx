@@ -1,6 +1,6 @@
 "use client";
 
-import { GoogleLogin, type CredentialResponse } from "@react-oauth/google";
+import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from "@react-oauth/google";
 import { useCallback, useState } from "react";
 import { BHD_GOOGLE_WEB_CLIENT_ID } from "../../lib/auth/config";
 
@@ -14,6 +14,7 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || BHD_GOOGLE_WEB_CLIENT_ID;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [armed, setArmed] = useState(false);
 
   const handleSuccess = useCallback(
     async (credentialResponse: CredentialResponse) => {
@@ -48,18 +49,26 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
 
   return (
     <div className="login-provider">
-      <div className="login-provider-hit" title={label} aria-label={label}>
-        <GoogleLogin
-          onSuccess={(credential) => void handleSuccess(credential)}
-          onError={() => setError(locale === "en" ? "Google sign-in failed." : "تعذّر تسجيل الدخول عبر Google.")}
-          useOneTap={false}
-          auto_select={false}
-          type="icon"
-          shape="circle"
-          theme="outline"
-          size="large"
-        />
-      </div>
+      {armed ? (
+        <div className="login-provider-hit" title={label} aria-label={label}>
+          <GoogleOAuthProvider clientId={clientId}>
+            <GoogleLogin
+              onSuccess={(credential) => void handleSuccess(credential)}
+              onError={() => setError(locale === "en" ? "Google sign-in failed." : "تعذّر تسجيل الدخول عبر Google.")}
+              useOneTap={false}
+              auto_select={false}
+              type="icon"
+              shape="circle"
+              theme="outline"
+              size="large"
+            />
+          </GoogleOAuthProvider>
+        </div>
+      ) : (
+        <button type="button" className="login-provider-arm" title={label} aria-label={label} onClick={() => setArmed(true)}>
+          G
+        </button>
+      )}
       {loading ? <span className="login-provider-status">…</span> : null}
       {error ? (
         <p className="login-error" role="alert">

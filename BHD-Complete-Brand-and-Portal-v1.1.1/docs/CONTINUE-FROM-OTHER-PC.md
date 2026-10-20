@@ -1,6 +1,6 @@
 # اقرأني أولاً — استكمال العمل من جهاز آخر
 
-**تاريخ التوثيق:** 4 أكتوبر 2026  
+**تاريخ التوثيق:** 20 أكتوبر 2026  
 **المستودع:** https://github.com/ainoamn/ONE-BHD  
 **الفرع:** `main` (يجب أن يكون متزامناً مع `origin/main`)
 
@@ -20,7 +20,7 @@ npm install
 ثم افتح سياسة الجلسة المعتمدة ودليل التسليم:
 
 → [`docs/BHD-SESSION-POLICY.md`](BHD-SESSION-POLICY.md)  
-→ [`docs/notes/2026-10-04-session-until-logout.md`](notes/2026-10-04-session-until-logout.md)
+→ [`docs/notes/2026-10-20-fast-multi-account.md`](notes/2026-10-20-fast-multi-account.md)
 
 ---
 
@@ -28,10 +28,9 @@ npm install
 
 | # | الموضوع | النتيجة |
 |---|---------|---------|
-| 1 | سياسة جلسة: البقاء حتى «خروج» — بلا خمول 48 ساعة | `docs/BHD-SESSION-POLICY.md` على الهوية |
-| 2 | حذف KeepAlive، `/me` و`PATCH /api/account` بلا Set-Cookie | مجلد النشر v1.1.0 |
-| 3 | جوجل على `/login` فقط؛ لا تسخين `/login`؛ لا One Tap | InstantLink + NavigationWarmup + GIS |
-| 4 | توثيق المنتجات: انسخ السياسة إلى مستودع كل موقع | وازن/حساب/كيمي/مكتب/متجر |
+| 1 | دخول/خروج/تبديل/تنقل أسرع من جزء من الثانية | `/me` من الكوكي، كود OAuth موقّع، GIS بعد الضغطة |
+| 2 | تعدد الحسابات من الرأس | `bhd_id_roster` + `/api/auth/switch` |
+| 3 | وثائق لكل المنتجات | `BHD-SESSION-POLICY` و`BHD-APP-SWITCHER` و`BHD-UNIFIED-LOGIN-AND-APPS` |
 
 **الإنتاج:** انشر من جذر المستودع: `npx vercel --prod --yes` (جذر المشروع `BHD-Complete-Brand-and-Portal-v1.1.0`).
 
@@ -39,7 +38,7 @@ npm install
 
 ## أين تكمل؟
 
-1. في مستودعات المنتجات: انسخ `BHD-SESSION-POLICY.md` ونفّذ قائمة التنفيذ (حذف KeepAlive، كوكي 400 يوم، `/me` قراءة فقط).
+1. في مستودعات المنتجات: انسخ `BHD-SESSION-POLICY.md` و`BHD-APP-SWITCHER.md` — `/me` من الكوكي، تنقل فوري، تبديل الحساب من الرأس على الهوية.
 2. ترجمة محتوى الصفحات الداخلية الكامل (about/privacy/…) — التنقّل جاهز.
 3. حد معدّل موزَّع إن احتجت حماية أقوى عبر عدة instances على Vercel.
 
