@@ -106,12 +106,14 @@ function accountPageUrl(pageOrigin: string) {
   return `${DEFAULT_IDENTITY_ISSUER}/account`;
 }
 
+type SwitcherCopy = (typeof COPY)[UiLocale];
+
 function ProviderMarks({
   providers,
   t,
 }: {
   providers: AuthProviderMark[];
-  t: (typeof COPY)["ar"];
+  t: SwitcherCopy;
 }) {
   const labels: Record<AuthProviderMark, { mark: string; label: string }> = {
     password: { mark: "●", label: t.providerPassword },
@@ -131,7 +133,7 @@ function ProviderMarks({
   );
 }
 
-function AccountIdentity({ user, t }: { user: BhdSwitcherUser; t: (typeof COPY)["ar"] }) {
+function AccountIdentity({ user, t }: { user: BhdSwitcherUser; t: SwitcherCopy }) {
   const meta = accountMeta(user);
   return (
     <div className="bhd-switcher-identity">
