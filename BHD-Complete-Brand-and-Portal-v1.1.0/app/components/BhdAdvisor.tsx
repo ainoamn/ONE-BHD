@@ -12,6 +12,7 @@ const intentKeywords: Record<string, string[]> = {
   nasab: ["عائلة", "أسرة", "نسب", "شجرة", "أجداد", "قرابة", "family", "tree"],
   "bhd-store": ["متجر", "بيع", "تجارة", "منتج", "طلب", "بائع", "سوق", "bhdstor", "shop", "store", "commerce"],
   "bhd-office": ["وثيقة", "أرشيف", "مكتب", "تشغيل", "إدارة داخلية", "archive", "office", "document"],
+  "bhd-hr": ["موارد", "موظفين", "رواتب", "إجازة", "حضور", "hr", "payroll", "employee"],
 };
 
 const suggestions = [

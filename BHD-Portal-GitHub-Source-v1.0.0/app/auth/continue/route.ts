@@ -11,6 +11,7 @@ function allowed(value: string) {
     if (url.origin === DEFAULT_IDENTITY_ISSUER) return url;
     if (BHD_APPS.some((app) => app.origin.replace(/\/$/, "") === url.origin)) return url;
     if (url.hostname === "bhd-om.com" || url.hostname.endsWith(".bhd-om.com")) return url;
+    if (url.hostname === "hr.hd-om.com") return url;
   } catch {
     /* ignore */
   }

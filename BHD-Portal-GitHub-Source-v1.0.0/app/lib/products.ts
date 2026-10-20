@@ -10,7 +10,7 @@ export type Product = {
   statusAr: string;
   statusEn: string;
   mark: string;
-  appId: "wazen" | "hisaby" | "nasab" | "baitak" | "bhd-r" | "store" | "office";
+  appId: "wazen" | "hisaby" | "nasab" | "baitak" | "bhd-r" | "store" | "office" | "hr";
   accent: string;
   soft: string;
   featured?: boolean;
@@ -148,6 +148,27 @@ export const products: Product[] = [
     capabilitiesAr: ["إدارة الوثائق", "العمليات الداخلية", "الأرشفة والحماية"],
     capabilitiesEn: ["Document management", "Internal operations", "Archiving and protection"],
     howAr: "مساحة داخلية لوثائق الشركة اليومية؛ ليست للعامة ولا تُمزج مع منتجات الأفراد.",
+  },
+  {
+    slug: "bhd-hr",
+    name: "BHD HR",
+    nameAr: "الموارد البشرية",
+    categoryAr: "الموارد البشرية والرواتب",
+    categoryEn: "HR and payroll",
+    descriptionAr:
+      "نظام الموظفين والرواتب والحضور لمنشآت بن حمود: ملفات، إجازات، رواتب وصلاحيات لكل منشأة.",
+    descriptionEn:
+      "Employees, payroll and attendance for Bin Hamood organisations: files, leave, salaries and per-company roles.",
+    href: "https://hr.bhd-om.com/",
+    statusAr: "متاح الآن",
+    statusEn: "Available now",
+    mark: "HR",
+    appId: "hr",
+    accent: "#3d5a45",
+    soft: "#e7efe9",
+    capabilitiesAr: ["ملفات الموظفين", "الرواتب والحضور", "صلاحيات لكل منشأة"],
+    capabilitiesEn: ["Employee files", "Payroll and attendance", "Per-company roles"],
+    howAr: "تدخل بحساب BHD إلى منشأتك، وتبقى بيانات الموارد البشرية معزولة عن وازن وحسابي والمتجر.",
   },
 ];
 

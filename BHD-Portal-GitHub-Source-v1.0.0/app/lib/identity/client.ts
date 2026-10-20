@@ -41,6 +41,7 @@ export function allowedBhdUrl(value: string) {
     if (url.origin === DEFAULT_IDENTITY_ISSUER) return url.toString();
     if (BHD_APPS.some((app) => app.origin.replace(/\/$/, "") === url.origin)) return url.toString();
     if (url.hostname === "bhd-om.com" || url.hostname.endsWith(".bhd-om.com")) return url.toString();
+    if (url.hostname === "hr.hd-om.com") return url.toString();
   } catch {
     /* ignore */
   }

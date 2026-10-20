@@ -12,6 +12,7 @@ const priorityRoutes = [
   "/products/nasab",
   "/products/bhd-r",
   "/products/bhd-store",
+  "/products/bhd-hr",
   "/technology",
   "/brand",
   "/about",
