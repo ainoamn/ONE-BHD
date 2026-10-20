@@ -38,7 +38,7 @@ npm install
 
 ## أين تكمل؟
 
-1. في مستودعات المنتجات: انسخ `BHD-SESSION-POLICY.md` و`BHD-APP-SWITCHER.md` و`BHD-ACCOUNT-SWITCHER.md` — `/me` من الكوكي، تنقل فوري، تبديل الحساب من الرأس بصورة دائرية ثم البريد.
+1. في مستودعات المنتجات: انسخ `BHD-SESSION-POLICY.md` و`BHD-APP-SWITCHER.md` و`BHD-ACCOUNT-SWITCHER.md` مع `lib/bhd/apps.ts` و`BhdAppIcon.tsx` — يشمل **الموارد البشرية** `https://hr.bhd-om.com` في المشغّل والحساب والفوتر.
 2. ترجمة محتوى الصفحات الداخلية الكامل (about/privacy/…) — التنقّل جاهز.
 3. حد معدّل موزَّع إن احتجت حماية أقوى عبر عدة instances على Vercel.
 

@@ -8,7 +8,7 @@
 | [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) | **سياسة الجلسة:** البقاء حتى الخروج الصريح — بلا خمول وبلا تحديث تلقائي وبلا جوجل إلا على `/login` |
 | [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات والتنقل الصامت، وتقنيات كل موقع بعد التثبيت |
 | [BHD-PRODUCT-SSO-ADMIN.md](BHD-PRODUCT-SSO-ADMIN.md) | **دليل تنفيذ المنتج:** SSO صامت + أدمن محلي لكل موقع (يُنسخ إلى مستودع المنتج) |
-| [BHD-APP-SWITCHER.md](BHD-APP-SWITCHER.md) | **المواصفة المعتمدة** لمشغّل التطبيقات بعد الدخول (تسع نقاط بجانب الحساب وشعارات التطبيقات). تُنسخ كما هي مع `lib/bhd/apps.ts` |
+| [BHD-APP-SWITCHER.md](BHD-APP-SWITCHER.md) | **المواصفة المعتمدة** لمشغّل التطبيقات. القسم **4.1** يضيف الموارد البشرية `hr.bhd-om.com` — انسخه مع `apps.ts` و`BhdAppIcon` إلى كل موقع |
 | [BHD-ACCOUNT-SWITCHER.md](BHD-ACCOUNT-SWITCHER.md) | **شكل بطاقة الحساب:** صورة دائرية + البريد (مثل جوجل). انسخه إلى كل موقع مع `BhdAppSwitcher` |
 | [BHD-WAZEN-INTEGRATION.md](BHD-WAZEN-INTEGRATION.md) | **خطة وازن الجاهزة للتنفيذ:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع WAZEN |
 | [BHD-STORE-INTEGRATION.md](BHD-STORE-INTEGRATION.md) | **خطة المتجر:** دخول موحّد + مشغّل تطبيقات. تُرفع كما هي إلى مستودع BHD-STOR |
