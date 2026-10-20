@@ -577,13 +577,13 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 
 | البند | التوثيق |
 |---|---|
-| تاريخ التثبيت | _يُملأ بعد الإطلاق_ |
+| تاريخ التثبيت | حي على `wazen.bhd-om.com` — OIDC + مشغّل + حسابات متعددة من الرأس (20 أكتوبر 2026) |
 | كيف ثُبّت | اتبع [BHD-WAZEN-INTEGRATION.md](BHD-WAZEN-INTEGRATION.md) — `client_id=bhd-wazen` |
 | كيف يعمل الدخول | `start` → Issuer authorize → `callback` → جلسة وازن + `bhd_sub` |
 | كيف يعمل التنقل الصامت | جلسة `bhd_id` على الهوية؛ وازن لا يرى كوكي البوابة |
-| المشغّل | بعد OIDC؛ الحساب → `https://id.bhd-om.com/account` |
+| المشغّل | `BhdSignedInSwitcher` — قائمة `accounts` من `id…/api/auth/me`، تبديل `POST …/switch` ثم `start` صامت، إضافة `/login?add=1`، خروج هذا/الكل |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_OAUTH_REDIRECT_URI` + سر جلسة وازن |
-| التقنيات الكاملة لوازن | _الإطار، القاعدة، المحافظ، النشر — يملأها فريق وازن_ |
+| التقنيات الكاملة لوازن | Next.js + Neon (D1 API) + محافظ/رحلات/جمعيات على Vercel |
 | ما لم يُوحَّد | المحافظ، المصاريف، الرحلات، الجمعيات |
 
 ### 12.3 حسابي — `ainoamn/BHD-Pro`

@@ -1,12 +1,9 @@
 import { NextResponse } from "next/server";
 import { getCurrentSession, readSessionRoster } from "../../../lib/auth/session";
 import { isPlatformAdminEmail } from "../../../lib/auth/platform-admin";
+import { productCorsHeaders, productCorsPreflight } from "../../../lib/auth/product-cors";
 
 export const runtime = "nodejs";
-
-function json(body: unknown) {
-  return NextResponse.json(body, { headers: { "Cache-Control": "no-store" } });
-}
 
 function publicFromSession(session: { sub: string; name: string; email: string; picture: string | null }) {
   return {
@@ -21,17 +18,25 @@ function publicFromSession(session: { sub: string; name: string; email: string; 
   };
 }
 
-export async function GET() {
+export function OPTIONS(request: Request) {
+  return productCorsPreflight(request);
+}
+
+export async function GET(request: Request) {
+  const headers = productCorsHeaders(request);
   const session = await getCurrentSession();
   if (!session) {
-    return json({ user: null, accounts: [] });
+    return NextResponse.json({ user: null, accounts: [] }, { headers });
   }
 
   const accounts = await readSessionRoster();
-  return json({
-    user: publicFromSession(session),
-    accounts: accounts.map(publicFromSession),
-    contact: null,
-    platformAdmin: isPlatformAdminEmail(session.email),
-  });
+  return NextResponse.json(
+    {
+      user: publicFromSession(session),
+      accounts: accounts.map(publicFromSession),
+      contact: null,
+      platformAdmin: isPlatformAdminEmail(session.email),
+    },
+    { headers },
+  );
 }

@@ -41,6 +41,19 @@ const nextConfig: NextConfig = {
         headers: securityHeaders,
       },
       {
+        // Product headers call these with credentials (BHD-SESSION-POLICY multi-account).
+        source: "/api/auth/me",
+        headers: [{ key: "Cross-Origin-Resource-Policy", value: "cross-origin" }],
+      },
+      {
+        source: "/api/auth/switch",
+        headers: [{ key: "Cross-Origin-Resource-Policy", value: "cross-origin" }],
+      },
+      {
+        source: "/api/auth/logout",
+        headers: [{ key: "Cross-Origin-Resource-Policy", value: "cross-origin" }],
+      },
+      {
         source: "/login",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, noarchive" },
