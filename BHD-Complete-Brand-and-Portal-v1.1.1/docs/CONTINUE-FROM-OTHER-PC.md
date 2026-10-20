@@ -30,7 +30,7 @@ npm install
 |---|---------|---------|
 | 1 | دخول/خروج/تبديل/تنقل أسرع من جزء من الثانية | `/me` من الكوكي، كود OAuth موقّع، GIS بعد الضغطة |
 | 2 | تعدد الحسابات من الرأس | `bhd_id_roster` + `/api/auth/switch` |
-| 3 | وثائق لكل المنتجات | `BHD-SESSION-POLICY` و`BHD-APP-SWITCHER` و`BHD-UNIFIED-LOGIN-AND-APPS` |
+| 3 | وثائق لكل المنتجات | `BHD-SESSION-POLICY` و`BHD-APP-SWITCHER` و`BHD-ACCOUNT-SWITCHER` و`BHD-UNIFIED-LOGIN-AND-APPS` |
 
 **الإنتاج:** انشر من جذر المستودع: `npx vercel --prod --yes` (جذر المشروع `BHD-Complete-Brand-and-Portal-v1.1.0`).
 
@@ -38,7 +38,7 @@ npm install
 
 ## أين تكمل؟
 
-1. في مستودعات المنتجات: انسخ `BHD-SESSION-POLICY.md` و`BHD-APP-SWITCHER.md` — `/me` من الكوكي، تنقل فوري، تبديل الحساب من الرأس على الهوية.
+1. في مستودعات المنتجات: انسخ `BHD-SESSION-POLICY.md` و`BHD-APP-SWITCHER.md` و`BHD-ACCOUNT-SWITCHER.md` — `/me` من الكوكي، تنقل فوري، تبديل الحساب من الرأس بصورة دائرية ثم البريد.
 2. ترجمة محتوى الصفحات الداخلية الكامل (about/privacy/…) — التنقّل جاهز.
 3. حد معدّل موزَّع إن احتجت حماية أقوى عبر عدة instances على Vercel.
 

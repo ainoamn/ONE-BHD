@@ -32,8 +32,9 @@ const COPY = {
     admin: "الإدارة",
     signOut: "خروج من هذا الحساب",
     signOutAll: "خروج من كل الحسابات",
-    addAccount: "إضافة حساب",
+    addAccount: "إضافة حساب آخر",
     switchTo: "تبديل إلى",
+    manage: "إدارة الحساب",
     providerPassword: "تسجيل عادي",
     providerGoogle: "جوجل",
     providerFacebook: "فيسبوك",
@@ -47,8 +48,9 @@ const COPY = {
     admin: "Admin",
     signOut: "Sign out of this account",
     signOutAll: "Sign out of all accounts",
-    addAccount: "Add account",
+    addAccount: "Add another account",
     switchTo: "Switch to",
+    manage: "Manage account",
     providerPassword: "Password",
     providerGoogle: "Google",
     providerFacebook: "Facebook",
@@ -108,62 +110,72 @@ function accountPageUrl(pageOrigin: string) {
 
 type SwitcherCopy = (typeof COPY)[UiLocale];
 
-const PROVIDER_MARK: Record<AuthProviderMark, string> = {
-  password: "●",
-  google: "G",
-  facebook: "f",
-  whatsapp: "WA",
-};
-
-function primaryProvider(user: BhdSwitcherUser): AuthProviderMark | null {
-  return accountProviders(user)[0] || null;
-}
-
-function AccountAvatar({
-  user,
-  size,
-  broken,
-  onBroken,
+function ProviderMarks({
+  providers,
   t,
 }: {
-  user: BhdSwitcherUser;
-  size: 32 | 40 | 56;
-  broken: boolean;
-  onBroken: () => void;
+  providers: AuthProviderMark[];
   t: SwitcherCopy;
 }) {
-  const initial = (user.name || user.email || "B").trim().slice(0, 1).toUpperCase();
-  const provider = primaryProvider(user);
-  const labels: Record<AuthProviderMark, string> = {
-    password: t.providerPassword,
-    google: t.providerGoogle,
-    facebook: t.providerFacebook,
-    whatsapp: t.providerWhatsapp,
+  const labels: Record<AuthProviderMark, { mark: string; label: string }> = {
+    password: { mark: "●", label: t.providerPassword },
+    google: { mark: "G", label: t.providerGoogle },
+    facebook: { mark: "f", label: t.providerFacebook },
+    whatsapp: { mark: "WA", label: t.providerWhatsapp },
   };
+  if (!providers.length) return null;
   return (
-    <span className={`bhd-switcher-face is-${size}`}>
-      {user.picture && !broken ? (
-        <img src={user.picture} alt="" width={size} height={size} referrerPolicy="no-referrer" onError={onBroken} />
-      ) : (
-        <span>{initial}</span>
-      )}
-      {provider ? (
-        <abbr className={`bhd-switcher-provider is-${provider}`} title={labels[provider]} aria-label={labels[provider]}>
-          {PROVIDER_MARK[provider]}
+    <span className="bhd-switcher-providers">
+      {providers.map((id) => (
+        <abbr key={id} className={`bhd-switcher-provider is-${id}`} title={labels[id].label} aria-label={labels[id].label}>
+          {labels[id].mark}
         </abbr>
-      ) : null}
+      ))}
     </span>
   );
 }
 
-function AccountIdentity({ user }: { user: BhdSwitcherUser }) {
-  const handle = accountHandle(user);
+function Face({ user, t, large = false }: { user: BhdSwitcherUser; t: SwitcherCopy; large?: boolean }) {
+  const [broken, setBroken] = useState(false);
+  const show = Boolean(user.picture) && !broken;
+  const initial = (user.name || user.email || "B").trim().slice(0, 1).toUpperCase();
+  return (
+    <span className={large ? "bhd-switcher-face is-large" : "bhd-switcher-face"}>
+      {show ? (
+        <img
+          src={user.picture || undefined}
+          alt=""
+          width={large ? 56 : 40}
+          height={large ? 56 : 40}
+          referrerPolicy="no-referrer"
+          onError={() => setBroken(true)}
+        />
+      ) : (
+        <span aria-hidden="true">{initial}</span>
+      )}
+      <ProviderMarks providers={accountProviders(user).slice(0, 1)} t={t} />
+    </span>
+  );
+}
+
+function AccountRow({
+  user,
+  t,
+  large = false,
+}: {
+  user: BhdSwitcherUser;
+  t: SwitcherCopy;
+  large?: boolean;
+}) {
   const meta = accountMeta(user);
   return (
-    <div className="bhd-switcher-identity">
-      <strong dir="ltr">{handle}</strong>
-      {meta.length ? <small dir="ltr">{meta.join(" · ")}</small> : null}
-    </div>
+    <span className="bhd-switcher-person">
+      <Face user={user} t={t} large={large} />
+      <span className="bhd-switcher-who">
+        <strong dir="ltr">{accountHandle(user)}</strong>
+        {meta.length ? <small dir="ltr">{meta.join(" · ")}</small> : null}
+      </span>
+    </span>
   );
 }
 
@@ -196,7 +208,7 @@ export function BhdAppSwitcher({
 }) {
   const [panel, setPanel] = useState<Panel>(null);
   const [origin, setOrigin] = useState("");
-  const [broken, setBroken] = useState<Record<string, boolean>>({});
+  const [pictureBroken, setPictureBroken] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const appsId = useId();
   const accountId = useId();
@@ -207,9 +219,9 @@ export function BhdAppSwitcher({
     setOrigin(window.location.origin);
   }, []);
 
-  function markBroken(key: string) {
-    setBroken((current) => (current[key] ? current : { ...current, [key]: true }));
-  }
+  useEffect(() => {
+    setPictureBroken(false);
+  }, [user.picture]);
 
   const close = useCallback(() => setPanel(null), []);
 
@@ -246,8 +258,8 @@ export function BhdAppSwitcher({
     openApp(app, origin);
   }
 
-  const headerKey = user.id || user.email;
-  const others = accounts.filter((item) => (item.id || item.email) !== headerKey);
+  const initial = user.name.trim().slice(0, 1) || "B";
+  const showPicture = Boolean(user.picture) && !pictureBroken;
 
   return (
     <div className="bhd-switcher-slot" ref={rootRef}>
@@ -276,13 +288,18 @@ export function BhdAppSwitcher({
         aria-controls={panel === "account" ? accountId : undefined}
         onClick={() => setPanel((current) => (current === "account" ? null : "account"))}
       >
-        <AccountAvatar
-          user={user}
-          size={32}
-          broken={Boolean(broken[headerKey])}
-          onBroken={() => markBroken(headerKey)}
-          t={t}
-        />
+        {showPicture ? (
+          <img
+            src={user.picture || undefined}
+            alt=""
+            width={32}
+            height={32}
+            referrerPolicy="no-referrer"
+            onError={() => setPictureBroken(true)}
+          />
+        ) : (
+          <span>{initial}</span>
+        )}
       </button>
 
       {panel === "apps" ? (
@@ -319,17 +336,10 @@ export function BhdAppSwitcher({
 
       {panel === "account" ? (
         <div className="bhd-switcher-card bhd-switcher-account" id={accountId} role="dialog" aria-label={t.accountAria}>
-          <div className="bhd-switcher-account-current">
-            <AccountAvatar
-              user={user}
-              size={56}
-              broken={Boolean(broken[headerKey])}
-              onBroken={() => markBroken(headerKey)}
-              t={t}
-            />
-            <AccountIdentity user={user} />
+          <div className="bhd-switcher-account-now">
+            <AccountRow user={user} t={t} large />
             <a className="bhd-switcher-manage" href={accountPageUrl(origin)}>
-              {t.account}
+              {t.manage}
             </a>
             {platformAdmin ? (
               <a className="bhd-switcher-manage" href="/admin">
@@ -337,45 +347,39 @@ export function BhdAppSwitcher({
               </a>
             ) : null}
           </div>
-          {others.length ? (
-            <div className="bhd-switcher-account-list">
-              {others.map((item) => {
-                const key = item.id || item.email;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    className="bhd-switcher-account-item"
-                    aria-label={`${t.switchTo} ${accountHandle(item)}`}
-                    onClick={() => item.id && void onSwitchAccount?.(item.id)}
-                  >
-                    <AccountAvatar
-                      user={item}
-                      size={40}
-                      broken={Boolean(broken[key])}
-                      onBroken={() => markBroken(key)}
-                      t={t}
-                    />
-                    <AccountIdentity user={item} />
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
-          <div className="bhd-switcher-account-actions">
+          <div className="bhd-switcher-account-list">
+            {accounts
+              .filter((item) => (item.id || item.email) !== (user.id || user.email))
+              .map((item) => (
+                <button
+                  key={item.id || item.email}
+                  type="button"
+                  className="bhd-switcher-account-choice"
+                  aria-label={`${t.switchTo} ${accountHandle(item)}`}
+                  onClick={() => item.id && void onSwitchAccount?.(item.id)}
+                >
+                  <AccountRow user={item} t={t} />
+                </button>
+              ))}
             {onAddAccount ? (
-              <button type="button" className="bhd-switcher-account-action" onClick={onAddAccount}>
-                <span className="bhd-switcher-action-icon" aria-hidden="true">
-                  +
+              <button type="button" className="bhd-switcher-account-choice" onClick={onAddAccount}>
+                <span className="bhd-switcher-person">
+                  <span className="bhd-switcher-face is-action" aria-hidden="true">
+                    <span>+</span>
+                  </span>
+                  <span className="bhd-switcher-who">
+                    <strong>{t.addAccount}</strong>
+                  </span>
                 </span>
-                {t.addAccount}
               </button>
             ) : null}
-            <button type="button" className="bhd-switcher-account-action" onClick={() => void onSignOut()}>
+          </div>
+          <div className="bhd-switcher-account-foot">
+            <button type="button" className="bhd-switcher-account-choice" onClick={() => void onSignOut()}>
               {t.signOut}
             </button>
             {onSignOutAll ? (
-              <button type="button" className="bhd-switcher-account-action" onClick={() => void onSignOutAll()}>
+              <button type="button" className="bhd-switcher-account-choice" onClick={() => void onSignOutAll()}>
                 {t.signOutAll}
               </button>
             ) : null}
