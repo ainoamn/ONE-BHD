@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { applyIdentitySwitch, readSessionRoster } from "../../../lib/auth/session";
+import { applyIdentitySwitch, publicAccount, readSessionRoster } from "../../../lib/auth/session";
 import { productCorsHeaders, productCorsPreflight } from "../../../lib/auth/product-cors";
 
 export const runtime = "nodejs";
@@ -26,16 +26,12 @@ export async function POST(request: Request) {
   if (!target) {
     return NextResponse.json({ message: "هذا الحساب غير محفوظ في هذه الجلسة." }, { status: 404, headers });
   }
+
   const response = NextResponse.json(
     {
       ok: true,
-      user: { id: target.sub, name: target.name, email: target.email, picture: target.picture },
-      accounts: roster.map((item) => ({
-        id: item.sub,
-        name: item.name,
-        email: item.email,
-        picture: item.picture,
-      })),
+      user: publicAccount(target),
+      accounts: roster.map(publicAccount),
     },
     { headers },
   );

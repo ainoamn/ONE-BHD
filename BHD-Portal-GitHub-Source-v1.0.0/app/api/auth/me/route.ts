@@ -1,27 +1,9 @@
 import { NextResponse } from "next/server";
-import { getCurrentSession, inferProviders, readSessionRoster, type PortalSession } from "../../../lib/auth/session";
+import { getCurrentSession, publicAccount, readSessionRoster } from "../../../lib/auth/session";
 import { isPlatformAdminEmail } from "../../../lib/auth/platform-admin";
 import { productCorsHeaders, productCorsPreflight } from "../../../lib/auth/product-cors";
 
 export const runtime = "nodejs";
-
-function publicFromSession(session: PortalSession) {
-  const providers = inferProviders(session);
-  return {
-    id: session.sub,
-    name: session.name,
-    email: session.email,
-    username: session.username || null,
-    phone: session.phone || null,
-    picture: session.picture,
-    providers,
-    googleLinked: providers.includes("google"),
-    facebookLinked: providers.includes("facebook"),
-    hasPassword: providers.includes("password"),
-    emailVerified: true,
-    mustCompleteProfile: false,
-  };
-}
 
 export function OPTIONS(request: Request) {
   return productCorsPreflight(request);
@@ -37,8 +19,8 @@ export async function GET(request: Request) {
   const accounts = await readSessionRoster();
   return NextResponse.json(
     {
-      user: publicFromSession(session),
-      accounts: accounts.map(publicFromSession),
+      user: publicAccount(session),
+      accounts: accounts.map(publicAccount),
       contact: null,
       platformAdmin: isPlatformAdminEmail(session.email),
     },

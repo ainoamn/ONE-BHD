@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { BrandLogo } from "./components/BrandLogo";
 import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
@@ -43,11 +44,17 @@ const copy = {
   },
 };
 
-function openGatewayApp(app: BhdApp) {
-  window.location.assign(launchUrlForApp(app, window.location.origin));
+function openGatewayApp(app: BhdApp, push: (href: string) => void) {
+  const url = launchUrlForApp(app, window.location.origin);
+  if (url.startsWith("/")) {
+    push(url);
+    return;
+  }
+  window.location.assign(url);
 }
 
 export default function Home() {
+  const router = useRouter();
   const [language, setLanguage] = useState<UiLocale>("ar");
   const [ready, setReady] = useState(false);
   const t = copy[language];
@@ -119,7 +126,7 @@ export default function Home() {
                 type="button"
                 className={`gateway-tile${isPortal ? " gateway-tile-portal" : ""}`}
                 style={{ "--tile-accent": app.accent, "--tile-soft": app.soft, "--tile-delay": `${index * 45}ms` } as React.CSSProperties}
-                onClick={() => openGatewayApp(app)}
+                onClick={() => openGatewayApp(app, (href) => router.push(href))}
               >
                 <BhdAppIcon id={app.id} title={label} className="gateway-tile-icon" />
                 <span className="gateway-tile-name">{label}</span>

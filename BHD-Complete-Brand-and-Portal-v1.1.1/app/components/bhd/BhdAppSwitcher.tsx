@@ -1,9 +1,10 @@
 "use client";
 
-import { BHD_APPS, launchUrlForApp, type BhdApp } from "../../lib/bhd/apps";
+import { BHD_APPS, hopOrigins, launchUrlForApp, type BhdApp } from "../../lib/bhd/apps";
 import { DEFAULT_IDENTITY_ISSUER } from "../../lib/identity/issuer";
 import type { UiLocale } from "../../lib/ui-locale";
 import { BhdAppIcon } from "./BhdAppIcon";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 export type AuthProviderMark = "password" | "google" | "facebook" | "whatsapp";
@@ -179,12 +180,42 @@ function AccountRow({
   );
 }
 
-function openApp(app: BhdApp, pageOrigin: string) {
-  if (app.mode === "identity") {
-    window.location.assign(accountPageUrl(pageOrigin));
+function hintHop(url: string) {
+  if (!url || url.startsWith("/")) return;
+  const origin = new URL(url, window.location.origin).origin;
+  if (!document.head.querySelector(`link[data-bhd-hop="${origin}"]`)) {
+    const pre = document.createElement("link");
+    pre.rel = "preconnect";
+    pre.href = origin;
+    pre.setAttribute("data-bhd-hop", origin);
+    document.head.appendChild(pre);
+  }
+  if (!document.head.querySelector(`link[data-bhd-prefetch="${url}"]`)) {
+    const prefetch = document.createElement("link");
+    prefetch.rel = "prefetch";
+    prefetch.as = "document";
+    prefetch.href = url;
+    prefetch.setAttribute("data-bhd-prefetch", url);
+    document.head.appendChild(prefetch);
+  }
+}
+
+function openApp(app: BhdApp, pageOrigin: string, push: (href: string) => void) {
+  const url = app.mode === "identity" ? accountPageUrl(pageOrigin) : launchUrlForApp(app, pageOrigin);
+  if (url.startsWith("/")) {
+    push(url);
     return;
   }
-  window.location.assign(launchUrlForApp(app, pageOrigin));
+  try {
+    const target = new URL(url);
+    if (target.origin === window.location.origin) {
+      push(`${target.pathname}${target.search}${target.hash}`);
+      return;
+    }
+  } catch {
+    /* fall through */
+  }
+  window.location.assign(url);
 }
 
 export function BhdAppSwitcher({
@@ -212,11 +243,13 @@ export function BhdAppSwitcher({
   const rootRef = useRef<HTMLDivElement>(null);
   const appsId = useId();
   const accountId = useId();
+  const router = useRouter();
   const t = COPY[locale];
   const isArabic = locale === "ar";
 
   useEffect(() => {
     setOrigin(window.location.origin);
+    hopOrigins().forEach((item) => hintHop(item));
   }, []);
 
   useEffect(() => {
@@ -241,6 +274,14 @@ export function BhdAppSwitcher({
     };
   }, [panel, close]);
 
+  useEffect(() => {
+    if (panel !== "apps" || !origin) return;
+    BHD_APPS.forEach((app) => {
+      if (!app.enabled) return;
+      hintHop(app.mode === "identity" ? accountPageUrl(origin) : launchUrlForApp(app, origin));
+    });
+  }, [panel, origin]);
+
   function onAppClick(app: BhdApp) {
     if (!app.enabled) return;
     if (app.id === "account") {
@@ -248,14 +289,20 @@ export function BhdAppSwitcher({
         close();
         return;
       }
-      window.location.assign(accountPageUrl(origin));
+      openApp(app, origin, (href) => {
+        close();
+        router.push(href);
+      });
       return;
     }
     if (origin && isCurrentApp(app, origin)) {
       close();
       return;
     }
-    openApp(app, origin);
+    openApp(app, origin, (href) => {
+      close();
+      router.push(href);
+    });
   }
 
   const initial = user.name.trim().slice(0, 1) || "B";

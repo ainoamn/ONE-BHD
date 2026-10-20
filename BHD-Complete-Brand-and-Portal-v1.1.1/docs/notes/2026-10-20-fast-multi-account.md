@@ -12,4 +12,6 @@
 
 قائمة التبديل تعرض **صورة دائرية + البريد** في صف واحد (مثل جوجل)، مع شارة المصدر على زاوية الصورة. الاسم وحده ممنوع لأنه يتكرر.
 
-انسخ إلى كل موقع: [`BHD-ACCOUNT-SWITCHER.md`](../BHD-ACCOUNT-SWITCHER.md) مع `BhdAppSwitcher`.
+تبديل الحساب يحدّث الرأس من JSON بلا إعادة تحميل. فتح موقع آخر يذهب إلى `workspacePath` مباشرة (`preconnect`/`prefetch`)؛ `start` فقط عند غياب جلسة المنتج.
+
+انسخ إلى كل موقع: [`BHD-ACCOUNT-SWITCHER.md`](../BHD-ACCOUNT-SWITCHER.md) مع `BhdAppSwitcher` و`lib/bhd/apps.ts`.

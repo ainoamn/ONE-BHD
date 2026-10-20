@@ -50,6 +50,24 @@ export function inferProviders(input: {
   return PROVIDERS.filter((item) => found.has(item));
 }
 
+export function publicAccount(session: PortalSession) {
+  const providers = inferProviders(session);
+  return {
+    id: session.sub,
+    name: session.name,
+    email: session.email,
+    username: session.username || null,
+    phone: session.phone || null,
+    picture: session.picture,
+    providers,
+    googleLinked: providers.includes("google"),
+    facebookLinked: providers.includes("facebook"),
+    hasPassword: providers.includes("password"),
+    emailVerified: true,
+    mustCompleteProfile: false,
+  };
+}
+
 export function portalSessionFromUser(
   user: {
     id: string;

@@ -1,5 +1,6 @@
 "use client";
 
+import { hopOrigins } from "../lib/bhd/apps";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -32,6 +33,14 @@ export function NavigationWarmup() {
 
     const run = () => {
       priorityRoutes.forEach((route) => router.prefetch(route));
+      hopOrigins().forEach((origin) => {
+        if (document.head.querySelector(`link[data-bhd-hop="${origin}"]`)) return;
+        const pre = document.createElement("link");
+        pre.rel = "preconnect";
+        pre.href = origin;
+        pre.setAttribute("data-bhd-hop", origin);
+        document.head.appendChild(pre);
+      });
     };
 
     window.addEventListener("pointerdown", run, { once: true, passive: true });

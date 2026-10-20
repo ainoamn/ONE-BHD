@@ -2,7 +2,7 @@
 
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
-import { SessionMenu } from "../components/auth/SessionMenu";
+import { BHD_ACCOUNT_CHANGED, SessionMenu } from "../components/auth/SessionMenu";
 import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { FormEvent, useEffect, useState } from "react";
@@ -108,20 +108,25 @@ export function AccountConsole() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/account", { cache: "no-store" })
-      .then(async (response) => {
-        const payload = (await response.json()) as AccountPayload;
-        if (!response.ok) throw new Error(payload.message || "تعذّر تحميل الحساب.");
-        if (!cancelled) applyPayload(payload);
-      })
-      .catch((err: Error) => {
-        if (!cancelled) setError(err.message);
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
+    function load() {
+      fetch("/api/account", { cache: "no-store" })
+        .then(async (response) => {
+          const payload = (await response.json()) as AccountPayload;
+          if (!response.ok) throw new Error(payload.message || "تعذّر تحميل الحساب.");
+          if (!cancelled) applyPayload(payload);
+        })
+        .catch((err: Error) => {
+          if (!cancelled) setError(err.message);
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }
+    load();
+    window.addEventListener(BHD_ACCOUNT_CHANGED, load);
     return () => {
       cancelled = true;
+      window.removeEventListener(BHD_ACCOUNT_CHANGED, load);
     };
   }, []);
 
