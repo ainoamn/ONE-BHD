@@ -13,6 +13,21 @@ export const metadata: Metadata = {
 
 const DOWNLOADS = [
   {
+    file: "BHD-COPY-TO-PRODUCTS.md",
+    title: "وثيقة النسخ الكاملة (29 أكتوبر 2026)",
+    note: "ارفعها أولاً: نوافذ متعددة، 400 يوم، حماية، الكتالوج لا يُدفع تلقائياً.",
+  },
+  {
+    file: "BHD-SESSION-POLICY.md",
+    title: "سياسة الجلسة",
+    note: "البقاء حتى الخروج. سقف الكوكي 400 يوم. حساب مستقل لكل نافذة.",
+  },
+  {
+    file: "BHD-SECURITY-PROTECTION.md",
+    title: "الحماية من الاحتيال",
+    note: "سجل IP والدولة، حظر العنوان، قفل الحساب، استعادة /recover.",
+  },
+  {
     file: "BHD-PRODUCT-SSO-ADMIN.md",
     title: "دليل SSO وأدمن المنتج",
     note: "الخطوة العملية الأولى داخل مستودع المنتج: start / callback / logout / admin-entry.",
@@ -20,7 +35,12 @@ const DOWNLOADS = [
   {
     file: "BHD-APP-SWITCHER.md",
     title: "مواصفة مشغّل التطبيقات",
-    note: "أيقونة التسع نقاط في الهيدر، الكتالوج المجمد، قواعد النقر والانتقال.",
+    note: "أيقونة التسع نقاط، الكتالوج المجمد، الموارد البشرية، قواعد النقر.",
+  },
+  {
+    file: "BHD-ACCOUNT-SWITCHER.md",
+    title: "بطاقة الحساب",
+    note: "صورة دائرية + البريد مثل جوجل. يُنسخ مع المشغّل.",
   },
   {
     file: "BHD-IDENTITY-SSO.md",
@@ -42,10 +62,12 @@ const DOWNLOADS = [
 const TOC = [
   ["#what", "ما هذه المنظومة؟"],
   ["#two-phases", "مرحلتان: تنفيذ المنتج ثم التسجيل"],
+  ["#session", "الجلسة والنوافذ المتعددة"],
+  ["#security", "الحماية والتدقيق"],
   ["#downloads", "تنزيل الملفات"],
   ["#product-steps", "خطوات التنفيذ على الموقع الجديد"],
   ["#admin-api", "التسجيل اليدوي من الإدارة / API"],
-  ["#icons", "الأيقونات في الهيدر والفوتر"],
+  ["#icons", "الأيقونات — لا تحديث تلقائي"],
   ["#auth-flow", "كيف يعمل الدخول بين المواقع"],
   ["#navigation", "التنقّل"],
   ["#checklist", "قائمة تحقق"],
@@ -70,12 +92,13 @@ export default function UnifiedLoginDocsPage() {
       </header>
 
       <article className="docs-guide-main section-wrap">
-        <p className="section-kicker">BHD Identity · Integration Pack · للمبتدئ والمنفّذ</p>
+        <p className="section-kicker">BHD Identity · محدّث 29 أكتوبر 2026 · للمبتدئ والمنفّذ</p>
         <h1>دليل ربط البرامج ببوابة الدخول الموحّدة</h1>
         <p className="docs-guide-lead">
           الهدف بسيط: المستخدم يدخل مرة واحدة على <code>https://id.bhd-om.com</code>، ثم ينتقل بين وازن وحسابي
-          ونَسَب وBHD R وبقية البرامج بلا إعادة كتابة كلمة المرور. هذا الدليل يشرح ذلك خطوة بخطوة، ثم يوضح كيف
-          تسجّل المنتج الجديد بنفسك من لوحة الإدارة بعد اكتمال التنفيذ.
+          ونَسَب وBHD R والموارد البشرية وبقية البرامج بلا إعادة كتابة كلمة المرور. يمكن فتح أكثر من حساب في نوافذ
+          مختلفة من نفس المتصفح. الجلسة تبقى حتى الخروج (سقف الكوكي 400 يوم). هذا الدليل يشرح الربط خطوة بخطوة،
+          والحماية في <InstantLink href="/admin">/admin</InstantLink>، وكيف تسجّل المنتج بعد اكتمال التنفيذ.
         </p>
 
         <nav className="docs-toc" aria-label="فهرس الدليل">
@@ -135,8 +158,59 @@ export default function UnifiedLoginDocsPage() {
           </div>
         </section>
 
+        <section className="docs-guide-panel" id="session">
+          <h2>3) الجلسة: 400 يوم، ونوافذ بحسابات مختلفة</h2>
+          <p>
+            السياسة المعتمدة: المستخدم يبقى داخل الحساب <strong>حتى يضغط خروج</strong>. لا مهلة خمول، ولا خروج بعد 40
+            يوماً مقصود. JWT وكوكي <code>bhd_id</code> يُوقَّعان بتاريخ انتهاء مطلق لـ 400 يوم (سقف Chromium).
+          </p>
+          <p>
+            كوكي المتصفح واحدة لكل ملف Chrome، لذلك عزل النوافذ يتم بـ JWT في <code>sessionStorage</code> (
+            <code>bhd_window_token</code>) وترويسة <code>Authorization: Bearer</code> عبر <code>identityFetch</code>.
+            تبديل الحساب في نافذة لا يغيّر النافذة الأخرى. انسخ{" "}
+            <code>app/lib/identity/window-session.ts</code> إلى المنتج واحفظ <code>token</code> بعد الدخول والتبديل.
+          </p>
+          <p className="docs-callout">
+            التفاصيل:{" "}
+            <a href="/docs/BHD-SESSION-POLICY.md" download="BHD-SESSION-POLICY.md">
+              BHD-SESSION-POLICY.md
+            </a>{" "}
+            و{" "}
+            <a href="/docs/BHD-COPY-TO-PRODUCTS.md" download="BHD-COPY-TO-PRODUCTS.md">
+              BHD-COPY-TO-PRODUCTS.md
+            </a>
+            . ممنوع تجديد الكوكي في <code>GET /api/auth/me</code>.
+          </p>
+        </section>
+
+        <section className="docs-guide-panel" id="security">
+          <h2>4) الحماية والتدقيق على الهوية</h2>
+          <p>
+            في <InstantLink href="/admin">لوحة الإدارة</InstantLink> تبويب <strong>الحماية والتدقيق</strong>: سجل الدخول
+            (الوقت، البريد، عنوان IP، الدولة)، بحث، حظر العناوين، الحسابات الموقوفة، وفحص الإعدادات مع ملخص تهديدات
+            (ذكاء اصطناعي إن وُجد المفتاح).
+          </p>
+          <ul>
+            <li>5 محاولات فاشلة على الحساب → قفل 15 دقيقة.</li>
+            <li>12 فشلاً من نفس العنوان خلال 15 دقيقة → حظر IP ساعة.</li>
+            <li>
+              8 فشل على نفس الحساب → قفل أمني حتى يثبت المالك بياناته في{" "}
+              <InstantLink href="/recover">/recover</InstantLink> (مدني، انتهاء، ميلاد، بريد، واتساب، آخر دخول، وصف
+              النشاط، ثم رموز البريد وواتساب). واتساب جاهز في الكود ويُفعَّل لاحقاً بـ <code>WHATSAPP_TOKEN</code>.
+            </li>
+          </ul>
+          <p>
+            المنتج لا يعيد بناء هذا المنطق. أحلِ المستخدم الموقوف إلى{" "}
+            <code>https://id.bhd-om.com/recover</code>. الدليل:{" "}
+            <a href="/docs/BHD-SECURITY-PROTECTION.md" download="BHD-SECURITY-PROTECTION.md">
+              BHD-SECURITY-PROTECTION.md
+            </a>
+            .
+          </p>
+        </section>
+
         <section className="docs-guide-panel" id="downloads">
-          <h2>3) نزّل الملفات إلى الموقع الآخر</h2>
+          <h2>5) نزّل الملفات إلى الموقع الآخر</h2>
           <p>
             ضع الملفات في مجلد <code>docs/</code> داخل مستودع المنتج. لا تغيّر القيم المجمّدة (معرّفات التطبيقات
             وروابطها) إلا عبر تحديث المصدر في ONE-BHD ثم إعادة النسخ.
@@ -158,7 +232,7 @@ export default function UnifiedLoginDocsPage() {
         </section>
 
         <section className="docs-guide-panel" id="product-steps">
-          <h2>4) خطوات التنفيذ على الموقع الجديد (المرحلة أ)</h2>
+          <h2>6) خطوات التنفيذ على الموقع الجديد (المرحلة أ)</h2>
           <ol className="docs-steps">
             <li>
               <strong>افتح الدليل</strong> <code>BHD-PRODUCT-SSO-ADMIN.md</code> واتبع قائمة التحقق حرفياً.
@@ -200,7 +274,7 @@ export default function UnifiedLoginDocsPage() {
         </section>
 
         <section className="docs-guide-panel" id="admin-api">
-          <h2>5) بعد التنفيذ — تسجيل يدوي من الإدارة أو API (المرحلة ب)</h2>
+          <h2>7) بعد التنفيذ — تسجيل يدوي من الإدارة أو API (المرحلة ب)</h2>
           <p>
             نعم: بعد أن يصبح مسار المنتج جاهزاً يمكنك ربطه بنفسك دون انتظار تعديل كود الهوية لكل عميل جديد.
           </p>
@@ -242,15 +316,15 @@ Cookie: جلسة أدمن المنصة
 PATCH https://id.bhd-om.com/api/admin/clients
 { "clientId": "bhd-myapp", "mode": "sso" }`}</pre>
           <p className="docs-callout">
-            ملاحظة عن أيقونات المشغّل في المنتجات الأخرى: الكتالوج المجمد داخل كل منتج ما زال يُنسخ من ONE-BHD في
-            v1. تسجيل العميل على الهوية يفعّل <strong>قبول OAuth</strong> فوراً. لإظهار أيقونة المنتج في شبكة المشغّل
-            داخل وازن/حسابي/… حدّث ملف الكتالوج لديهم بعد إضافته في مصدر ONE-BHD، أو انتظر كتالوجاً مركزياً في إصدار
-            لاحق.
+            تسجيل العميل يفعّل قبول OAuth فوراً. أيقونات المشغّل في وازن/حسابي/… <strong>لا تتحدث وحدها</strong>. انسخ{" "}
+            <code>apps.ts</code> من ONE-BHD أو اسحب{" "}
+            <a href="https://id.bhd-om.com/api/bhd/catalog">https://id.bhd-om.com/api/bhd/catalog</a> (
+            <code>autoPush: false</code>).
           </p>
         </section>
 
         <section className="docs-guide-panel" id="icons">
-          <h2>6) الأيقونات في الهيدر والفوتر</h2>
+          <h2>8) الأيقونات في الهيدر والفوتر — ليست تلقائية على كل المواقع</h2>
           <div className="docs-two-col">
             <div>
               <h3>الهيدر — بعد تسجيل الدخول</h3>
@@ -260,9 +334,8 @@ PATCH https://id.bhd-om.com/api/admin/clients
                 </li>
                 <li>بدون جلسة صالحة: لا مشغّل. هذا متعمّد.</li>
                 <li>
-                  النقر على تطبيق بوضع <code>sso</code> يفتح{" "}
-                  <code>{`{origin}/api/auth/bhd/start?returnTo={workspacePath}`}</code> ثم انتقال كامل للمتصفح (ليس
-                  iframe).
+                  النقر يفتح <code>workspacePath</code> مباشرة إن وُجدت جلسة المنتج. <code>start</code> فقط إن لم توجد
+                  جلسة. انتقال كامل للمتصفح (ليس iframe).
                 </li>
                 <li>
                   المصدر: <code>BhdAppSwitcher</code> + كتالوج <code>BHD_APPS</code>.
@@ -280,15 +353,22 @@ PATCH https://id.bhd-om.com/api/admin/clients
                   يمكن إخفاؤها عند الحاجة بـ <code>hidePrograms</code> حتى لا تتكرر مع بوابة التطبيقات.
                 </li>
                 <li>استخدم نفس معرّف الأيقونة الرسمي — لا ترسم أيقونات مختلفة لكل موقع.</li>
+                <li>
+                  تغيير أيقونة أو رابط على البوابة أو الهوية <strong>لا يُحدَّث</strong> وازن وحسابي وبقية المواقع حتى
+                  تُنسخ الملفات أو يُسحب الكتالوج.
+                </li>
               </ul>
             </div>
           </div>
         </section>
 
         <section className="docs-guide-panel" id="auth-flow">
-          <h2>7) كيف يعمل الدخول والترابط (تسلسل)</h2>
+          <h2>9) كيف يعمل الدخول والترابط (تسلسل)</h2>
           <ol className="docs-steps">
-            <li>المستخدم يسجّل دخوله على الهوية → تُحفظ جلسة Host-only على <code>id.bhd-om.com</code>.</li>
+            <li>
+              المستخدم يسجّل دخوله على الهوية → تُحفظ جلسة Host-only على <code>id.bhd-om.com</code> لمدة 400 يوم، ونسخة
+              JWT لهذه النافذة في <code>sessionStorage</code>.
+            </li>
             <li>يفتح منتجاً أو يضغط تطبيقاً من المشغّل → المنتج يستدعي <code>/api/auth/bhd/start</code>.</li>
             <li>
               الهوية ترى جلسة قائمة فتصدر <code>code</code> بسرعة دون طلب كلمة المرور من جديد.
@@ -304,7 +384,7 @@ PATCH https://id.bhd-om.com/api/admin/clients
         </section>
 
         <section className="docs-guide-panel" id="navigation">
-          <h2>8) أين يحدث التنقّل؟</h2>
+          <h2>10) أين يحدث التنقّل؟</h2>
           <table className="docs-table">
             <thead>
               <tr>
@@ -318,7 +398,7 @@ PATCH https://id.bhd-om.com/api/admin/clients
                 <td>مشغّل الهيدر</td>
                 <td>مستخدم داخل منتج</td>
                 <td>
-                  <code>sso</code> → start بمساحة العمل · <code>browse</code> → أصل الموقع فقط
+                  hop إلى مساحة العمل · <code>start</code> إن لم توجد جلسة منتج
                 </td>
               </tr>
               <tr>
@@ -334,28 +414,31 @@ PATCH https://id.bhd-om.com/api/admin/clients
               <tr>
                 <td>/admin على الهوية</td>
                 <td>أدمن المنصة</td>
-                <td>مستخدمون + تسجيل عملاء OAuth + هذا الدليل</td>
+                <td>مستخدمون + حماية وتدقيق + عملاء OAuth + هذا الدليل</td>
               </tr>
             </tbody>
           </table>
         </section>
 
         <section className="docs-guide-panel" id="checklist">
-          <h2>9) قائمة تحقق سريعة قبل الإطلاق</h2>
+          <h2>11) قائمة تحقق سريعة قبل الإطلاق</h2>
           <ul className="docs-check">
             <li>□ start يحوّل إلى id.bhd-om.com وليس أصل المنتج</li>
             <li>□ callback يتحقق من id_token على الخادم فقط</li>
             <li>□ المستخدم يُحفظ بـ bhd_sub</li>
             <li>□ returnTo يفتح لوحة العميل وليس التسويق فقط</li>
+            <li>□ hops تفتح workspacePath إن وُجدت جلسة المنتج</li>
+            <li>□ identityFetch يرسل Bearer من sessionStorage (نوافذ متعددة)</li>
+            <li>□ جلسة المنتج 400 يوم حتى خروج صريح</li>
             <li>□ العميل مسجّل في /admin أو ضمن القائمة الثابتة</li>
             <li>□ بعد الاختبار الحي: mode = sso</li>
-            <li>□ المشغّل يظهر بعد الدخول فقط</li>
-            <li>□ الخروج يمرّ بـ end-session</li>
+            <li>□ المشغّل يظهر بعد الدخول فقط، والكتالوج منسوخ أو يُسحب من /api/bhd/catalog</li>
+            <li>□ الخروج يمرّ بـ end-session · الحساب الموقوف يذهب إلى /recover</li>
           </ul>
         </section>
 
         <section className="docs-guide-panel" id="glossary">
-          <h2>10) قاموس سريع</h2>
+          <h2>12) قاموس سريع</h2>
           <dl className="docs-glossary">
             <div>
               <dt>issuer</dt>
@@ -381,11 +464,19 @@ PATCH https://id.bhd-om.com/api/admin/clients
               <dt>workspacePath</dt>
               <dd>المسار داخل المنتج بعد الدخول (لوحة العميل)</dd>
             </div>
+            <div>
+              <dt>bhd_window_token</dt>
+              <dd>JWT هذه النافذة في sessionStorage حتى لا يسرق تبديل الحساب النافذة الأخرى</dd>
+            </div>
+            <div>
+              <dt>/api/bhd/catalog</dt>
+              <dd>كتالوج التطبيقات للقراءة. لا يُدفع تلقائياً إلى المواقع الأخرى</dd>
+            </div>
           </dl>
         </section>
 
         <section className="docs-guide-panel" id="errors">
-          <h2>11) أخطاء شائعة</h2>
+          <h2>13) أخطاء شائعة</h2>
           <table className="docs-table">
             <thead>
               <tr>
@@ -420,6 +511,21 @@ PATCH https://id.bhd-om.com/api/admin/clients
                 <td>الدور غير مربوط بـ bhd_sub محلياً</td>
                 <td>اربط الصف المحلي في callback — ليس من هوية المنصة</td>
               </tr>
+              <tr>
+                <td>النافذة القديمة تعرض الحساب الجديد</td>
+                <td>المنتج يقرأ الكوكي المشتركة بلا Bearer</td>
+                <td>انسخ window-session واحفظ token بعد switch</td>
+              </tr>
+              <tr>
+                <td>خروج بعد نحو 40 يوماً</td>
+                <td>JWT exp حُسب خطأ كطابع يونكس صغير</td>
+                <td>وقّع بـ Date مطلق + 400 يوم كما في سياسة الجلسة</td>
+              </tr>
+              <tr>
+                <td>الأيقونة تغيّرت على الهوية فقط</td>
+                <td>الكتالوج مجمد في كل مستودع</td>
+                <td>انسخ apps.ts أو اسحب /api/bhd/catalog</td>
+              </tr>
             </tbody>
           </table>
         </section>
@@ -429,8 +535,12 @@ PATCH https://id.bhd-om.com/api/admin/clients
           <a href="https://github.com/ainoamn/ONE-BHD/tree/main/docs" rel="noreferrer" target="_blank">
             ainoamn/ONE-BHD/docs
           </a>
-          . حدّث هناك أولاً ثم انسخ للمنتجات. للتسجيل اليدوي بعد التنفيذ استخدم{" "}
-          <InstantLink href="/admin">/admin → العملاء OAuth</InstantLink>.
+          . ابدأ بنسخ{" "}
+          <a href="/docs/BHD-COPY-TO-PRODUCTS.md" download="BHD-COPY-TO-PRODUCTS.md">
+            BHD-COPY-TO-PRODUCTS.md
+          </a>
+          . للتسجيل اليدوي: <InstantLink href="/admin">/admin → العملاء OAuth</InstantLink>. للحماية:{" "}
+          <InstantLink href="/admin">/admin → الحماية والتدقيق</InstantLink>.
         </p>
       </article>
 
