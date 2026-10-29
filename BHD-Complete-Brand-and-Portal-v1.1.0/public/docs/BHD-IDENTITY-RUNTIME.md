@@ -51,8 +51,9 @@ const runtime = await BhdIdentity.runtime();
 // runtime.session.maxAgeSec === 40 * 24 * 3600
 const { body } = await BhdIdentity.me();
 // body.user / body.accounts — نفس النافذة لا تسرق نافذة أخرى
-await BhdIdentity.switchAccount(sub);
-window.location.assign(BhdIdentity.productStart("/dashboard"));
+// بعد التبديل: أعد ربط جلسة المنتج بـ POST /api/auth/bhd/rebind (Bearer) —
+// ممنوع productStart وحده بعد switch (انظر BHD-ACCOUNT-ISOLATION.md)
+await BhdIdentity.switchAccount(sub); // يستدعي isolate → يفضّل rebind
 ```
 
 عند إنشاء كوكي جلسة المنتج في `callback`:

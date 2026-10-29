@@ -30,15 +30,17 @@
   cookie.maxAge = runtime.session.maxAgeSec; // 40 يوماً حالياً
 - ممنوع رقم 400 يوماً أو أي maxAge محلي ثابت.
 
-3) عزل الحسابات والنوافذ (خصوصية إلزامية)
+3) عزل الحسابات والنوافذ (خصوصية إلزامية) — اقرأ BHD-ACCOUNT-ISOLATION.md
 - كل نافذة تستخدم رمزها عبر BhdIdentity (Bearer في sessionStorage).
-- عند تبديل الحساب:
-  await BhdIdentity.switchAccount(sub);
-  // السكربت يستدعي isolate تلقائياً: window-handoff ثم /api/auth/bhd/start
-- ممنوع إبقاء بيانات المستخدم السابق في الصفحة بعد التبديل.
-- بعد التبديل: امسح state المحلي للحساب (user/profile/dashboard) ثم أعد الجلب من الخادم بالحساب الجديد.
-- ممنوع BroadcastChannel لمزامنة الحساب بين النوافذ.
-- إن اختلف /api/auth/me المحلي عن BhdIdentity.me() أعد الربط عبر start/handoff فوراً.
+- عند تبديل الحساب في المنتج (الطريقة الصحيحة):
+  1) POST https://id.bhd-om.com/api/auth/switch مع Bearer النافذة → احفظ token
+  2) POST /api/auth/bhd/rebind بالـ token (يعيد كتابة كوكي جلسة المنتج ويمسح نطاق المنشأة)
+  3) returnTo مع ?_bhd=timestamp وأخفِ الواجهة فوراً
+- ممنوع بعد تبديل Bearer: استدعاء /api/auth/bhd/start مباشرة بلا تذكرة window-handoff
+  (الكوكي المشتركة bhd_id تبقى على الحساب القديم → البيانات لا تُعزل).
+- BhdIdentity.switchAccount/isolate يفضّل الآن rebind بالـ Bearer؛ لا تعتمد على سقوط isolate إلى start.
+- ممنوع إبقاء بيانات المستخدم السابق؛ ممنوع BroadcastChannel لمزامنة الحساب بين النوافذ.
+- إن اختلف /api/auth/me المحلي عن BhdIdentity.me() → rebind بالـ Bearer فوراً (لا start أعمى).
 
 4) جلب البيانات والأيقونات من كتالوج واحد
 - المصدر الحي: GET https://id.bhd-om.com/api/bhd/catalog
@@ -71,8 +73,8 @@
 |---|---|
 | دخول | المستخدم يدخل على `id.bhd-om.com` → كوكي `bhd_id` + رمز النافذة |
 | فتح منتج | `/api/auth/bhd/start` → `/oauth/authorize` يرى الجلسة → كود → `callback` يفتح جلسة المنتج |
-| تبديل حساب | `POST /api/auth/switch` + Bearer النافذة → `window-handoff` → `auth/handoff` يضع كوكي تسليم قصيرة → `start` يصدر كود الحساب الجديد |
-| بيانات الصفحة | تُمسَح ثم تُجلب من جديد للمستخدم الحالي فقط |
+| تبديل حساب | `POST /api/auth/switch` + Bearer → **`POST /api/auth/bhd/rebind`** بالرمز (مسار الخصوصية). احتياط: handoff→start فقط إن لم يوجد token |
+| بيانات الصفحة | تُمسَح فوراً ثم تُجلب من جلسة المنتج الجديدة فقط — انظر `BHD-ACCOUNT-ISOLATION.md` |
 
 ## كيف يُعزل المستخدمون
 

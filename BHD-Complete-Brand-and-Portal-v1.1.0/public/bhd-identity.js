@@ -72,10 +72,36 @@
         return result;
       });
     },
+    /**
+     * Rebind the product tab to THIS window's account.
+     * Prefer product POST /api/auth/bhd/rebind with Bearer — never bare /start after a
+     * Bearer switch (shared bhd_id stays on the previous account → privacy leak).
+     */
     isolate: function () {
       var here = window.location.pathname + (window.location.search || "") || "/";
+      if (here.indexOf("_bhd=") < 0) {
+        here += (here.indexOf("?") >= 0 ? "&" : "?") + "_bhd=" + Date.now();
+      }
       if (window.location.origin.replace(/\/$/, "") === ISSUER) {
         window.location.reload();
+        return Promise.resolve();
+      }
+      var token = typeof sessionStorage !== "undefined" ? sessionStorage.getItem(TOKEN_KEY) : "";
+      if (token) {
+        var form = document.createElement("form");
+        form.method = "POST";
+        form.action = "/api/auth/bhd/rebind";
+        form.style.display = "none";
+        var tokenInput = document.createElement("input");
+        tokenInput.name = "token";
+        tokenInput.value = token;
+        var returnInput = document.createElement("input");
+        returnInput.name = "returnTo";
+        returnInput.value = here.charAt(0) === "/" ? here : "/";
+        form.appendChild(tokenInput);
+        form.appendChild(returnInput);
+        document.body.appendChild(form);
+        form.submit();
         return Promise.resolve();
       }
       return request("/api/auth/window-handoff", { method: "POST" }).then(function (result) {
@@ -87,7 +113,10 @@
           );
           return;
         }
-        window.location.assign(start);
+        // Never fall through to bare start (would use shared bhd_id = previous account).
+        window.location.assign(
+          window.location.origin + "/api/auth/bhd/logout?continue=" + encodeURIComponent(start),
+        );
       });
     },
     switchAccount: function (sub) {

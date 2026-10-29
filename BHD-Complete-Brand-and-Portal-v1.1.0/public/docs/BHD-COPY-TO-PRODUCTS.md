@@ -38,7 +38,7 @@
 1. حمّل `https://id.bhd-om.com/bhd-identity.js` — التفاصيل في [`BHD-IDENTITY-RUNTIME.md`](BHD-IDENTITY-RUNTIME.md).
 2. اقرأ مدة الجلسة من `GET https://id.bhd-om.com/api/bhd/runtime` لا من ثابت محلي.
 3. لا تنسخ منطق النوافذ. السكربت يرسل Bearer لكل نافذة.
-4. بعد التبديل يجب أن تختفي بيانات الحساب السابق فوراً. إن حمّلتم `bhd-identity.js` استدعوا `BhdIdentity.isolate()` (handoff ثم start). ممنوع `BroadcastChannel` لمزامنة الحساب بين النوافذ.
+4. بعد التبديل يجب أن تختفي بيانات الحساب السابق فوراً. المسار الآمن: `POST /api/auth/bhd/rebind` بـ Bearer النافذة (انظر [`BHD-ACCOUNT-ISOLATION.md`](BHD-ACCOUNT-ISOLATION.md)). ممنوع فتح `/start` بعد تبديل Bearer بلا handoff. ممنوع `BroadcastChannel` لمزامنة الحساب بين النوافذ.
 
 ---
 
