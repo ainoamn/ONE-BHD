@@ -68,12 +68,26 @@ export function addAccountUrl() {
   return `${identityApiUrl("/login")}?add=1&next=${encodeURIComponent(next)}`;
 }
 
-export function applyAccountIsolation() {
+export async function applyAccountIsolation() {
   if (typeof window === "undefined") return;
   const here = currentReturnPath();
   if (isIdentityOrigin()) {
-    window.location.assign(here);
+    window.location.reload();
     return;
+  }
+  try {
+    const response = await identityFetch("/api/auth/window-handoff", { method: "POST" });
+    const data = (await response.json().catch(() => ({}))) as { ticket?: string };
+    const start = new URL(productStartPath(here), window.location.origin).toString();
+    if (data.ticket) {
+      const handoff = new URL("/auth/handoff", DEFAULT_IDENTITY_ISSUER);
+      handoff.searchParams.set("ticket", data.ticket);
+      handoff.searchParams.set("next", start);
+      window.location.assign(handoff.toString());
+      return;
+    }
+  } catch {
+    /* fall through to start */
   }
   window.location.assign(productStartPath(here));
 }

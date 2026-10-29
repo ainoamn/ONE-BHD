@@ -72,6 +72,24 @@
         return result;
       });
     },
+    isolate: function () {
+      var here = window.location.pathname + (window.location.search || "") || "/";
+      if (window.location.origin.replace(/\/$/, "") === ISSUER) {
+        window.location.reload();
+        return Promise.resolve();
+      }
+      return request("/api/auth/window-handoff", { method: "POST" }).then(function (result) {
+        var ticket = result.body && result.body.ticket;
+        var start = window.location.origin + "/api/auth/bhd/start?returnTo=" + encodeURIComponent(here.charAt(0) === "/" ? here : "/");
+        if (ticket) {
+          window.location.assign(
+            ISSUER + "/auth/handoff?ticket=" + encodeURIComponent(ticket) + "&next=" + encodeURIComponent(start),
+          );
+          return;
+        }
+        window.location.assign(start);
+      });
+    },
     switchAccount: function (sub) {
       return request("/api/auth/switch", {
         method: "POST",
@@ -79,6 +97,7 @@
         body: JSON.stringify({ sub: sub }),
       }).then(function (result) {
         emit("bhd-account-changed", result.body);
+        if (result.ok) return BhdIdentity.isolate().then(function () { return result; });
         return result;
       });
     },

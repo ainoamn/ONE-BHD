@@ -4,7 +4,7 @@ import { loginRedirectForAuthorize } from "../../lib/identity/safe-next";
 import { issueAuthorizationCode } from "../../lib/identity/tickets";
 import { allowRequest, clientKey } from "../../lib/auth/rate-limit";
 import { getRequestIp } from "../../lib/auth/request-ip";
-import { getCurrentSession } from "../../lib/auth/session";
+import { clearHandoffCookie, getCurrentSession } from "../../lib/auth/session";
 import { authSecret } from "../../lib/auth/config";
 import { touchUserLogin } from "../../lib/auth/users";
 
@@ -44,7 +44,7 @@ export async function GET(request: Request) {
     return oauthErrorRedirect(redirectUri, "invalid_request", state);
   }
 
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
   if (!session) {
     return NextResponse.redirect(loginRedirectForAuthorize(url.origin, url.searchParams));
   }
@@ -67,5 +67,7 @@ export async function GET(request: Request) {
   const next = new URL(redirectUri);
   next.searchParams.set("code", code);
   next.searchParams.set("state", state);
-  return NextResponse.redirect(next);
+  const response = NextResponse.redirect(next);
+  clearHandoffCookie(response.cookies);
+  return response;
 }

@@ -9,6 +9,7 @@ import {
 } from "./config";
 
 export const ROSTER_COOKIE = "bhd_id_roster";
+export const HANDOFF_COOKIE = "bhd_id_handoff";
 export const MAX_ROSTER_ACCOUNTS = 8;
 const ROSTER_ISSUER = "bhd-roster";
 
@@ -178,9 +179,32 @@ export async function getCurrentSession(request?: Request | null): Promise<Porta
     if (fromHeader) return fromHeader;
   }
   const jar = await cookies();
+  const handoff = jar.get(HANDOFF_COOKIE)?.value;
+  if (handoff) {
+    const fromHandoff = await readSessionToken(handoff);
+    if (fromHandoff) return fromHandoff;
+  }
   const token = jar.get(IDENTITY_SESSION_COOKIE)?.value || jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   return readSessionToken(token);
+}
+
+export function clearHandoffCookie(
+  store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
+) {
+  store.set(HANDOFF_COOKIE, "", { ...sessionCookieOptions(), maxAge: 0, path: "/" });
+}
+
+export function setHandoffCookie(
+  store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
+  token: string,
+) {
+  store.set(HANDOFF_COOKIE, token, {
+    ...sessionCookieOptions(),
+    maxAge: 45,
+    expires: new Date(Date.now() + 45_000),
+    path: "/",
+  });
 }
 
 export async function cookieSessionToken(): Promise<string | null> {

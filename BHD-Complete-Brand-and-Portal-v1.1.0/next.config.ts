@@ -54,6 +54,10 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cross-Origin-Resource-Policy", value: "cross-origin" }],
       },
       {
+        source: "/api/auth/window-handoff",
+        headers: [{ key: "Cross-Origin-Resource-Policy", value: "cross-origin" }],
+      },
+      {
         source: "/api/bhd/:path*",
         headers: [
           { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },

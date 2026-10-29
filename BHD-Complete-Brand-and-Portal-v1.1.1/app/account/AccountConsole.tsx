@@ -163,6 +163,8 @@ export function AccountConsole() {
   useEffect(() => {
     let cancelled = false;
     function load() {
+      setLoading(true);
+      setData(null);
       identityFetch("/api/account")
         .then(async (response) => {
           const payload = (await response.json()) as AccountPayload;

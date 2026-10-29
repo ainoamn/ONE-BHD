@@ -98,7 +98,8 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       return;
     }
     captureWindowToken(data.token);
-    applyAccountIsolation();
+    window.dispatchEvent(new Event(BHD_ACCOUNT_CHANGED));
+    await applyAccountIsolation();
   }, []);
 
   const switchAccount = useCallback(async (sub: string) => {
@@ -110,7 +111,8 @@ export function SessionMenu({ signInLabel, locale }: Props) {
     if (!response.ok) return;
     const data = (await response.json().catch(() => ({}))) as { token?: string };
     captureWindowToken(data.token);
-    applyAccountIsolation();
+    window.dispatchEvent(new Event(BHD_ACCOUNT_CHANGED));
+    await applyAccountIsolation();
   }, []);
 
   if (!ready) {

@@ -27,7 +27,8 @@ export function middleware(request: NextRequest) {
     path.startsWith("/api/auth/bhd/") ||
     path === "/api/auth/me" ||
     path === "/api/auth/switch" ||
-    path === "/api/auth/logout"
+    path === "/api/auth/logout" ||
+    path === "/api/auth/window-handoff"
   ) {
     return NextResponse.next();
   }

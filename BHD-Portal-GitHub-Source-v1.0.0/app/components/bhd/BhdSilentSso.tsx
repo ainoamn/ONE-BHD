@@ -1,11 +1,12 @@
 "use client";
 
-import { identityFetch, isIdentityOrigin, isPortalPublicOrigin, productStartPath } from "../../lib/identity/client";
+import { applyAccountIsolation, identityFetch, isIdentityOrigin, isPortalPublicOrigin } from "../../lib/identity/client";
 import { useEffect } from "react";
 
 /**
  * If identity already has an active account and this host has no matching
  * product session, bind silently via start — never /login?add=1.
+ * Re-bind whenever the identity account in this window differs from the product session.
  */
 export function BhdSilentSso() {
   useEffect(() => {
@@ -23,9 +24,6 @@ export function BhdSilentSso() {
     }
 
     let cancelled = false;
-    const here = `${window.location.pathname}${window.location.search || ""}` || "/";
-    const guardKey = `bhd-sso:${here}`;
-    if (sessionStorage.getItem(guardKey) === "1") return;
     identityFetch("/api/auth/me")
       .then((response) => response.json())
       .then(async (identity: { user?: { id?: string } | null }) => {
@@ -34,8 +32,11 @@ export function BhdSilentSso() {
         const local = (await localResponse.json().catch(() => ({}))) as { user?: { id?: string } | null };
         if (cancelled) return;
         if (local.user?.id && local.user.id === identity.user.id) return;
-        sessionStorage.setItem(guardKey, "1");
-        window.location.replace(productStartPath(here));
+        const guardKey = `bhd-sso:${identity.user.id}`;
+        const last = Number(sessionStorage.getItem(guardKey) || "0");
+        if (last && Date.now() - last < 15_000) return;
+        sessionStorage.setItem(guardKey, String(Date.now()));
+        await applyAccountIsolation();
       })
       .catch(() => undefined);
     return () => {

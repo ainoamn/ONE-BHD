@@ -64,7 +64,7 @@
 الكوكي `bhd_id` مشتركة بين نوافذ نفس الملف؛ العزل يتم بـ `sessionStorage` (`bhd_window_token`) وترويسة `Authorization: Bearer`. التبديل مع Bearer **لا يغيّر** كوكي النوافذ الأخرى. انظر [`BHD-COPY-TO-PRODUCTS.md`](BHD-COPY-TO-PRODUCTS.md).
 
 1. بطاقة الحساب: صورة دائرية نظيفة + البريد، وشارة المصدر بجانب البريد لا داخل الصورة. [`BHD-ACCOUNT-SWITCHER.md`](BHD-ACCOUNT-SWITCHER.md).
-2. التبديل: `POST https://id.bhd-om.com/api/auth/switch` مع Bearer النافذة، احفظ `token` من الرد في `sessionStorage`، ثم أعد فتح الصفحة. ممنوع `/login?add=1` هنا.
+2. التبديل: `POST https://id.bhd-om.com/api/auth/switch` مع Bearer النافذة، احفظ `token`، ثم **أفرغ صفحة الحساب السابق وأعد ربط المنتج** عبر `/api/auth/window-handoff` ثم `/auth/handoff` حتى يصدر OIDC كود الحساب الجديد لا كوكي النافذة الأخرى. ممنوع إبقاء بيانات المستخدم السابق في الصفحة. ممنوع `/login?add=1` هنا.
 3. «إضافة حساب» فقط: `/login?add=1&next=…`. الجلسات الأخرى تبقى في القائمة.
 4. رابط مباشر لمنتج وجلسة هوية قائمة: SSO صامت بالحساب النشط (`BhdSilentSso`) بلا طلب دخول أو خروج.
 5. JWT والكوكي يُوقَّعان بتاريخ انتهاء مطلق لـ **40 يوماً**. بعدها يُطلب الدخول من جديد.

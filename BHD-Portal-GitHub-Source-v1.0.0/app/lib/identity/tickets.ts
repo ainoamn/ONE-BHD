@@ -5,7 +5,7 @@ import { oauthTickets } from "../../../db/schema";
 import { authSecret } from "../auth/config";
 import { randomUrlToken } from "./crypto";
 
-type TicketKind = "code" | "refresh";
+type TicketKind = "code" | "refresh" | "handoff";
 
 type MemoryTicket = {
   kind: TicketKind;
