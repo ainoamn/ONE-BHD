@@ -15,7 +15,7 @@ export function OPTIONS(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const headers = productCorsHeaders(request);
+  const headers = new Headers(productCorsHeaders(request));
   headers.set("Cache-Control", "no-store");
   if (request.headers.get("x-bhd-window-signed-out") === "1") {
     const accounts = await readSessionRoster(request);
