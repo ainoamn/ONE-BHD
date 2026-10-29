@@ -48,7 +48,8 @@ export function productCorsHeaders(request: Request): HeadersInit {
     "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type, Authorization, X-BHD-Window-Bootstrap, X-BHD-Window-Signed-Out",
+    "Access-Control-Allow-Headers":
+      "Content-Type, Authorization, X-BHD-Window-Bootstrap, X-BHD-Window-Signed-Out, X-BHD-Persist-Cookie",
     "Access-Control-Max-Age": "86400",
     "Vary": "Origin",
     "Cross-Origin-Resource-Policy": "cross-origin",

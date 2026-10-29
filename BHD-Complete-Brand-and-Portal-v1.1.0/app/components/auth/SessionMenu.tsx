@@ -108,7 +108,12 @@ export function SessionMenu({ signInLabel, locale }: Props) {
     setAccounts([]);
     const response = await identityFetch("/api/auth/switch", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        // Same-tab identity UI must rewrite bhd_id so /account SSR matches.
+        // Product tabs omit this header to keep other windows on their Bearer.
+        "X-BHD-Persist-Cookie": "1",
+      },
       body: JSON.stringify({ sub }),
     });
     if (!response.ok) {

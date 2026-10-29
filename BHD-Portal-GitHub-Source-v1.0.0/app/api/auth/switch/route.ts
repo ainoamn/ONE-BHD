@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   applyIdentitySwitch,
   publicAccount,
+  readBearerToken,
   readSessionRoster,
 } from "../../../lib/auth/session";
 import { productCorsHeaders, productCorsPreflight } from "../../../lib/auth/product-cors";
@@ -32,10 +33,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "هذا الحساب غير محفوظ في هذه الجلسة." }, { status: 404, headers });
   }
 
-  // ALWAYS rewrite bhd_id (+ roster). Skipping the cookie when a Bearer was present
-  // left SSR, /account, and product OAuth stuck on the first signed-in email.
+  /**
+   * Cookie policy (multi-window):
+   * - Persist bhd_id when there is no Bearer (bootstrap) OR caller sends X-BHD-Persist-Cookie: 1
+   *   (identity site SessionMenu — needed so /account SSR matches the switch).
+   * - Product tabs switch with Bearer only and must NOT rewrite shared bhd_id, or every other
+   *   tab that bootstraps from the cookie would jump accounts.
+   */
+  const persistCookie =
+    !readBearerToken(request) || request.headers.get("x-bhd-persist-cookie") === "1";
+
   const response = NextResponse.json({ ok: true, user: publicAccount(target), accounts: roster.map(publicAccount) }, { headers });
-  const switched = await applyIdentitySwitch(response.cookies, target.sub, roster, true);
+  const switched = await applyIdentitySwitch(response.cookies, target.sub, roster, persistCookie);
   if (switched) {
     return NextResponse.json(
       {
