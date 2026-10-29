@@ -176,10 +176,7 @@ function samePortalOrigin(pageOrigin?: string) {
 /** مساحة العمل مباشرة — بلا سلسلة start في كل نقرة. */
 export function workspaceUrlForApp(app: BhdApp, pageOrigin?: string): string {
   if (app.mode === "identity") {
-    if (pageOrigin) {
-      const here = pageOrigin.replace(/\/$/, "");
-      if (here === "https://id.bhd-om.com" || samePortalOrigin(pageOrigin)) return app.workspacePath;
-    }
+    if (pageOrigin?.replace(/\/$/, "") === "https://id.bhd-om.com") return app.workspacePath;
     return `${app.origin.replace(/\/$/, "")}${app.workspacePath}`;
   }
   if (app.id === "portal" && samePortalOrigin(pageOrigin)) {
@@ -201,4 +198,8 @@ export function startUrlForApp(app: BhdApp): string | null {
 
 export function hopOrigins(): string[] {
   return [...new Set(BHD_APPS.filter((app) => app.enabled && app.origin).map((app) => app.origin.replace(/\/$/, "")))];
+}
+
+export function hopUrls(pageOrigin?: string): string[] {
+  return BHD_APPS.filter((app) => app.enabled).map((app) => launchUrlForApp(app, pageOrigin));
 }

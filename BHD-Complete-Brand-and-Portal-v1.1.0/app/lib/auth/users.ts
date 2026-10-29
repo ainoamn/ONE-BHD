@@ -365,7 +365,7 @@ export async function loginOrRegisterWithGoogle(input: {
     user = created;
   }
 
-  await ensureSelfContact(user.id, {
+  void ensureSelfContact(user.id, {
     name: user.name,
     email: user.email,
     phone: user.phone,
@@ -436,7 +436,7 @@ export async function loginOrRegisterWithFacebook(input: {
     user = created;
   }
 
-  await ensureSelfContact(
+  void ensureSelfContact(
     user.id,
     {
       name: user.name,

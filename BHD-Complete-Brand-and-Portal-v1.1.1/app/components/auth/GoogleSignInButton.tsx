@@ -1,7 +1,7 @@
 "use client";
 
 import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from "@react-oauth/google";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BHD_GOOGLE_WEB_CLIENT_ID } from "../../lib/auth/config";
 
 type Props = {
@@ -14,7 +14,17 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || BHD_GOOGLE_WEB_CLIENT_ID;
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [armed, setArmed] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const arm = () => setReady(true);
+    const idle = window.requestIdleCallback?.(arm, { timeout: 600 });
+    if (idle == null) {
+      const timer = window.setTimeout(arm, 0);
+      return () => window.clearTimeout(timer);
+    }
+    return () => window.cancelIdleCallback?.(idle);
+  }, []);
 
   const handleSuccess = useCallback(
     async (credentialResponse: CredentialResponse) => {
@@ -49,7 +59,7 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
 
   return (
     <div className="login-provider">
-      {armed ? (
+      {ready ? (
         <div className="login-provider-hit" title={label} aria-label={label}>
           <GoogleOAuthProvider clientId={clientId}>
             <GoogleLogin
@@ -65,7 +75,7 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
           </GoogleOAuthProvider>
         </div>
       ) : (
-        <button type="button" className="login-provider-arm" title={label} aria-label={label} onClick={() => setArmed(true)}>
+        <button type="button" className="login-provider-arm" title={label} aria-label={label} onClick={() => setReady(true)}>
           G
         </button>
       )}

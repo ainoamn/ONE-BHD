@@ -10,6 +10,16 @@ export function isIdentityOrigin(origin = pageOrigin()) {
   return here === DEFAULT_IDENTITY_ISSUER || /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(here);
 }
 
+/** البوابة التسويقية ليست منتج SSO — الرأس يقرأ الهوية مباشرة. */
+export function isPortalPublicOrigin(origin = pageOrigin()) {
+  const here = origin.replace(/\/$/, "");
+  return (
+    here === "https://www.bhd-om.com" ||
+    here === "https://bhd-om.com" ||
+    here.endsWith(".vercel.app")
+  );
+}
+
 export function identityApiUrl(path: string) {
   const normalized = path.startsWith("/") ? path : `/${path}`;
   if (isIdentityOrigin()) return normalized;

@@ -45,7 +45,7 @@ export function facebookLoginUrl(input: { state: string; redirectUri: string }):
     redirect_uri: input.redirectUri,
     state: input.state,
     response_type: "code",
-    scope: "email,public_profile,user_birthday,user_gender,user_location",
+    scope: "email,public_profile",
     auth_type: "rerequest",
   });
   return `${DIALOG}?${params.toString()}`;
@@ -141,18 +141,13 @@ export async function exchangeFacebookCode(code: string, redirectUri: string): P
 
   const token = await graphJson<{ access_token?: string }>(tokenUrl.toString());
   if (!token.access_token) throw new Error("Missing Facebook access token");
+  return profileFromFacebookToken(token.access_token);
+}
 
-  const debugUrl = new URL("https://graph.facebook.com/debug_token");
-  debugUrl.searchParams.set("input_token", token.access_token);
-  debugUrl.searchParams.set("access_token", `${appId}|${secret}`);
-  const debug = await graphJson<{ data?: { app_id?: string; is_valid?: boolean } }>(debugUrl.toString());
-  if (!debug.data?.is_valid || debug.data.app_id !== appId) {
-    throw new Error("Facebook token is not for this app");
-  }
-
+export async function profileFromFacebookToken(accessToken: string): Promise<FacebookProfile> {
   const meUrl = new URL(`${GRAPH}/me`);
-  meUrl.searchParams.set("fields", "id,name,email,picture.type(large),birthday,gender,location{name}");
-  meUrl.searchParams.set("access_token", token.access_token);
+  meUrl.searchParams.set("fields", "id,name,email,picture.type(large)");
+  meUrl.searchParams.set("access_token", accessToken);
   const me = await graphJson<{
     id?: string;
     name?: string;

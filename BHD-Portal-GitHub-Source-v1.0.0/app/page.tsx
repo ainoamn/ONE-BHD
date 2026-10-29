@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { BrandLogo } from "./components/BrandLogo";
 import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
-import { gatewayApps, launchUrlForApp, type BhdApp } from "./lib/bhd/apps";
+import { gatewayApps, launchUrlForApp } from "./lib/bhd/apps";
 import type { UiLocale } from "./lib/ui-locale";
 import {
   applyDocumentLocale,
@@ -44,24 +43,16 @@ const copy = {
   },
 };
 
-function openGatewayApp(app: BhdApp, push: (href: string) => void) {
-  const url = launchUrlForApp(app, window.location.origin);
-  if (url.startsWith("/")) {
-    push(url);
-    return;
-  }
-  window.location.assign(url);
-}
-
 export default function Home() {
-  const router = useRouter();
   const [language, setLanguage] = useState<UiLocale>("ar");
+  const [origin, setOrigin] = useState("");
   const [ready, setReady] = useState(false);
   const t = copy[language];
   const isArabic = language === "ar";
   const apps = gatewayApps();
 
   useEffect(() => {
+    setOrigin(window.location.origin);
     const stored = readStoredUiLocale();
     if (stored) setLanguage(stored);
     setReady(true);
@@ -120,20 +111,22 @@ export default function Home() {
           {apps.map((app, index) => {
             const isPortal = app.id === "portal";
             const label = isArabic ? app.nameAr : app.nameEn;
+            const href = launchUrlForApp(app, origin || undefined);
+            const sameOrigin = href.startsWith("/");
+            const TileTag = sameOrigin ? InstantLink : "a";
             return (
-              <button
+              <TileTag
                 key={app.id}
-                type="button"
+                href={href}
                 className={`gateway-tile${isPortal ? " gateway-tile-portal" : ""}`}
                 style={{ "--tile-accent": app.accent, "--tile-soft": app.soft, "--tile-delay": `${index * 45}ms` } as React.CSSProperties}
-                onClick={() => openGatewayApp(app, (href) => router.push(href))}
               >
                 <BhdAppIcon id={app.id} title={label} className="gateway-tile-icon" />
                 <span className="gateway-tile-name">{label}</span>
                 <span className="gateway-tile-meta">
                   {isPortal ? t.companyHint : t.openWorkspace}
                 </span>
-              </button>
+              </TileTag>
             );
           })}
         </div>

@@ -112,6 +112,20 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     <html lang="ar" dir="rtl" className={`${plexArabic.variable} ${inter.variable}`}>
       <head>
         <link rel="preload" href="/brand/bhd-logo.svg" as="image" type="image/svg+xml" />
+        <link rel="preconnect" href="https://id.bhd-om.com" />
+        <link rel="preconnect" href="https://www.bhd-om.com" />
+        <link rel="preconnect" href="https://wazen.bhd-om.com" />
+        <link rel="preconnect" href="https://hisaby.bhd-om.com" />
+        <link rel="preconnect" href="https://nasab.bhd-om.com" />
+        <link rel="preconnect" href="https://r.bhd-om.com" />
+        <link rel="preconnect" href="https://store.bhd-om.com" />
+        <link rel="preconnect" href="https://office.bhd-om.com" />
+        <link rel="preconnect" href="https://hr.bhd-om.com" />
+        <link rel="preconnect" href="https://accounts.google.com" />
+        <link rel="preconnect" href="https://www.facebook.com" />
+        <link rel="dns-prefetch" href="https://id.bhd-om.com" />
+        <link rel="dns-prefetch" href="https://wazen.bhd-om.com" />
+        <link rel="dns-prefetch" href="https://accounts.google.com" />
       </head>
       <body className={plexArabic.className}>
         <a className="skip-link" href="#main-content">انتقل إلى المحتوى الرئيسي</a>

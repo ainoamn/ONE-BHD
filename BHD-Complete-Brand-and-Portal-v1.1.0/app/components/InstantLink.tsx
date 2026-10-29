@@ -41,7 +41,7 @@ export function InstantLink({
   const router = useRouter();
   const resolved = hrefToString(href);
   const target = resolved.split("#")[0] || "/";
-  const skipPrefetch = target === "/login" || target.startsWith("/login?") || target.startsWith("/api/auth");
+  const skipPrefetch = target.startsWith("/api/auth");
 
   if (needsDocumentNavigation(href)) {
     return (

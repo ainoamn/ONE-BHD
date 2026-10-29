@@ -1,6 +1,6 @@
 "use client";
 
-import { identityFetch, isIdentityOrigin, productStartPath } from "../../lib/identity/client";
+import { identityFetch, isIdentityOrigin, isPortalPublicOrigin, productStartPath } from "../../lib/identity/client";
 import { useEffect } from "react";
 
 /**
@@ -12,6 +12,7 @@ export function BhdSilentSso() {
     const path = window.location.pathname;
     if (
       isIdentityOrigin() ||
+      isPortalPublicOrigin() ||
       path.startsWith("/login") ||
       path.startsWith("/oauth") ||
       path.startsWith("/api/") ||

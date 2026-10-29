@@ -97,15 +97,7 @@ function isCurrentApp(app: BhdApp, pageOrigin: string) {
 }
 
 function accountPageUrl(pageOrigin: string) {
-  if (!pageOrigin) return "/account";
-  const accountApp = BHD_APPS.find((app) => app.id === "account");
-  const portalApp = BHD_APPS.find((app) => app.id === "portal");
-  if (
-    (accountApp && isCurrentApp(accountApp, pageOrigin)) ||
-    (portalApp && isCurrentApp(portalApp, pageOrigin))
-  ) {
-    return "/account";
-  }
+  if (stripSlash(pageOrigin) === "https://id.bhd-om.com") return "/account";
   return `${DEFAULT_IDENTITY_ISSUER}/account`;
 }
 
@@ -360,15 +352,31 @@ export function BhdAppSwitcher({
             {BHD_APPS.map((app) => {
               const current = origin ? isCurrentApp(app, origin) : false;
               const label = isArabic ? app.nameAr : app.nameEn;
+              const href = app.mode === "identity" ? accountPageUrl(origin) : launchUrlForApp(app, origin);
               return (
-                <button
+                <a
                   key={app.id}
-                  type="button"
+                  href={app.enabled ? href : "#"}
                   className={app.enabled ? "bhd-switcher-app" : "bhd-switcher-app is-disabled"}
-                  disabled={!app.enabled}
                   aria-disabled={!app.enabled}
                   aria-current={current ? "page" : undefined}
-                  onClick={() => onAppClick(app)}
+                  onClick={(event) => {
+                    if (!app.enabled) {
+                      event.preventDefault();
+                      return;
+                    }
+                    if (current) {
+                      event.preventDefault();
+                      close();
+                      return;
+                    }
+                    if (href.startsWith("/")) {
+                      event.preventDefault();
+                      onAppClick(app);
+                      return;
+                    }
+                    close();
+                  }}
                 >
                   <BhdAppIcon
                     id={app.id}
@@ -376,7 +384,7 @@ export function BhdAppSwitcher({
                     className={current ? "bhd-switcher-mark is-current" : "bhd-switcher-mark"}
                   />
                   <span>{label}</span>
-                </button>
+                </a>
               );
             })}
           </div>

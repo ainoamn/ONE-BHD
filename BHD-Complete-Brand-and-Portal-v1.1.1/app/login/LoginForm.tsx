@@ -6,7 +6,7 @@ import { FacebookSignInButton } from "../components/auth/FacebookSignInButton";
 import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { BHD_APPS } from "../lib/bhd/apps";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type Mode = "login" | "register" | "forgot";
@@ -176,6 +176,7 @@ function isOauthContinue(path: string): boolean {
 }
 
 export function LoginForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next");
   const nextSafe = useMemo(() => safeNextPath(nextPath), [nextPath]);
@@ -276,7 +277,11 @@ export function LoginForm() {
   }
 
   function finishOk() {
-    window.location.replace(nextSafe);
+    if (oauthContinue) {
+      window.location.replace(nextSafe);
+      return;
+    }
+    router.replace(nextSafe);
   }
 
   async function onSubmit(event: FormEvent) {
