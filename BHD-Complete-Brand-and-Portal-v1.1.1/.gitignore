@@ -41,3 +41,4 @@ yarn-error.log*
 /output/
 /tmp/
 /work/
+.env*.local

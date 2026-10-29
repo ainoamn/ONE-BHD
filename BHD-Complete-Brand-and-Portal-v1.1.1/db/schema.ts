@@ -18,6 +18,8 @@ export const contactTypeEnum = pgEnum("contact_type", ["SELF", "PERSON", "COMPAN
 export const users = pgTable("bhd_users", {
   id: uuid("id").defaultRandom().primaryKey(),
   name: text("name").notNull(),
+  nameAr: text("name_ar"),
+  nameEn: text("name_en"),
   email: text("email").notNull().unique(),
   username: text("username").unique(),
   /** Null for Google-only accounts */
@@ -28,6 +30,11 @@ export const users = pgTable("bhd_users", {
   phone: text("phone"),
   gender: text("gender"),
   birthDate: text("birth_date"),
+  nationality: text("nationality"),
+  civilId: text("civil_id"),
+  civilIdExpires: text("civil_id_expires"),
+  passportNumber: text("passport_number"),
+  passportExpires: text("passport_expires"),
   isActive: boolean("is_active").notNull().default(true),
   emailVerified: boolean("email_verified").notNull().default(false),
   mustCompleteProfile: boolean("must_complete_profile").notNull().default(false),
@@ -105,6 +112,18 @@ export const registeredClients = pgTable("bhd_oauth_clients", {
 });
 
 /** Editable copy for transactional identity emails (admin-managed). */
+export const userFiles = pgTable("bhd_user_files", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  filename: text("filename").notNull(),
+  mime: text("mime").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const emailTemplates = pgTable("bhd_email_templates", {
   kind: text("kind").primaryKey(),
   subject: text("subject").notNull(),
@@ -121,3 +140,4 @@ export type BhdContact = typeof contacts.$inferSelect;
 export type NewBhdContact = typeof contacts.$inferInsert;
 export type BhdOauthTicket = typeof oauthTickets.$inferSelect;
 export type BhdRegisteredClient = typeof registeredClients.$inferSelect;
+export type BhdUserFile = typeof userFiles.$inferSelect;

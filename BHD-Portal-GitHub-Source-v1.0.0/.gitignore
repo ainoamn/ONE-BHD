@@ -38,4 +38,7 @@ yarn-error.log*
 /dist/
 /.wrangler/
 /outputs/
+/output/
+/tmp/
 /work/
+.env*.local

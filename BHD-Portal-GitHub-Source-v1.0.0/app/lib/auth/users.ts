@@ -3,6 +3,8 @@ import { getDb, isDatabaseConfigured, ensureIdentitySchema } from "../../../db";
 import { contacts, users, oauthTickets, type BhdContact, type BhdUser } from "../../../db/schema";
 import { hashPassword, isStrongPassword, verifyPassword } from "./passwords";
 import { isPlatformAdminEmail } from "./platform-admin";
+import { listAccountFileMeta } from "./account-files";
+import { translatePersonName } from "./translate-name";
 
 const MAX_ATTEMPTS = 5;
 const LOCK_MINUTES = 15;
@@ -15,6 +17,13 @@ export type PublicUser = {
   phone: string | null;
   gender: string | null;
   birthDate: string | null;
+  nationality: string | null;
+  nameAr: string | null;
+  nameEn: string | null;
+  civilId: string | null;
+  civilIdExpires: string | null;
+  passportNumber: string | null;
+  passportExpires: string | null;
   picture: string | null;
   emailVerified: boolean;
   mustCompleteProfile: boolean;
@@ -57,6 +66,13 @@ export function toPublicUser(user: BhdUser): PublicUser {
     phone: user.phone,
     gender: user.gender,
     birthDate: user.birthDate,
+    nationality: user.nationality,
+    nameAr: user.nameAr,
+    nameEn: user.nameEn,
+    civilId: user.civilId,
+    civilIdExpires: user.civilIdExpires,
+    passportNumber: user.passportNumber,
+    passportExpires: user.passportExpires,
     picture: user.avatar,
     emailVerified: user.emailVerified,
     mustCompleteProfile: user.mustCompleteProfile,
@@ -241,7 +257,9 @@ export async function registerWithPassword(input: RegisterInput): Promise<Public
     zipCode: input.zipCode,
   });
 
-  return toPublicUser(user);
+  const created = toPublicUser(user);
+  void fillMissingNameTranslations(user.id, name);
+  return created;
 }
 
 export async function loginWithPassword(
@@ -291,7 +309,9 @@ export async function loginWithPassword(
     .where(eq(users.id, user.id))
     .returning();
 
-  return toPublicUser(updated);
+  const publicUser = toPublicUser(updated);
+  void fillMissingNameTranslations(updated.id, updated.name);
+  return publicUser;
 }
 
 export async function loginOrRegisterWithGoogle(input: {
@@ -351,7 +371,9 @@ export async function loginOrRegisterWithGoogle(input: {
     phone: user.phone,
   });
 
-  return toPublicUser(user);
+  const publicUser = toPublicUser(user);
+  void fillMissingNameTranslations(user.id, user.name);
+  return publicUser;
 }
 
 export async function loginOrRegisterWithFacebook(input: {
@@ -426,7 +448,9 @@ export async function loginOrRegisterWithFacebook(input: {
     true,
   );
 
-  return toPublicUser(user);
+  const publicUser = toPublicUser(user);
+  void fillMissingNameTranslations(user.id, user.name);
+  return publicUser;
 }
 
 export async function getUserById(id: string): Promise<PublicUser | null> {
@@ -454,9 +478,39 @@ export type AccountContact = {
   zipCode: string | null;
 };
 
+export type AccountFileMeta = { id: string; filename: string; kind: string };
+
+export async function fillMissingNameTranslations(userId: string, sourceName: string) {
+  if (!isDatabaseConfigured()) return;
+  try {
+    await ensureIdentitySchema();
+    const db = getDb();
+    const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    const user = rows[0];
+    if (!user || (user.nameAr && user.nameEn)) return;
+    const translated = await translatePersonName(sourceName || user.name);
+    await db
+      .update(users)
+      .set({
+        nameAr: user.nameAr || translated.ar,
+        nameEn: user.nameEn || translated.en,
+        name: user.nameAr || translated.ar || user.name,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+    const self = await getSelfContact(userId);
+    if (self && !self.nameEn) {
+      await db.update(contacts).set({ nameEn: translated.en, updatedAt: new Date() }).where(eq(contacts.id, self.id));
+    }
+  } catch {
+    /* translation is best-effort on login */
+  }
+}
+
 export async function getAccountProfile(id: string): Promise<{
   user: AccountProfile;
   contact: AccountContact | null;
+  files: { civilIdFile: AccountFileMeta | null; passportFile: AccountFileMeta | null };
 } | null> {
   if (!isDatabaseConfigured()) return null;
   await ensureIdentitySchema();
@@ -465,6 +519,7 @@ export async function getAccountProfile(id: string): Promise<{
   const user = rows[0];
   if (!user) return null;
   const contact = await getSelfContact(user.id);
+  const files = await listAccountFileMeta(user.id);
   return {
     user: {
       ...toPublicUser(user),
@@ -485,6 +540,7 @@ export async function getAccountProfile(id: string): Promise<{
           zipCode: contact.zipCode,
         }
       : null,
+    files,
   };
 }
 
@@ -521,10 +577,17 @@ export async function updateOwnProfile(
   userId: string,
   input: {
     name?: string;
+    nameAr?: string | null;
+    nameEn?: string | null;
     username?: string | null;
     phone?: string | null;
     gender?: string | null;
     birthDate?: string | null;
+    nationality?: string | null;
+    civilId?: string | null;
+    civilIdExpires?: string | null;
+    passportNumber?: string | null;
+    passportExpires?: string | null;
     phone2?: string | null;
     whatsapp?: string | null;
     address?: string | null;
@@ -572,15 +635,37 @@ export async function updateOwnProfile(
   const phone = input.phone !== undefined ? input.phone?.trim() || null : user.phone;
   const gender = input.gender !== undefined ? input.gender?.trim() || null : user.gender;
   const birthDate = input.birthDate !== undefined ? input.birthDate?.trim() || null : user.birthDate;
+  const nameAr = input.nameAr !== undefined ? input.nameAr?.trim() || null : user.nameAr;
+  const nameEn = input.nameEn !== undefined ? input.nameEn?.trim() || null : user.nameEn;
+  const nationality = input.nationality !== undefined ? input.nationality?.trim() || null : user.nationality;
+  const civilId = input.civilId !== undefined ? input.civilId?.trim() || null : user.civilId;
+  const civilIdExpires = input.civilIdExpires !== undefined ? input.civilIdExpires?.trim() || null : user.civilIdExpires;
+  const passportNumber = input.passportNumber !== undefined ? input.passportNumber?.trim() || null : user.passportNumber;
+  const passportExpires = input.passportExpires !== undefined ? input.passportExpires?.trim() || null : user.passportExpires;
+  const files = await listAccountFileMeta(user.id);
+  if (!phone) throw new Error("PHONE_REQUIRED");
+  if (!nameAr || !nameEn) throw new Error("NAME_TRANSLATION_REQUIRED");
+  if (!nationality) throw new Error("NATIONALITY_REQUIRED");
+  if (!gender) throw new Error("GENDER_REQUIRED");
+  if (!birthDate) throw new Error("BIRTHDATE_REQUIRED");
+  if (!civilId || !civilIdExpires || !files.civilIdFile) throw new Error("CIVIL_ID_REQUIRED");
+  if (!passportNumber || !passportExpires || !files.passportFile) throw new Error("PASSPORT_REQUIRED");
 
   const [updated] = await db
     .update(users)
     .set({
-      name,
+      name: nameAr || name,
+      nameAr,
+      nameEn,
       username,
       phone,
       gender,
       birthDate,
+      nationality,
+      civilId,
+      civilIdExpires,
+      passportNumber,
+      passportExpires,
       passwordHash,
       mustCompleteProfile: false,
       updatedAt: new Date(),

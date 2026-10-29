@@ -39,6 +39,27 @@ export async function ensureIdentitySchema(): Promise<void> {
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS last_login_ip text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS signup_ip text`);
       await getSql().unsafe(`ALTER TABLE bhd_contacts ADD COLUMN IF NOT EXISTS hometown text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS name_ar text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS name_en text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS nationality text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS civil_id text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS civil_id_expires text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS passport_number text`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS passport_expires text`);
+      await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_user_files (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id uuid NOT NULL REFERENCES bhd_users(id) ON DELETE CASCADE,
+          kind text NOT NULL,
+          filename text NOT NULL,
+          mime text NOT NULL,
+          content text NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
+      await getSql().unsafe(
+        `CREATE UNIQUE INDEX IF NOT EXISTS bhd_user_files_user_kind ON bhd_user_files (user_id, kind)`,
+      );
       await getSql().unsafe(`
         CREATE TABLE IF NOT EXISTS bhd_oauth_clients (
           client_id text PRIMARY KEY,

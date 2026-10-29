@@ -5,6 +5,7 @@ import { InstantLink } from "../components/InstantLink";
 import { BHD_ACCOUNT_CHANGED, SessionMenu } from "../components/auth/SessionMenu";
 import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
+import { NATIONALITIES } from "../lib/auth/nationalities";
 import { FormEvent, useEffect, useState } from "react";
 
 type AccountUser = {
@@ -15,6 +16,13 @@ type AccountUser = {
   phone: string | null;
   gender: string | null;
   birthDate: string | null;
+  nationality: string | null;
+  nameAr: string | null;
+  nameEn: string | null;
+  civilId: string | null;
+  civilIdExpires: string | null;
+  passportNumber: string | null;
+  passportExpires: string | null;
   picture: string | null;
   emailVerified: boolean;
   googleLinked: boolean;
@@ -43,9 +51,12 @@ type LinkedSite = {
   status: "linked" | "available" | "soon";
 };
 
+type AccountFileMeta = { id: string; filename: string; kind: string };
+
 type AccountPayload = {
   user: AccountUser;
   contact: AccountContact | null;
+  files?: { civilIdFile: AccountFileMeta | null; passportFile: AccountFileMeta | null };
   sites: LinkedSite[];
   subscriptions: Array<{ id: string; nameAr: string; plan: string; status: string }>;
   message?: string;
@@ -79,6 +90,17 @@ export function AccountConsole() {
   const [phone, setPhone] = useState("");
   const [gender, setGender] = useState("");
   const [birthDate, setBirthDate] = useState("");
+  const [nationality, setNationality] = useState("OM");
+  const [nameAr, setNameAr] = useState("");
+  const [nameEn, setNameEn] = useState("");
+  const [civilId, setCivilId] = useState("");
+  const [civilIdExpires, setCivilIdExpires] = useState("");
+  const [passportNumber, setPassportNumber] = useState("");
+  const [passportExpires, setPassportExpires] = useState("");
+  const [civilIdFile, setCivilIdFile] = useState<AccountFileMeta | null>(null);
+  const [passportFile, setPassportFile] = useState<AccountFileMeta | null>(null);
+  const [translating, setTranslating] = useState(false);
+  const [uploading, setUploading] = useState("");
   const [phone2, setPhone2] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [address, setAddress] = useState("");
@@ -97,6 +119,15 @@ export function AccountConsole() {
     setPhone(payload.user.phone || "");
     setGender(payload.user.gender || "");
     setBirthDate(payload.user.birthDate || "");
+    setNationality(payload.user.nationality || "OM");
+    setNameAr(payload.user.nameAr || "");
+    setNameEn(payload.user.nameEn || "");
+    setCivilId(payload.user.civilId || "");
+    setCivilIdExpires(payload.user.civilIdExpires || "");
+    setPassportNumber(payload.user.passportNumber || "");
+    setPassportExpires(payload.user.passportExpires || "");
+    setCivilIdFile(payload.files?.civilIdFile || null);
+    setPassportFile(payload.files?.passportFile || null);
     setPhone2(payload.contact?.phone2 || "");
     setWhatsapp(payload.contact?.whatsapp || "");
     setAddress(payload.contact?.address || "");
@@ -104,6 +135,9 @@ export function AccountConsole() {
     setHometown(payload.contact?.hometown || "");
     setCountry(payload.contact?.country || "OM");
     setZipCode(payload.contact?.zipCode || "");
+    if (!payload.user.nameAr || !payload.user.nameEn) {
+      void translateName(payload.user.nameAr || payload.user.nameEn || payload.user.name, true);
+    }
   }
 
   useEffect(() => {
@@ -130,6 +164,48 @@ export function AccountConsole() {
     };
   }, []);
 
+  async function translateName(source?: string, silent = false) {
+    setTranslating(true);
+    if (!silent) setError("");
+    try {
+      const response = await fetch("/api/account/translate-name", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: source || nameAr || nameEn || name }),
+      });
+      const payload = (await response.json()) as { ar?: string; en?: string; message?: string };
+      if (!response.ok) throw new Error(payload.message || "تعذّرت الترجمة.");
+      if (payload.ar) setNameAr(payload.ar);
+      if (payload.en) setNameEn(payload.en);
+      if (payload.ar) setName(payload.ar);
+    } catch (err) {
+      if (!silent) setError(err instanceof Error ? err.message : "تعذّرت الترجمة. اكتبه يدوياً.");
+    } finally {
+      setTranslating(false);
+    }
+  }
+
+  async function uploadFile(kind: "civil_id" | "passport", file: File | undefined) {
+    if (!file) return;
+    setUploading(kind);
+    setError("");
+    try {
+      const form = new FormData();
+      form.set("kind", kind);
+      form.set("file", file);
+      const response = await fetch("/api/account/file", { method: "POST", body: form });
+      const payload = (await response.json()) as AccountFileMeta & { message?: string };
+      if (!response.ok) throw new Error(payload.message || "تعذّر رفع المرفق.");
+      if (kind === "civil_id") setCivilIdFile(payload);
+      else setPassportFile(payload);
+      setSaved("تم رفع المرفق. احفظ بقية البيانات.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "تعذّر رفع المرفق.");
+    } finally {
+      setUploading("");
+    }
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setSaving(true);
@@ -150,11 +226,18 @@ export function AccountConsole() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
+          name: nameAr || name,
+          nameAr,
+          nameEn,
           username: username || null,
           phone: phone || null,
           gender: gender || null,
           birthDate: birthDate || null,
+          nationality: nationality || null,
+          civilId,
+          civilIdExpires,
+          passportNumber,
+          passportExpires,
           phone2: phone2 || null,
           whatsapp: whatsapp || null,
           address: address || null,
@@ -201,7 +284,7 @@ export function AccountConsole() {
         <p className="section-kicker">حساب BHD الموحّد</p>
         <h1>بياناتك. مواقعك. اشتراكاتك.</h1>
         <p className="account-lead">
-          عدّل ملفك هنا مرة واحدة. الاسم والهاتف وصورة الحساب تنتقل إلى وازن وحسابي وبقية المواقع عبر هوية BHD، دون مشاركة قواعد بياناتها.
+          عدّل ملفك هنا مرة واحدة. الاسم بالعربية والإنجليزية والهاتف والجنسية وبيانات الهوية تنتقل إلى وازن وحسابي وبقية المواقع عبر هوية BHD، دون مشاركة قواعد بياناتها.
         </p>
 
         {loading ? <p className="account-status">جاري تحميل الحساب…</p> : null}
@@ -277,6 +360,10 @@ export function AccountConsole() {
                   <dt>تاريخ الميلاد</dt>
                   <dd>{user.birthDate || "—"}</dd>
                 </div>
+                <div>
+                  <dt>الجنسية</dt>
+                  <dd>{NATIONALITIES.find((item) => item.code === user.nationality)?.ar || user.nationality || "—"}</dd>
+                </div>
               </dl>
             </section>
 
@@ -284,13 +371,30 @@ export function AccountConsole() {
               <form className="account-panel" onSubmit={onSubmit}>
                 <div className="account-panel-head">
                   <h2>تعديل البيانات</h2>
-                  <p>البريد ثابت لأنه مفتاح الدخول. إن دخلت بفيسبوك أو جوجل يمكنك هنا إنشاء كلمة مرور للمرات القادمة. رقم الهاتف لا يأتي من فيسبوك.</p>
+                  <p>الاسم بالعربية والإنجليزية إلزامي (ترجمة ذكاء اصطناعي أو يدوي). الدخول بالبريد أو فيسبوك أو جوجل يترجم الاسم تلقائياً. الرقم المدني والجواز ومرفقاهما والهاتف إلزامية.</p>
                 </div>
                 <div className="account-fields">
                   <label>
-                    الاسم الكامل
-                    <input value={name} onChange={(event) => setName(event.target.value)} required />
+                    الاسم بالعربية *
+                    <input
+                      value={nameAr}
+                      onChange={(event) => {
+                        setNameAr(event.target.value);
+                        setName(event.target.value);
+                      }}
+                      required
+                    />
                   </label>
+                  <label>
+                    الاسم بالإنجليزية *
+                    <input dir="ltr" value={nameEn} onChange={(event) => setNameEn(event.target.value)} required />
+                  </label>
+                  <div className="account-translate is-wide">
+                    <button type="button" className="outline-button" disabled={translating} onClick={() => void translateName()}>
+                      {translating ? "جاري الترجمة…" : "ترجمة الاسم بالذكاء الاصطناعي"}
+                    </button>
+                    <small>يمكنك تصحيح الترجمة يدوياً قبل الحفظ.</small>
+                  </div>
                   <label>
                     اسم المستخدم
                     <input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="اختياري" />
@@ -300,25 +404,83 @@ export function AccountConsole() {
                     <input value={user.email} readOnly />
                   </label>
                   <label>
-                    الهاتف
-                    <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="فيسبوك لا يرسل الرقم — أدخله هنا" />
+                    رقم الهاتف *
+                    <input value={phone} onChange={(event) => setPhone(event.target.value)} required placeholder="مثال: 9689xxxxxxx" />
                   </label>
                   <label>
-                    الجنس
-                    <select value={gender} onChange={(event) => setGender(event.target.value)}>
-                      <option value="">غير محدد</option>
+                    رقم هاتف بديل
+                    <input value={phone2} onChange={(event) => setPhone2(event.target.value)} />
+                  </label>
+                  <label>
+                    الجنسية *
+                    <select value={nationality} onChange={(event) => setNationality(event.target.value)} required>
+                      {NATIONALITIES.map((item) => (
+                        <option key={item.code} value={item.code}>
+                          {item.ar}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label>
+                    الجنس *
+                    <select value={gender} onChange={(event) => setGender(event.target.value)} required>
+                      <option value="">اختر</option>
                       <option value="male">ذكر</option>
                       <option value="female">أنثى</option>
                     </select>
                   </label>
                   <label>
-                    تاريخ الميلاد
-                    <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
+                    تاريخ الميلاد *
+                    <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} required />
                   </label>
                   <label>
-                    هاتف إضافي
-                    <input value={phone2} onChange={(event) => setPhone2(event.target.value)} />
+                    الرقم المدني *
+                    <input value={civilId} onChange={(event) => setCivilId(event.target.value)} required />
                   </label>
+                  <label>
+                    تاريخ انتهاء البطاقة *
+                    <input type="date" value={civilIdExpires} onChange={(event) => setCivilIdExpires(event.target.value)} required />
+                  </label>
+                  <div className="account-upload is-wide">
+                    <span>مرفق نسخة البطاقة المدنية *</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(event) => void uploadFile("civil_id", event.target.files?.[0])}
+                    />
+                    {uploading === "civil_id" ? <small>جاري الرفع…</small> : null}
+                    {civilIdFile ? (
+                      <a href="/api/account/file?kind=civil_id" target="_blank" rel="noreferrer">
+                        {civilIdFile.filename}
+                      </a>
+                    ) : (
+                      <small>صورة أو PDF حتى 4 ميغابايت.</small>
+                    )}
+                  </div>
+                  <label>
+                    رقم جواز السفر *
+                    <input value={passportNumber} onChange={(event) => setPassportNumber(event.target.value)} required />
+                  </label>
+                  <label>
+                    تاريخ انتهاء الجواز *
+                    <input type="date" value={passportExpires} onChange={(event) => setPassportExpires(event.target.value)} required />
+                  </label>
+                  <div className="account-upload is-wide">
+                    <span>مرفق نسخة الجواز *</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,application/pdf"
+                      onChange={(event) => void uploadFile("passport", event.target.files?.[0])}
+                    />
+                    {uploading === "passport" ? <small>جاري الرفع…</small> : null}
+                    {passportFile ? (
+                      <a href="/api/account/file?kind=passport" target="_blank" rel="noreferrer">
+                        {passportFile.filename}
+                      </a>
+                    ) : (
+                      <small>صورة أو PDF حتى 4 ميغابايت.</small>
+                    )}
+                  </div>
                   <label>
                     واتساب
                     <input value={whatsapp} onChange={(event) => setWhatsapp(event.target.value)} />

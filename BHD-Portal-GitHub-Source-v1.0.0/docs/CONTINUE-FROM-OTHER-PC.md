@@ -31,6 +31,7 @@ npm install
 | 1 | دخول/خروج/تبديل/تنقل أسرع من جزء من الثانية | `/me` من الكوكي، كود OAuth موقّع، GIS بعد الضغطة |
 | 2 | تعدد الحسابات من الرأس | `bhd_id_roster` + `/api/auth/switch` |
 | 3 | وثائق لكل المنتجات | `BHD-SESSION-POLICY` و`BHD-APP-SWITCHER` و`BHD-ACCOUNT-SWITCHER` و`BHD-UNIFIED-LOGIN-AND-APPS` |
+| 4 | حقول الحساب KYC | ترجمة الاسم عربي/إنجليزي، جنسية، جنس، ميلاد، مدني+جواز+مرفقات، هاتف |
 
 **الإنتاج:** انشر من جذر المستودع: `npx vercel --prod --yes` (جذر المشروع `BHD-Complete-Brand-and-Portal-v1.1.0`).
 

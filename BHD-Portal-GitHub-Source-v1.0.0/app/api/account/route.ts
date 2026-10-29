@@ -50,11 +50,19 @@ export async function GET() {
         facebookLinked: false,
         gender: null,
         birthDate: null,
+        nationality: null,
+        nameAr: null,
+        nameEn: null,
+        civilId: null,
+        civilIdExpires: null,
+        passportNumber: null,
+        passportExpires: null,
         hasPassword: false,
         createdAt: null,
         lastLoginAt: null,
       },
       contact: null,
+      files: { civilIdFile: null, passportFile: null },
       sites: linkedSites([]),
       subscriptions: [],
     });
@@ -63,12 +71,13 @@ export async function GET() {
   const profile = await getAccountProfile(session.sub);
   if (!profile) return noStore({ message: "الحساب غير موجود." }, 404);
   const linkedClientIds = await listLinkedClientIds(session.sub);
-  return noStore({
-    user: profile.user,
-    contact: profile.contact,
-    sites: linkedSites(linkedClientIds),
-    subscriptions: [],
-  });
+    return noStore({
+      user: profile.user,
+      contact: profile.contact,
+      files: profile.files,
+      sites: linkedSites(linkedClientIds),
+      subscriptions: [],
+    });
 }
 
 export async function PATCH(request: Request) {
@@ -88,6 +97,13 @@ export async function PATCH(request: Request) {
       phone?: string | null;
       gender?: string | null;
       birthDate?: string | null;
+      nationality?: string | null;
+      nameAr?: string | null;
+      nameEn?: string | null;
+      civilId?: string | null;
+      civilIdExpires?: string | null;
+      passportNumber?: string | null;
+      passportExpires?: string | null;
       phone2?: string | null;
       whatsapp?: string | null;
       address?: string | null;
@@ -104,6 +120,7 @@ export async function PATCH(request: Request) {
     return noStore({
       user: profile?.user || user,
       contact: profile?.contact || null,
+      files: profile?.files || { civilIdFile: null, passportFile: null },
       sites: linkedSites(linkedClientIds),
       subscriptions: [],
     });
@@ -111,6 +128,13 @@ export async function PATCH(request: Request) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
     const messages: Record<string, [string, number]> = {
       INVALID_INPUT: ["أدخل الاسم بشكل صحيح.", 400],
+      NAME_TRANSLATION_REQUIRED: ["الاسم بالعربية والإنجليزية إلزامي.", 400],
+      PHONE_REQUIRED: ["رقم الهاتف إلزامي.", 400],
+      NATIONALITY_REQUIRED: ["الجنسية إلزامية.", 400],
+      GENDER_REQUIRED: ["الجنس إلزامي.", 400],
+      BIRTHDATE_REQUIRED: ["تاريخ الميلاد إلزامي.", 400],
+      CIVIL_ID_REQUIRED: ["الرقم المدني وتاريخ الانتهاء وصورة البطاقة إلزامية.", 400],
+      PASSPORT_REQUIRED: ["رقم الجواز وتاريخ الانتهاء وصورة الجواز إلزامية.", 400],
       INVALID_USERNAME: ["اسم المستخدم من 3 إلى 32 حرفًا إنجليزيًا أو رقمًا.", 400],
       EMAIL_OR_USERNAME_TAKEN: ["اسم المستخدم مستخدم مسبقًا.", 409],
       INVALID_CREDENTIALS: ["كلمة المرور الحالية غير صحيحة.", 401],

@@ -4670,6 +4670,29 @@ a.login-submit {
 
 .account-fields .is-wide { grid-column: 1 / -1; }
 
+.account-translate,
+.account-upload {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+
+.account-translate small,
+.account-upload small {
+  color: #5f7169;
+  font-weight: 600;
+}
+
+.account-upload span {
+  color: #3d5249;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.account-upload input[type="file"] {
+  padding: 8px;
+}
+
 .account-fields input,
 .account-fields select {
   min-height: 44px;

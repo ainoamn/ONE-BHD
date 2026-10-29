@@ -2,7 +2,7 @@
 
 > **لوحة Neon:** [console.neon.tech — org projects](https://console.neon.tech/app/org-broad-surf-16375800/projects)  
 > **الموقع:** https://one-bhd.vercel.app  
-> **الجداول:** `bhd_users` و`bhd_contacts` (مثل مستخدمي ودفتر عناوين حسابي)  
+> **الجداول:** `bhd_users` و`bhd_contacts` و`bhd_user_files` (مثل مستخدمي ودفتر عناوين حسابي + مرفقات الهوية)  
 > **الهوية الموحّدة:** الاسم المعتمد لمشروع Neon هو `bhd-identity` — التفاصيل في [BHD-IDENTITY-SSO.md](BHD-IDENTITY-SSO.md)
 
 ---
@@ -48,8 +48,9 @@ npx drizzle-kit push
 
 هذا ينشئ:
 
-- `bhd_users` — الحساب (إيميل، اسم مستخدم، كلمة مرور مشفّرة، Google ID، هاتف…)
+- `bhd_users` — الحساب (إيميل، اسم عربي/إنجليزي، جنسية، جنس، ميلاد، مدني، جواز، هاتف…)
 - `bhd_contacts` — دفتر العناوين (`SELF` للملف الشخصي، و`PERSON`/`COMPANY` لجهات الاتصال)
+- `bhd_user_files` — مرفق البطاقة المدنية والجواز (base64، نوع فريد لكل مستخدم)
 
 ---
 
