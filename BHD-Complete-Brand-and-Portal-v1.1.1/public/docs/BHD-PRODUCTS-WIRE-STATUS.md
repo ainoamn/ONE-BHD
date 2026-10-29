@@ -15,7 +15,7 @@
 
 | المستودع | SHA | GitHub |
 |---|---|---|
-| ONE-BHD | `affcb7e` | [ONE-BHD](https://github.com/ainoamn/ONE-BHD) |
+| ONE-BHD | `1e1f9c1` | [ONE-BHD](https://github.com/ainoamn/ONE-BHD) |
 | BHD-HR | `9df36b5` | [BHD-HR](https://github.com/ainoamn/BHD-HR) |
 | WAZEN | `9391b42` | [WAZEN](https://github.com/ainoamn/WAZEN) |
 | bhd-om | `a360843` | [bhd-om](https://github.com/ainoamn/bhd-om) |
@@ -23,21 +23,29 @@
 | BHD-STOR | `15a70a0` | [BHD-STOR](https://github.com/ainoamn/BHD-STOR) |
 | BHD-R | `8e200b21` | [BHD-R](https://github.com/ainoamn/BHD-R) |
 | Nasab | `5e75a0a` | [Nasab](https://github.com/ainoamn/Nasab) |
-| ainoamn-ain-oman-web | `2e67b62` | [ainoamn-ain-oman-web](https://github.com/ainoamn/ainoamn-ain-oman-web) |
-| nextjs-boilerplate | `4fecd43` | [nextjs-boilerplate](https://github.com/ainoamn/nextjs-boilerplate) |
+| ainoamn-ain-oman-web | `bca76ac` | [ainoamn-ain-oman-web](https://github.com/ainoamn/ainoamn-ain-oman-web) |
+| nextjs-boilerplate | `a047410` | [nextjs-boilerplate](https://github.com/ainoamn/nextjs-boilerplate) |
 
-## نشر Vercel
+## نشر Vercel (آخر إنتاج — الكل Ready)
 
-| موقع | حالة |
+| مشروع Vercel | حالة |
 |---|---|
-| id.bhd-om.com (ONE-BHD) | نُشر |
-| hr.bhd-om.com (BHD-HR) | نُشر |
-| wazen | نُشر بعد إصلاح typecheck |
-| bhd-om | نُشر |
-| BHD-R (bhd-r-api) | نُشر |
-| hisaby | نُشر |
-| Nasab | نُشر |
-| BHD-STOR | نُشر (frontend) |
-| ain-oman-web | الكود مرفوع — البناء فشل لأخطاء قديمة في `contracts/*.tsx` (ليست من سلك العزل) |
-| nextjs-boilerplate | قالب مرفوع |
+| one-bhd | Ready |
+| bhd-hr | Ready |
+| wazen | Ready |
+| bhd-om | Ready |
+| bhd-r-api | Ready |
+| hisaby | Ready |
+| nasab | Ready |
+| bhdstor | Ready |
+| bhd-stor-x7dc | Ready |
+| frontend | Ready |
+| nextjs-boilerplate | Ready |
+| ain-oman-web | Ready (`bca76ac`) |
 
+## إصلاحات ain-oman-web حتى Ready
+
+1. إزالة `commandForIgnoringBuildStep` التالف (`echo …; no custom …`) من إعدادات المشروع عبر API.
+2. عزل صفحات المسودة/الاختبار (`*.tsx.draft`) التي كانت تكسر الـ prerender.
+3. fallback آمن أثناء الـ SSG لـ `useI18n` / `useCurrency` وباقي سياقـات الـ throw.
+4. ترقية `next` إلى `15.4.11` لتجاوز بوابة CVE في Vercel.
