@@ -208,8 +208,8 @@ export default function UnifiedLoginDocsPage() {
           <p>
             كوكي المتصفح واحدة لكل ملف Chrome، لذلك عزل النوافذ يتم بـ JWT في <code>sessionStorage</code> (
             <code>bhd_window_token</code>) وترويسة <code>Authorization: Bearer</code> عبر <code>identityFetch</code>.
-            تبديل الحساب في نافذة لا يغيّر النافذة الأخرى. انسخ{" "}
-            <code>app/lib/identity/window-session.ts</code> إلى المنتج واحفظ <code>token</code> بعد الدخول والتبديل.
+            تبديل الحساب في نافذة لا يغيّر النافذة الأخرى. المنتج يحمّل{" "}
+            <code>bhd-identity.js</code> ولا ينسخ منطق النوافذ.
           </p>
           <p className="docs-callout">
             التفاصيل:{" "}
@@ -455,7 +455,7 @@ PATCH https://id.bhd-om.com/api/admin/clients
               <tr>
                 <td>/admin على الهوية</td>
                 <td>أدمن المنصة</td>
-                <td>مستخدمون + حماية وتدقيق + عملاء OAuth + هذا الدليل</td>
+                <td>مستخدمون + حماية + ربط المواقع (#connect) + عملاء OAuth + هذا الدليل</td>
               </tr>
             </tbody>
           </table>
@@ -469,8 +469,8 @@ PATCH https://id.bhd-om.com/api/admin/clients
             <li>□ المستخدم يُحفظ بـ bhd_sub</li>
             <li>□ returnTo يفتح لوحة العميل وليس التسويق فقط</li>
             <li>□ من www.bhd-om.com البلاط يفتح الصفحة الرئيسية (homePath) لا لوحة التحكم</li>
-            <li>□ identityFetch يرسل Bearer من sessionStorage (نوافذ متعددة)</li>
-            <li>□ جلسة المنتج 40 يوماً ثم دخول جديد</li>
+            <li>□ السكربت من id.bhd-om.com و<code>BhdIdentity.me()</code> لكل نافذة</li>
+            <li>□ كوكي المنتج من runtime.session.maxAgeSec (40 يوماً)</li>
             <li>□ العميل مسجّل في /admin أو ضمن القائمة الثابتة</li>
             <li>□ بعد الاختبار الحي: mode = sso</li>
             <li>□ المشغّل يظهر بعد الدخول فقط، والكتالوج منسوخ أو يُسحب من /api/bhd/catalog</li>
@@ -555,17 +555,17 @@ PATCH https://id.bhd-om.com/api/admin/clients
               <tr>
                 <td>النافذة القديمة تعرض الحساب الجديد</td>
                 <td>المنتج يقرأ الكوكي المشتركة بلا Bearer</td>
-                <td>انسخ window-session واحفظ token بعد switch</td>
+                <td>حمّل bhd-identity.js واتبع /admin#connect</td>
               </tr>
               <tr>
                 <td>لم يُطلب الدخول بعد 40 يوماً</td>
                 <td>JWT أو كوكي المنتج أطول من ثابت الهوية</td>
-                <td>وقّع بـ Date مطلق + 40 يوماً كما في سياسة الجلسة</td>
+                <td>maxAge من /api/bhd/runtime لا من ثابت محلي</td>
               </tr>
               <tr>
                 <td>الأيقونة تغيّرت على الهوية فقط</td>
                 <td>الكتالوج مجمد في كل مستودع</td>
-                <td>انسخ apps.ts أو اسحب /api/bhd/catalog</td>
+                <td>اقرأ /api/bhd/catalog أو /admin#connect</td>
               </tr>
             </tbody>
           </table>
