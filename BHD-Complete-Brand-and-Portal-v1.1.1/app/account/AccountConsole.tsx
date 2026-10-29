@@ -5,7 +5,6 @@ import { InstantLink } from "../components/InstantLink";
 import { BHD_ACCOUNT_CHANGED, SessionMenu } from "../components/auth/SessionMenu";
 import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
-import { localNamePair } from "../lib/auth/name-transliterate";
 import { NATIONALITIES } from "../lib/auth/nationalities";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 
@@ -24,6 +23,12 @@ type AccountUser = {
   civilIdExpires: string | null;
   passportNumber: string | null;
   passportExpires: string | null;
+  accountKind: "person" | "company";
+  companyNameAr: string | null;
+  companyNameEn: string | null;
+  crNumber: string | null;
+  crExpires: string | null;
+  taxId: string | null;
   picture: string | null;
   emailVerified: boolean;
   googleLinked: boolean;
@@ -41,6 +46,8 @@ type AccountContact = {
   hometown: string | null;
   country: string | null;
   zipCode: string | null;
+  crNumber?: string | null;
+  taxId?: string | null;
 };
 
 type LinkedSite = {
@@ -100,6 +107,12 @@ export function AccountConsole() {
   const [passportExpires, setPassportExpires] = useState("");
   const [civilIdFile, setCivilIdFile] = useState<AccountFileMeta | null>(null);
   const [passportFile, setPassportFile] = useState<AccountFileMeta | null>(null);
+  const [accountKind, setAccountKind] = useState<"person" | "company">("person");
+  const [companyNameAr, setCompanyNameAr] = useState("");
+  const [companyNameEn, setCompanyNameEn] = useState("");
+  const [crNumber, setCrNumber] = useState("");
+  const [crExpires, setCrExpires] = useState("");
+  const [taxId, setTaxId] = useState("");
   const [attempted, setAttempted] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [uploading, setUploading] = useState("");
@@ -130,6 +143,12 @@ export function AccountConsole() {
     setPassportExpires(payload.user.passportExpires || "");
     setCivilIdFile(payload.files?.civilIdFile || null);
     setPassportFile(payload.files?.passportFile || null);
+    setAccountKind(payload.user.accountKind === "company" ? "company" : "person");
+    setCompanyNameAr(payload.user.companyNameAr || "");
+    setCompanyNameEn(payload.user.companyNameEn || "");
+    setCrNumber(payload.user.crNumber || payload.contact?.crNumber || "");
+    setCrExpires(payload.user.crExpires || "");
+    setTaxId(payload.user.taxId || payload.contact?.taxId || "");
     setPhone2(payload.contact?.phone2 || "");
     setWhatsapp(payload.contact?.whatsapp || "");
     setAddress(payload.contact?.address || "");
@@ -165,21 +184,27 @@ export function AccountConsole() {
 
   useEffect(() => {
     if (!data?.user) return;
-    if (nameAr && nameEn) return;
-    const seed = nameAr || nameEn || name || data.user.name;
+    const kind = data.user.accountKind === "company" ? "company" : "person";
+    if (kind === "company") {
+      if (data.user.companyNameAr && data.user.companyNameEn) return;
+      const seed = data.user.companyNameAr || data.user.companyNameEn || data.user.name;
+      if (seed) void translateName(seed, true);
+      return;
+    }
+    if (data.user.nameAr && data.user.nameEn) return;
+    const seed = data.user.nameAr || data.user.nameEn || data.user.name;
     if (seed) void translateName(seed, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.user?.id]);
 
   async function translateName(source?: string, silent = false) {
-    const seed = (source || nameAr || nameEn || name).trim();
+    const seed = (source || nameAr || nameEn || companyNameAr || companyNameEn || name).trim();
     if (!seed) {
-      if (!silent) setError("اكتب الاسم بالعربية أو الإنجليزية ثم اضغط ترجمة.");
+      if (!silent) setError("اكتب الاسم في أحد الحقلين ثم اضغط الترجمة.");
       return;
     }
     setTranslating(true);
     if (!silent) setError("");
-    const fallback = localNamePair(seed);
     try {
       const response = await fetch("/api/account/translate-name", {
         method: "POST",
@@ -187,18 +212,22 @@ export function AccountConsole() {
         body: JSON.stringify({ name: seed }),
       });
       const payload = (await response.json()) as { ar?: string; en?: string; message?: string };
-      const ar = payload.ar?.trim() || fallback.ar;
-      const en = payload.en?.trim() || fallback.en;
-      setNameAr(ar);
-      setNameEn(en);
-      setName(ar);
-      if (!response.ok && !silent && (!payload.ar || !payload.en)) {
-        setError(payload.message || "استُخدمت ترجمة احتياطية. يمكنك تصحيحها.");
+      if (!response.ok || !payload.ar || !payload.en) {
+        throw new Error(payload.message || "تعذّرت الترجمة الآلية.");
       }
-    } catch {
-      setNameAr(fallback.ar);
-      setNameEn(fallback.en);
-      setName(fallback.ar);
+      if (accountKind === "company") {
+        setCompanyNameAr(payload.ar);
+        setCompanyNameEn(payload.en);
+        setNameAr(payload.ar);
+        setNameEn(payload.en);
+        setName(payload.ar);
+      } else {
+        setNameAr(payload.ar);
+        setNameEn(payload.en);
+        setName(payload.ar);
+      }
+    } catch (err) {
+      if (!silent) setError(err instanceof Error ? err.message : "تعذّرت الترجمة الآلية. أعد المحاولة.");
     } finally {
       setTranslating(false);
     }
@@ -227,15 +256,25 @@ export function AccountConsole() {
 
   const missing = useMemo(
     () =>
-      [
-        { key: "nameAr", label: "الاسم بالعربية", value: nameAr },
-        { key: "nameEn", label: "الاسم بالإنجليزية", value: nameEn },
-        { key: "phone", label: "رقم الهاتف", value: phone },
-        { key: "nationality", label: "الجنسية", value: nationality },
-        { key: "gender", label: "الجنس", value: gender },
-        { key: "birthDate", label: "تاريخ الميلاد", value: birthDate },
-      ].filter((item) => !item.value.trim()),
-    [nameAr, nameEn, phone, nationality, gender, birthDate],
+      (accountKind === "company"
+        ? [
+            { key: "companyNameAr", label: "اسم الشركة بالعربية", value: companyNameAr },
+            { key: "companyNameEn", label: "اسم الشركة بالإنجليزية", value: companyNameEn },
+            { key: "nameAr", label: "اسم المفوض بالعربية", value: nameAr },
+            { key: "nameEn", label: "اسم المفوض بالإنجليزية", value: nameEn },
+            { key: "crNumber", label: "السجل التجاري", value: crNumber },
+            { key: "phone", label: "رقم الهاتف", value: phone },
+          ]
+        : [
+            { key: "nameAr", label: "الاسم بالعربية", value: nameAr },
+            { key: "nameEn", label: "الاسم بالإنجليزية", value: nameEn },
+            { key: "phone", label: "رقم الهاتف", value: phone },
+            { key: "nationality", label: "الجنسية", value: nationality },
+            { key: "gender", label: "الجنس", value: gender },
+            { key: "birthDate", label: "تاريخ الميلاد", value: birthDate },
+          ]
+      ).filter((item) => !item.value.trim()),
+    [accountKind, companyNameAr, companyNameEn, crNumber, nameAr, nameEn, phone, nationality, gender, birthDate],
   );
 
   function fieldTone(value: string) {
@@ -269,9 +308,15 @@ export function AccountConsole() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: nameAr || name,
+          name: nameAr || companyNameAr || name,
           nameAr,
           nameEn,
+          accountKind,
+          companyNameAr,
+          companyNameEn,
+          crNumber,
+          crExpires,
+          taxId,
           username: username || null,
           phone: phone || null,
           gender: gender || null,
@@ -353,7 +398,8 @@ export function AccountConsole() {
                 <span className="account-hero-initial">{initial}</span>
               )}
               <div>
-                <strong>{user.name}</strong>
+                <strong>{user.companyNameAr || user.name}</strong>
+                {user.accountKind === "company" ? <small>حساب شركة</small> : null}
                 <small>{user.email}</small>
                 <div className="account-chips">
                   {user.emailVerified ? <span>بريد موثّق</span> : <span>بريد غير موثّق</span>}
@@ -424,29 +470,78 @@ export function AccountConsole() {
               <form className="account-panel" onSubmit={onSubmit}>
                 <div className="account-panel-head">
                   <h2>تعديل البيانات</h2>
-                  <p>الاسم بالعربية والإنجليزية والهاتف والجنسية والجنس وتاريخ الميلاد إلزامية. البطاقة والجواز ومرفقاتهما اختيارية.</p>
+                  <p>
+                    {accountKind === "company"
+                      ? "حساب شركة: اسم الشركة بالعربي والإنجليزي والسجل التجاري والهاتف واسم المفوض إلزامية."
+                      : "حساب فرد: الاسم بالعربية والإنجليزية والهاتف والجنسية والجنس وتاريخ الميلاد إلزامية. البطاقة والجواز اختيارية."}
+                  </p>
                 </div>
                 <div className="account-fields">
-                  <label className={fieldTone(nameAr)}>
-                    الاسم بالعربية *
-                    <input
-                      value={nameAr}
-                      onChange={(event) => {
-                        setNameAr(event.target.value);
-                        setName(event.target.value);
-                      }}
-                    />
-                  </label>
-                  <label className={fieldTone(nameEn)}>
-                    الاسم بالإنجليزية *
-                    <input dir="ltr" value={nameEn} onChange={(event) => setNameEn(event.target.value)} />
-                  </label>
+                  {accountKind === "company" ? (
+                    <>
+                      <label className={fieldTone(companyNameAr)}>
+                        اسم الشركة بالعربية *
+                        <input
+                          value={companyNameAr}
+                          onChange={(event) => {
+                            setCompanyNameAr(event.target.value);
+                            setName(event.target.value);
+                          }}
+                        />
+                      </label>
+                      <label className={fieldTone(companyNameEn)}>
+                        اسم الشركة بالإنجليزية *
+                        <input dir="ltr" value={companyNameEn} onChange={(event) => setCompanyNameEn(event.target.value)} />
+                      </label>
+                    </>
+                  ) : (
+                    <>
+                      <label className={fieldTone(nameAr)}>
+                        الاسم بالعربية *
+                        <input
+                          value={nameAr}
+                          onChange={(event) => {
+                            setNameAr(event.target.value);
+                            setName(event.target.value);
+                          }}
+                        />
+                      </label>
+                      <label className={fieldTone(nameEn)}>
+                        الاسم بالإنجليزية *
+                        <input dir="ltr" value={nameEn} onChange={(event) => setNameEn(event.target.value)} />
+                      </label>
+                    </>
+                  )}
                   <div className="account-translate is-wide">
                     <button type="button" className="outline-button" disabled={translating} onClick={() => void translateName()}>
-                      {translating ? "جاري الترجمة…" : "ترجمة الاسم بالذكاء الاصطناعي"}
+                      {translating ? "جاري الترجمة…" : "ترجمة بالذكاء الاصطناعي"}
                     </button>
-                    <small>يمكنك تصحيح الترجمة يدوياً قبل الحفظ.</small>
+                    <small>نفس أسلوب BHD R: اكتب أحد الحقلين ثم ترجم. يمكنك التصحيح يدوياً.</small>
                   </div>
+                  {accountKind === "company" ? (
+                    <>
+                      <label className={fieldTone(nameAr)}>
+                        اسم المفوض بالعربية *
+                        <input value={nameAr} onChange={(event) => setNameAr(event.target.value)} />
+                      </label>
+                      <label className={fieldTone(nameEn)}>
+                        اسم المفوض بالإنجليزية *
+                        <input dir="ltr" value={nameEn} onChange={(event) => setNameEn(event.target.value)} />
+                      </label>
+                      <label className={fieldTone(crNumber)}>
+                        السجل التجاري *
+                        <input value={crNumber} onChange={(event) => setCrNumber(event.target.value)} />
+                      </label>
+                      <label>
+                        تاريخ انتهاء السجل
+                        <input type="date" value={crExpires} onChange={(event) => setCrExpires(event.target.value)} />
+                      </label>
+                      <label>
+                        الرقم الضريبي
+                        <input value={taxId} onChange={(event) => setTaxId(event.target.value)} />
+                      </label>
+                    </>
+                  ) : null}
                   <label>
                     اسم المستخدم
                     <input value={username} onChange={(event) => setUsername(event.target.value)} placeholder="اختياري" />
@@ -463,6 +558,8 @@ export function AccountConsole() {
                     رقم هاتف بديل
                     <input value={phone2} onChange={(event) => setPhone2(event.target.value)} />
                   </label>
+                  {accountKind === "person" ? (
+                  <>
                   <label className={fieldTone(nationality)}>
                     الجنسية *
                     <select value={nationality} onChange={(event) => setNationality(event.target.value)}>
@@ -533,6 +630,8 @@ export function AccountConsole() {
                       <small>صورة أو PDF حتى 4 ميغابايت.</small>
                     )}
                   </div>
+                  </>
+                  ) : null}
                   <label>
                     واتساب
                     <input value={whatsapp} onChange={(event) => setWhatsapp(event.target.value)} />

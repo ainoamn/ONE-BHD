@@ -2529,6 +2529,30 @@ h3 {
   box-shadow: 0 8px 18px rgba(9, 45, 36, 0.08);
 }
 
+.login-kind-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.login-kind-tabs button {
+  min-height: 42px;
+  border: 1px solid #d7e2dc;
+  border-radius: 12px;
+  background: #f8faf9;
+  color: #4d635a;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.login-kind-tabs button.is-active {
+  border-color: var(--ink);
+  background: #fff;
+  color: var(--ink);
+}
+
 .login-form {
   display: grid;
   gap: 14px;

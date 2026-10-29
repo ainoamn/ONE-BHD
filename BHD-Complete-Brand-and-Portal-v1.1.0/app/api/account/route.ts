@@ -57,6 +57,12 @@ export async function GET() {
         civilIdExpires: null,
         passportNumber: null,
         passportExpires: null,
+        accountKind: "person",
+        companyNameAr: null,
+        companyNameEn: null,
+        crNumber: null,
+        crExpires: null,
+        taxId: null,
         hasPassword: false,
         createdAt: null,
         lastLoginAt: null,
@@ -104,6 +110,12 @@ export async function PATCH(request: Request) {
       civilIdExpires?: string | null;
       passportNumber?: string | null;
       passportExpires?: string | null;
+      accountKind?: "person" | "company";
+      companyNameAr?: string | null;
+      companyNameEn?: string | null;
+      crNumber?: string | null;
+      crExpires?: string | null;
+      taxId?: string | null;
       phone2?: string | null;
       whatsapp?: string | null;
       address?: string | null;
@@ -133,6 +145,7 @@ export async function PATCH(request: Request) {
       NATIONALITY_REQUIRED: ["الجنسية إلزامية.", 400],
       GENDER_REQUIRED: ["الجنس إلزامي.", 400],
       BIRTHDATE_REQUIRED: ["تاريخ الميلاد إلزامي.", 400],
+      COMPANY_REQUIRED: ["اسم الشركة بالعربي والإنجليزي والسجل التجاري إلزامية.", 400],
       INVALID_USERNAME: ["اسم المستخدم من 3 إلى 32 حرفًا إنجليزيًا أو رقمًا.", 400],
       EMAIL_OR_USERNAME_TAKEN: ["اسم المستخدم مستخدم مسبقًا.", 409],
       INVALID_CREDENTIALS: ["كلمة المرور الحالية غير صحيحة.", 401],

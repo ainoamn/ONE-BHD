@@ -19,6 +19,8 @@ function messageFor(code: string) {
       return "كلمة المرور يجب أن تكون 8 أحرف على الأقل.";
     case "INVALID_USERNAME":
       return "اسم المستخدم: 3–32 حرفًا (لاتيني صغير، أرقام، . _ -).";
+    case "COMPANY_REQUIRED":
+      return "لحساب الشركة أدخل اسم الشركة بالعربية والسجل التجاري واسم المفوض.";
     default:
       return "تعذّر إنشاء الحساب.";
   }

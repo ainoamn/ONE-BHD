@@ -24,6 +24,12 @@ export type PublicUser = {
   civilIdExpires: string | null;
   passportNumber: string | null;
   passportExpires: string | null;
+  accountKind: "person" | "company";
+  companyNameAr: string | null;
+  companyNameEn: string | null;
+  crNumber: string | null;
+  crExpires: string | null;
+  taxId: string | null;
   picture: string | null;
   emailVerified: boolean;
   mustCompleteProfile: boolean;
@@ -44,6 +50,12 @@ export type RegisterInput = {
   city?: string;
   country?: string;
   zipCode?: string;
+  accountKind?: "person" | "company";
+  companyNameAr?: string;
+  companyNameEn?: string;
+  crNumber?: string;
+  crExpires?: string;
+  taxId?: string;
   signupIp?: string | null;
 };
 
@@ -73,6 +85,12 @@ export function toPublicUser(user: BhdUser): PublicUser {
     civilIdExpires: user.civilIdExpires,
     passportNumber: user.passportNumber,
     passportExpires: user.passportExpires,
+    accountKind: user.accountKind === "company" ? "company" : "person",
+    companyNameAr: user.companyNameAr,
+    companyNameEn: user.companyNameEn,
+    crNumber: user.crNumber,
+    crExpires: user.crExpires,
+    taxId: user.taxId,
     picture: user.avatar,
     emailVerified: user.emailVerified,
     mustCompleteProfile: user.mustCompleteProfile,
@@ -203,9 +221,19 @@ async function ensureSelfContact(
 
 export async function registerWithPassword(input: RegisterInput): Promise<PublicUser> {
   requireDatabase();
+  await ensureIdentitySchema();
   const email = normalizeEmail(input.email);
   const username = normalizeUsername(input.username);
   const name = input.name.trim();
+  const accountKind = input.accountKind === "company" ? "company" : "person";
+  const companyNameAr = input.companyNameAr?.trim() || null;
+  const companyNameEn = input.companyNameEn?.trim() || null;
+  const crNumber = input.crNumber?.trim() || null;
+  const crExpires = input.crExpires?.trim() || null;
+  const taxId = input.taxId?.trim() || null;
+  if (accountKind === "company" && (!companyNameAr || !crNumber || !name)) {
+    throw new Error("COMPANY_REQUIRED");
+  }
 
   if (!name || !email || !input.password) {
     throw new Error("INVALID_INPUT");
@@ -231,7 +259,15 @@ export async function registerWithPassword(input: RegisterInput): Promise<Public
   const [user] = await db
     .insert(users)
     .values({
-      name,
+      name: companyNameAr || name,
+      nameAr: accountKind === "company" ? name : null,
+      nameEn: null,
+      accountKind,
+      companyNameAr,
+      companyNameEn,
+      crNumber,
+      crExpires,
+      taxId,
       email,
       username,
       passwordHash,
@@ -246,7 +282,7 @@ export async function registerWithPassword(input: RegisterInput): Promise<Public
     .returning();
 
   await ensureSelfContact(user.id, {
-    name,
+    name: companyNameAr || name,
     email,
     phone: input.phone,
     phone2: input.phone2,
@@ -476,6 +512,8 @@ export type AccountContact = {
   hometown: string | null;
   country: string | null;
   zipCode: string | null;
+  crNumber: string | null;
+  taxId: string | null;
 };
 
 export type AccountFileMeta = { id: string; filename: string; kind: string };
@@ -487,7 +525,22 @@ export async function fillMissingNameTranslations(userId: string, sourceName: st
     const db = getDb();
     const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
     const user = rows[0];
-    if (!user || (user.nameAr && user.nameEn)) return;
+    if (!user) return;
+    if (user.accountKind === "company") {
+      if (user.companyNameAr && user.companyNameEn && user.nameAr && user.nameEn) return;
+      const translated = await translatePersonName(sourceName || user.companyNameAr || user.name);
+      await db
+        .update(users)
+        .set({
+          companyNameAr: user.companyNameAr || translated.ar,
+          companyNameEn: user.companyNameEn || translated.en,
+          name: user.companyNameAr || translated.ar || user.name,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId));
+      return;
+    }
+    if (user.nameAr && user.nameEn) return;
     const translated = await translatePersonName(sourceName || user.name);
     await db
       .update(users)
@@ -538,6 +591,8 @@ export async function getAccountProfile(id: string): Promise<{
           hometown: contact.hometown,
           country: contact.country,
           zipCode: contact.zipCode,
+          crNumber: contact.crNumber,
+          taxId: contact.taxId,
         }
       : null,
     files,
@@ -588,6 +643,12 @@ export async function updateOwnProfile(
     civilIdExpires?: string | null;
     passportNumber?: string | null;
     passportExpires?: string | null;
+    accountKind?: "person" | "company";
+    companyNameAr?: string | null;
+    companyNameEn?: string | null;
+    crNumber?: string | null;
+    crExpires?: string | null;
+    taxId?: string | null;
     phone2?: string | null;
     whatsapp?: string | null;
     address?: string | null;
@@ -642,18 +703,34 @@ export async function updateOwnProfile(
   const civilIdExpires = input.civilIdExpires !== undefined ? input.civilIdExpires?.trim() || null : user.civilIdExpires;
   const passportNumber = input.passportNumber !== undefined ? input.passportNumber?.trim() || null : user.passportNumber;
   const passportExpires = input.passportExpires !== undefined ? input.passportExpires?.trim() || null : user.passportExpires;
+  const accountKind = input.accountKind === "company" || user.accountKind === "company" ? "company" : "person";
+  const companyNameAr = input.companyNameAr !== undefined ? input.companyNameAr?.trim() || null : user.companyNameAr;
+  const companyNameEn = input.companyNameEn !== undefined ? input.companyNameEn?.trim() || null : user.companyNameEn;
+  const crNumber = input.crNumber !== undefined ? input.crNumber?.trim() || null : user.crNumber;
+  const crExpires = input.crExpires !== undefined ? input.crExpires?.trim() || null : user.crExpires;
+  const taxId = input.taxId !== undefined ? input.taxId?.trim() || null : user.taxId;
   if (!phone) throw new Error("PHONE_REQUIRED");
   if (!nameAr || !nameEn) throw new Error("NAME_TRANSLATION_REQUIRED");
-  if (!nationality) throw new Error("NATIONALITY_REQUIRED");
-  if (!gender) throw new Error("GENDER_REQUIRED");
-  if (!birthDate) throw new Error("BIRTHDATE_REQUIRED");
+  if (accountKind === "company") {
+    if (!companyNameAr || !companyNameEn || !crNumber) throw new Error("COMPANY_REQUIRED");
+  } else {
+    if (!nationality) throw new Error("NATIONALITY_REQUIRED");
+    if (!gender) throw new Error("GENDER_REQUIRED");
+    if (!birthDate) throw new Error("BIRTHDATE_REQUIRED");
+  }
 
   const [updated] = await db
     .update(users)
     .set({
-      name: nameAr || name,
+      name: accountKind === "company" ? companyNameAr || name : nameAr || name,
       nameAr,
       nameEn,
+      accountKind,
+      companyNameAr,
+      companyNameEn,
+      crNumber,
+      crExpires,
+      taxId,
       username,
       phone,
       gender,

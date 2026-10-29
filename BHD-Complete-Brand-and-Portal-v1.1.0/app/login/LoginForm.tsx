@@ -75,6 +75,14 @@ const COPY = {
     lang: "English",
     fail: "تعذّر إكمال العملية.",
     network: "تعذّر الاتصال بالخادم.",
+    person: "فرد",
+    company: "شركة",
+    companyNameAr: "اسم الشركة بالعربية",
+    companyNameEn: "اسم الشركة بالإنجليزية",
+    crNumber: "السجل التجاري",
+    crExpires: "تاريخ انتهاء السجل",
+    taxId: "الرقم الضريبي",
+    signatory: "اسم المفوض بالتوقيع",
   },
   en: {
     kicker: "BHD Gateway",
@@ -138,6 +146,14 @@ const COPY = {
     lang: "العربية",
     fail: "Something went wrong.",
     network: "Could not reach the server.",
+    person: "Individual",
+    company: "Company",
+    companyNameAr: "Company name (Arabic)",
+    companyNameEn: "Company name (English)",
+    crNumber: "Commercial registration",
+    crExpires: "CR expiry",
+    taxId: "Tax ID",
+    signatory: "Authorized signatory",
   },
 } as const;
 
@@ -204,6 +220,12 @@ export function LoginForm() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("OM");
   const [zipCode, setZipCode] = useState("");
+  const [accountKind, setAccountKind] = useState<"person" | "company">("person");
+  const [companyNameAr, setCompanyNameAr] = useState("");
+  const [companyNameEn, setCompanyNameEn] = useState("");
+  const [crNumber, setCrNumber] = useState("");
+  const [crExpires, setCrExpires] = useState("");
+  const [taxId, setTaxId] = useState("");
   const [existing, setExisting] = useState<{ name: string; email: string } | null>(null);
   const [adding, setAdding] = useState(false);
 
@@ -322,6 +344,12 @@ export function LoginForm() {
                 email,
                 username: username || undefined,
                 password,
+                accountKind,
+                companyNameAr: companyNameAr || undefined,
+                companyNameEn: companyNameEn || undefined,
+                crNumber: crNumber || undefined,
+                crExpires: crExpires || undefined,
+                taxId: taxId || undefined,
                 phone: phone || undefined,
                 phone2: phone2 || undefined,
                 whatsapp: whatsapp || undefined,
@@ -456,10 +484,55 @@ export function LoginForm() {
                 <form className="login-form" onSubmit={(event) => void onSubmit(event)}>
                   {mode === "register" ? (
                     <>
+                      <div className="login-kind-tabs" role="tablist" aria-label={lang === "ar" ? "نوع الحساب" : "Account type"}>
+                        <button
+                          type="button"
+                          className={accountKind === "person" ? "is-active" : ""}
+                          onClick={() => setAccountKind("person")}
+                        >
+                          {t.person}
+                        </button>
+                        <button
+                          type="button"
+                          className={accountKind === "company" ? "is-active" : ""}
+                          onClick={() => setAccountKind("company")}
+                        >
+                          {t.company}
+                        </button>
+                      </div>
+                      {accountKind === "company" ? (
+                        <>
+                          <label>
+                            <span>{t.companyNameAr}</span>
+                            <input value={companyNameAr} onChange={(e) => setCompanyNameAr(e.target.value)} required />
+                          </label>
+                          <label>
+                            <span>{t.companyNameEn}</span>
+                            <input dir="ltr" value={companyNameEn} onChange={(e) => setCompanyNameEn(e.target.value)} />
+                          </label>
+                          <label>
+                            <span>{t.crNumber}</span>
+                            <input value={crNumber} onChange={(e) => setCrNumber(e.target.value)} required />
+                          </label>
+                          <label>
+                            <span>{t.crExpires}</span>
+                            <input type="date" value={crExpires} onChange={(e) => setCrExpires(e.target.value)} />
+                          </label>
+                          <label>
+                            <span>{t.taxId}</span>
+                            <input value={taxId} onChange={(e) => setTaxId(e.target.value)} />
+                          </label>
+                          <label>
+                            <span>{t.signatory}</span>
+                            <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />
+                          </label>
+                        </>
+                      ) : (
                       <label>
                         <span>{t.name}</span>
                         <input value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" required />
                       </label>
+                      )}
                       <label>
                         <span>{t.email}</span>
                         <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
@@ -516,7 +589,7 @@ export function LoginForm() {
                     <>
                       <label>
                         <span>{t.phone}</span>
-                        <input value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" placeholder="+968" />
+                        <input value={phone} onChange={(e) => setPhone(e.target.value)} autoComplete="tel" placeholder="+968" required={accountKind === "company"} />
                       </label>
                       <button type="button" className="login-more-toggle" onClick={() => setShowMore((value) => !value)}>
                         {showMore ? t.hide : t.more}
