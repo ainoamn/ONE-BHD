@@ -26,10 +26,10 @@ function ssoStart(origin: string, workspacePath: string) {
 }
 
 /**
- * كتالوج مجمد — يُنسخ حرفياً إلى كل منتجات BHD.
+ * كتالوج المصدر على الهوية. المنتجات تقرأه من GET /api/bhd/runtime و /api/bhd/catalog.
  * workspacePath = لوحة العميل بعد SSO (ليس /admin إلا للمكتب الداخلي).
  * من www.bhd-om.com تُفتح homePath (الصفحة الرئيسية). من الهوية/المنتج يُفتح workspacePath.
- * انظر docs/BHD-PRODUCT-SSO-ADMIN.md وdocs/BHD-APP-SWITCHER.md
+ * انظر docs/BHD-IDENTITY-RUNTIME.md و docs/BHD-APP-SWITCHER.md
  */
 export const BHD_APPS: BhdApp[] = [
   {

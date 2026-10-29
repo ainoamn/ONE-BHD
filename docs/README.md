@@ -5,6 +5,9 @@
 | الملف | الغرض |
 |---|---|
 | [CONTINUE-FROM-OTHER-PC.md](CONTINUE-FROM-OTHER-PC.md) | **نقطة الدخول** لسحب العمل ومتابعة هذه الجلسة على كمبيوتر آخر |
+| [BHD-IDENTITY-RUNTIME.md](BHD-IDENTITY-RUNTIME.md) | **API الحي + bhd-identity.js:** الجلسة والنوافذ والكتالوج من الهوية دون نسخ الكود |
+| [BHD-COPY-TO-PRODUCTS.md](BHD-COPY-TO-PRODUCTS.md) | وثيقة الربط لباقي المواقع |
+| [BHD-SECURITY-PROTECTION.md](BHD-SECURITY-PROTECTION.md) | حماية الاحتيال: سجل IP/الدولة، حظر العنوان، قفل الحساب، `/recover` |
 | [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) | **سياسة الجلسة:** البقاء حتى الخروج الصريح — بلا خمول وبلا تحديث تلقائي وبلا جوجل إلا على `/login` |
 | [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات والتنقل الصامت، وتقنيات كل موقع بعد التثبيت |
 | [BHD-PRODUCT-SSO-ADMIN.md](BHD-PRODUCT-SSO-ADMIN.md) | **دليل تنفيذ المنتج:** SSO صامت + أدمن محلي لكل موقع (يُنسخ إلى مستودع المنتج) |

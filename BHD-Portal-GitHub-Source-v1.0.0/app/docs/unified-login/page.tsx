@@ -53,6 +53,11 @@ const DOWNLOADS = [
     note: "الخريطة الكاملة للمنظومة والسياسات بين المواقع.",
   },
   {
+    file: "BHD-IDENTITY-RUNTIME.md",
+    title: "API الحي وسكربت الهوية",
+    note: "البرمجة على id.bhd-om.com — المواقع تقرأ الجلسة والنوافذ والكتالوج مباشرة.",
+  },
+  {
     file: "BHD-WAZEN-INTEGRATION.md",
     title: "مثال تكامل وازن",
     note: "مرجع حي لمسار مكتمل يمكنك مقارنته أثناء التنفيذ.",
@@ -62,6 +67,7 @@ const DOWNLOADS = [
 const TOC = [
   ["#what", "ما هذه المنظومة؟"],
   ["#two-phases", "مرحلتان: تنفيذ المنتج ثم التسجيل"],
+  ["#runtime", "الربط الحي من الهوية (API)"],
   ["#session", "الجلسة 40 يوماً والنوافذ المتعددة"],
   ["#security", "الحماية والتدقيق"],
   ["#downloads", "تنزيل الملفات"],
@@ -156,6 +162,39 @@ export default function UnifiedLoginDocsPage() {
               </p>
             </div>
           </div>
+        </section>
+
+        <section className="docs-guide-panel" id="runtime">
+          <h2>الربط الحي — البرمجة هنا، المواقع تقرأ عبر API</h2>
+          <p>
+            لا تعيد كتابة مدة الدخول أو عزل النوافذ أو قائمة التطبيقات داخل وازن أو حسابي. ذلك ما جعل كل موقع «يبرمج على
+            مزاجه». المصدر الحي:
+          </p>
+          <ul>
+            <li>
+              <code>GET https://id.bhd-om.com/api/bhd/runtime</code> — 40 يوماً، ترويسات النافذة، الكتالوج مع الصفحة
+              الرئيسية ومساحة العمل
+            </li>
+            <li>
+              <code>https://id.bhd-om.com/bhd-identity.js</code> — <code>me</code> / تبديل / خروج لكل نافذة
+            </li>
+            <li>
+              OIDC <code>start</code> على المنتج فقط (السر على الخادم) حتى يتعرّف الموقع على الحساب بعد دخول الهوية
+            </li>
+          </ul>
+          <pre className="docs-code">{`<script src="https://id.bhd-om.com/bhd-identity.js" defer></script>
+<script>
+  const runtime = await BhdIdentity.runtime();
+  cookie.maxAge = runtime.session.maxAgeSec;
+  const { body } = await BhdIdentity.me();
+</script>`}</pre>
+          <p>
+            الدليل:{" "}
+            <a href="/docs/BHD-IDENTITY-RUNTIME.md" download="BHD-IDENTITY-RUNTIME.md">
+              BHD-IDENTITY-RUNTIME.md
+            </a>
+            .
+          </p>
         </section>
 
         <section className="docs-guide-panel" id="session">

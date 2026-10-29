@@ -12,7 +12,8 @@
 | `docs/BHD-ACCOUNT-SWITCHER.md` | بطاقة الحساب |
 | `docs/BHD-PRODUCT-SSO-ADMIN.md` | SSO صامت + أدمن محلي |
 | `docs/BHD-UNIFIED-LOGIN-AND-APPS.md` | الدليل المرجعي |
-| `app/lib/bhd/apps.ts` | الكتالوج المجمد (انظر §4) |
+| `docs/BHD-IDENTITY-RUNTIME.md` | **الربط الحي:** API + `bhd-identity.js` بدل نسخ الجلسة في كل موقع |
+| `app/lib/bhd/apps.ts` | احتياطي إن لم يُقرأ الكتالوج من الهوية بعد |
 | أيقونات `BhdAppIcon` إن تغيّرت العلامات | نفس المسار في المنتج |
 
 الهوية: `https://id.bhd-om.com` — الإدارة: `https://id.bhd-om.com/admin`
@@ -31,12 +32,12 @@
 - نافذة جديدة بلا رمز تتبنّى الكوكي الحالية (آخر دخول كامل، لا آخر تبديل).
 - خروج «هذا الحساب» في نافذة يضع `bhd_window_signed_out` ولا يمسح جلسات النوافذ الأخرى. خروج الكل يمر بـ `end-session?all=1`.
 
-### ماذا ينسخ المنتج؟
+### ماذا يفعل المنتج؟ (حي من الهوية)
 
-1. انسخ `app/lib/identity/window-session.ts` وحديث `identityFetch` لإرفاق الترويسة.
-2. بعد `POST /api/auth/switch` و`/login` و`/google` احفظ `token` من JSON في `captureWindowToken`.
-3. لا تستخدم `BroadcastChannel` لمزامنة الحساب النشط بين النوافذ.
-4. اجعل طلبات `/api/account` وبيانات المستخدم تمر من `identityFetch` لا من `fetch` العاري حتى لا تُقرأ كوكي نافذة أخرى.
+1. حمّل `https://id.bhd-om.com/bhd-identity.js` — التفاصيل في [`BHD-IDENTITY-RUNTIME.md`](BHD-IDENTITY-RUNTIME.md).
+2. اقرأ مدة الجلسة من `GET https://id.bhd-om.com/api/bhd/runtime` لا من ثابت محلي.
+3. لا تنسخ منطق النوافذ. السكربت يرسل Bearer لكل نافذة.
+4. لا تستخدم `BroadcastChannel` لمزامنة الحساب النشط بين النوافذ.
 
 ---
 
@@ -51,7 +52,7 @@
 | Refresh | 40 يوماً — لا يمدّد بعد انتهاء الجلسة |
 | خمول | لا يُسقط الجلسة قبل الـ 40 يوماً |
 
-المنتجات تطابق `exp` مع `Date.now() + 40d`. ممنوع تجديد الكوكي في `GET /api/auth/me`.
+المنتجات تأخذ `maxAgeSec` من `/api/bhd/runtime`. ممنوع تجديد الكوكي في `GET /api/auth/me`.
 
 ---
 
@@ -68,22 +69,18 @@
 
 ## 4. هل تتغيّر الأيقونات والروابط تلقائياً في كل المواقع؟
 
-**لا.** كتالوج `BHD_APPS` في `apps.ts` **مجمّد ومنسوخ**. تغيير أيقونة أو رابط على البوابة أو الهوية **لا يُدفع** إلى وازن أو حسابي أو غيرهما.
+**إن قرأ المنتج `/api/bhd/runtime` أو `/api/bhd/catalog`:** نعم، القائمة و`homeUrl` تتحدث خلال دقيقة دون إعادة نشر المنتج.
 
-ما يتوفر الآن للمزامنة اليدوية أو عبر سحب:
+**إن بقي الكتالوج منسوخاً في `apps.ts`:** لا. ذلك النسخ القديم هو سبب «كل موقع برمج على مزاجه». انقلوا الرأس إلى السكربت والكتالوج إلى الـ API.
 
-- المصدر المعتمد: `https://id.bhd-om.com/api/bhd/catalog` (`spec: bhd-appswitcher.v1`, `autoPush: false`).
-- بعد تعديل الكتالوج على ONE-BHD: انسخ `apps.ts` + الأيقونات + حدّث الوثيقة، أو اجعل المنتج يقرأ الكتالوج من ذلك العنوان عند الإقلاع إن رغبتم لاحقاً.
-
-لا تعتمدوا على أن `www.bhd-om.com` يحدّث المنتجات لوحده.
+الأيقونات الرسومية (`BhdAppIcon`) ما زالت ملفاً في المنتج حتى تُستبدل بتحميل العلامة من الهوية لاحقاً.
 
 ---
 
 ## 5. قائمة تحقق سريعة للمنتج
 
-- [ ] `identityFetch` يرسل Bearer من `sessionStorage`
-- [ ] حفظ `token` بعد الدخول والتبديل
-- [ ] جلسة المنتج 40 يوماً ثم دخول جديد (نفس ثابت الهوية)
+- [ ] `<script src="https://id.bhd-om.com/bhd-identity.js">`
+- [ ] كوكي المنتج `maxAge` من `runtime.session.maxAgeSec`
+- [ ] الكتالوج من `/api/bhd/catalog` لا من نسخة محلية قديمة
 - [ ] hops إلى `workspacePath` مباشرة إن وُجدت جلسة المنتج
-- [ ] نسخ `apps.ts` بعد كل تغيير كتالوج
 - [ ] رابط الاستعادة `https://id.bhd-om.com/recover` عند `ACCOUNT_SECURITY_HOLD`

@@ -5,7 +5,7 @@
 > **التاريخ:** 29 أكتوبر 2026  
 > **الهوية:** `https://id.bhd-om.com`
 
-انسخ هذا الملف إلى مستودع كل منتج تحت `docs/BHD-SESSION-POLICY.md` ونفّذه على جلسة **المنتج** كما تنفّذه الهوية على `bhd_id`.
+مدة الجلسة وعزل النوافذ تُقرآن حيّاً من `https://id.bhd-om.com/api/bhd/runtime` و`bhd-identity.js` — انظر `docs/BHD-IDENTITY-RUNTIME.md`. لا تثبّت أرقاماً محلية في المنتج.
 
 ---
 

@@ -54,6 +54,21 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cross-Origin-Resource-Policy", value: "cross-origin" }],
       },
       {
+        source: "/api/bhd/:path*",
+        headers: [
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+        ],
+      },
+      {
+        source: "/bhd-identity.js",
+        headers: [
+          { key: "Cross-Origin-Resource-Policy", value: "cross-origin" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          { key: "Cache-Control", value: "public, max-age=60, stale-while-revalidate=300" },
+        ],
+      },
+      {
         source: "/login",
         headers: [
           { key: "X-Robots-Tag", value: "noindex, noarchive" },

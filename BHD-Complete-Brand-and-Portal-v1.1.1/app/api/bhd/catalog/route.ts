@@ -1,23 +1,25 @@
 import { NextResponse } from "next/server";
-import { BHD_APP_SWITCHER_SPEC, BHD_APPS, hopUrls } from "../../../lib/bhd/apps";
+import { bhdRuntimePayload, runtimeCorsHeaders } from "../../../lib/bhd/runtime";
 
 export const runtime = "nodejs";
 
-/** Frozen catalog for other BHD sites. Copying apps.ts is still required unless the product fetches this URL. */
+export function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: runtimeCorsHeaders });
+}
+
 export function GET() {
+  const runtime = bhdRuntimePayload();
   return NextResponse.json(
     {
-      spec: BHD_APP_SWITCHER_SPEC,
-      source: "https://id.bhd-om.com/api/bhd/catalog",
+      spec: runtime.catalog.spec,
+      source: runtime.endpoints.catalog,
+      live: true,
       autoPush: false,
-      apps: BHD_APPS,
-      hops: hopUrls(),
+      sessionMaxAgeSec: runtime.session.maxAgeSec,
+      script: runtime.script,
+      apps: runtime.catalog.apps,
+      hops: runtime.catalog.hops,
     },
-    {
-      headers: {
-        "Cache-Control": "public, max-age=300",
-        "Access-Control-Allow-Origin": "*",
-      },
-    },
+    { headers: runtimeCorsHeaders },
   );
 }
