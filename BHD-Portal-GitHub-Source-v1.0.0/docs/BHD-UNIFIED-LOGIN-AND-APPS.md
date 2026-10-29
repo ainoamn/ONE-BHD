@@ -49,7 +49,7 @@
 
 ## 0.2 الجلسة: تبقى حتى الخروج، حسابات متعددة من الرأس، سرعة فورية
 
-**لا خمول.** المستخدم يبقى داخلًا حتى يضغط «خروج». الخمول وإغلاق التبويب/المتصفح وإعادة فتح الجهاز لا تُسقط الجلسة ولا تُحدّث الصفحة ولا تستدعي جوجل. المرجع: [`BHD-SESSION-POLICY.md`](BHD-SESSION-POLICY.md). كوكي `bhd_id` لمدة 400 يوم أو حتى الخروج. المنتج يطبّق **نفس** السياسة على جلسته المحلية حتى يبقى التنقل الصامت متسقاً.
+**لا خمول.** المستخدم يبقى داخلًا حتى يضغط «خروج» أو حتى تمرّ **40 يوماً** على الجلسة. الخمول وإغلاق التبويب/المتصفح وإعادة فتح الجهاز لا تُسقط الجلسة قبل ذلك ولا تُحدّث الصفحة ولا تستدعي جوجل. المرجع: [`BHD-SESSION-POLICY.md`](BHD-SESSION-POLICY.md). المنتج يطبّق **نفس** مدة الـ 40 يوماً على جلسته المحلية.
 
 **سرعة إلزامية.** فتح الموقع، صفحة الدخول، تسجيل الدخول، الخروج، تبديل الحساب، والتنقل بين الصفحات والمواقع يجب أن يتم في أقل من جزء من الثانية بعد أول تفاعل. `/api/auth/me` من الكوكي فقط. كود التفويض موقّع بلا انتظار Neon. GIS بعد ضغطة زر جوجل فقط.
 
@@ -161,7 +161,7 @@
 
 ما يحدث فعلياً:
 
-1. عند أول دخول ناجح على `id.bhd-om.com` تُضبط كوكي هوية اسمها `bhd_id`، **Host-only** على مضيف الهوية فقط، **400 يوم أو حتى «خروج»**، `HttpOnly` + `Secure` + `SameSite=Lax`.
+1. عند أول دخول ناجح على `id.bhd-om.com` تُضبط كوكي هوية اسمها `bhd_id`، **Host-only** على مضيف الهوية فقط، **40 يوماً أو حتى «خروج»**، `HttpOnly` + `Secure` + `SameSite=Lax`.
 2. عندما يفتح المستخدم منتجاً آخر (مثلاً وازن) يذهب المتصفح إلى `{origin}/api/auth/bhd/start` ثم إلى  
    `https://id.bhd-om.com/oauth/authorize?...`
 3. الهوية ترى كوكي `bhd_id` لأنها على **نفس المضيف** الذي ضبطها. لا تحتاج كلمة مرور.
@@ -211,8 +211,8 @@ sequenceDiagram
 | scopes | `openid profile email` |
 | صلاحية الكود | 60 ثانية، استخدام واحد |
 | صلاحية ID/Access Token | 10 دقائق |
-| صلاحية Refresh | 400 يوم مع تدوير |
-| صلاحية `bhd_id` | 400 يوم أو حتى الخروج الصريح — بلا خمول |
+| صلاحية Refresh | 40 يوماً مع تدوير |
+| صلاحية `bhd_id` | 40 يوماً أو حتى الخروج الصريح — بلا خمول |
 | DNS للنطاقات الفرعية | CNAME → `cname.vercel-dns.com` (**ليس** `vercel-dns-017`) |
 
 ### 2.1 `client_id` و`redirect_uri` الإنتاج
@@ -477,7 +477,7 @@ CREATE INDEX IF NOT EXISTS users_bhd_sub_idx ON <users>(bhd_sub);
 | `app/components/SiteFooter.tsx` | فوتر برامجنا + عن الشركة + الهوية |
 | `app/apps/page.tsx` | شرح كل برنامج وفوائده وكيف يعمل |
 | `app/components/InstantLink.tsx` | لا يسخّن `/login` ولا `/api/auth` (يمنع تحميل GIS دون طلب) |
-| `app/lib/auth/config.ts` | `SESSION_MAX_AGE_SEC` = 400 يوم حتى الخروج الصريح |
+| `app/lib/auth/config.ts` | `SESSION_MAX_AGE_SEC` = 40 يوماً ثم دخول جديد |
 | `docs/BHD-SESSION-POLICY.md` | سياسة الجلسة المعتمدة لجميع المواقع |
 | `db/schema.ts` | جداول Neon للهوية فقط |
 
@@ -616,7 +616,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | كيف يعمل الدخول | زر «تسجيل الدخول» → `GET /api/auth/bhd/start` → `https://id.bhd-om.com/oauth/authorize` (ليس أصل نَسَب) → `callback` يربط `bhd_sub` (يبقي دور الأدمن المحلي إن وُجد بالبريد) ويمسح جلسة المنتج السابقة → كوكي `kimi_sid`. جوجل وكلمة المرور المحلية معطّلان عند جاهزية SSO |
 | كيف يعمل التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ نَسَب لا يقرأ كوكي البوابة |
 | المشغّل | `AppHeader` بعد جلسة نَسَب فقط. «الحساب» → `https://id.bhd-om.com/account`. إعدادات الشجرة/الفوترة تبقى `/account` داخل نَسَب |
-| جلسة المنتج | حتى «خروج» — `BHD-SESSION-POLICY.md`. كوكي `kimi_sid` 400 يوم. بلا خمول ولا KeepAlive. بطاقة الحساب بنمط جوجل — `BHD-ACCOUNT-SWITCHER.md`: صورة+بريد، شارة مصدر على زاوية الصورة. قائمة من هوية `/api/auth/me` → `accounts`؛ تبديل `POST /api/auth/switch` ثم `start` صامت؛ إضافة → `login?add=1`؛ خروج هذا/الكل. مساحة العمل `/app` |
+| جلسة المنتج | حتى «خروج» — `BHD-SESSION-POLICY.md`. كوكي `kimi_sid` 40 يوماً. بلا خمول ولا KeepAlive. بطاقة الحساب بنمط جوجل — `BHD-ACCOUNT-SWITCHER.md`: صورة+بريد، شارة مصدر على زاوية الصورة. قائمة من هوية `/api/auth/me` → `accounts`؛ تبديل `POST /api/auth/switch` ثم `start` صامت؛ إضافة → `login?add=1`؛ خروج هذا/الكل. مساحة العمل `/app` |
 | الإدارة | صلاحية محلية `users.role=admin` فقط مربوط بـ `bhd_sub`. مسار الدخول: `GET /api/auth/admin-entry` → SSO → `/admin`. لا `/login?admin=1` ولا كلمة مرور محلية للمستخدم النهائي. غير المشرف يرى منعاً صريحاً. أدمن منصة الهوية لا يفتح نَسَب |
 | الفوتر | صف «برامجنا» من الكتالوج + روابط عن الشركة/الهوية/apps/الخصوصية/الشروط/الأمان على `www.bhd-om.com` + «دخول الإدارة» → `/api/auth/admin-entry` |
 | الهوية البصرية | حبر `#092d24` · أخضر `#075c45` · رمل `#fbfaf7`/`#f4f0e8` · IBM Plex Sans Arabic (لون تمييز نَسَب في أيقونة المشغّل فقط) |
@@ -624,7 +624,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | عمود `bhd_sub` | جدول `users` (Neon PostgreSQL) |
 | قلب `mode` إلى `sso` | 19 أغسطس 2026 في `lib/bhd/apps.ts` داخل ONE-BHD |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BHD_OAUTH_REDIRECT_URI`, `BHD_IDENTITY_TOKEN_SECRET`, `APP_SECRET`, `DATABASE_URL` |
-| التقنيات الكاملة لبناء هذا الموقع وكيف يعمل | SPA: Vite + React + TypeScript + Tailwind + tRPC من المتصفح. الخادم: Hono داخل `app/server` يُنشر دالة Vercel واحدة (`Root Directory = app`، مشروع `nasab`). البيانات: Neon PostgreSQL (eu-west-2) عبر Drizzle ومسار Neon HTTP sidecar. الجلسة: JWT HS256 في كوكي Host-only اسمها `kimi_sid` موقَّعة بـ `APP_SECRET`، 400 يوم أو حتى «خروج» بلا خمول. الواجهة عربية/إنجليزية. المدفوعات (تحويل بنكي / ثواني / Stripe) والكوبونات محلية في نَسَب. الاختبار: Vitest. |
+| التقنيات الكاملة لبناء هذا الموقع وكيف يعمل | SPA: Vite + React + TypeScript + Tailwind + tRPC من المتصفح. الخادم: Hono داخل `app/server` يُنشر دالة Vercel واحدة (`Root Directory = app`، مشروع `nasab`). البيانات: Neon PostgreSQL (eu-west-2) عبر Drizzle ومسار Neon HTTP sidecar. الجلسة: JWT HS256 في كوكي Host-only اسمها `kimi_sid` موقَّعة بـ `APP_SECRET`، 40 يوماً أو حتى «خروج» بلا خمول. الواجهة عربية/إنجليزية. المدفوعات (تحويل بنكي / ثواني / Stripe) والكوبونات محلية في نَسَب. الاختبار: Vitest. |
 | ما لم يُوحَّد | الأشجار، الأعضاء، الدعوات، القصص، GEDCOM، فواتير نَسَب، الخطط، أدوار الشجرة |
 | فريق الصيانة | مستودع `ainoamn/Nasab` |
 
@@ -654,7 +654,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | الأدمن | صلاحية محلية في جدول `users.role` فقط؛ الهوية لا تمنح أدمن. مسار الدخول: `/api/auth/admin-entry` لا `?local=1`. middleware يحوّل `/dashboard/admin` بلا جلسة إلى `admin-entry`. يتطلب `BACKEND_URL` + migration 017 لربط `bhd_sub` |
 | التنقل الصامت | كوكي `bhd_id` على الهوية؛ الكتالوج `mode=sso` للمتجر |
 | المشغّل | تسع نقاط في شريط المتجر؛ الحساب `https://id.bhd-om.com/account`؛ مزامنة `apps.ts` من ONE-BHD (23 أغسطس 2026) |
-| جلسة المنتج | [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) (4 أكتوبر 2026): كوكيز `accessToken`/`refreshToken`/`bhd_session` و JWT `exp` = 400 يوم ثابتة حتى «خروج» · Host-only · `SameSite=Lax` · حُذف `SessionKeepAlive` ومسار keepalive · لا إعادة جلب `/me` عند عودة التبويب · فشل `/me` لا يُخرج المستخدم · انتهاء جلسة المنتج → `start` صامت · لا تسخين `/auth/login` · Service Worker لا يعيد التحميل إلا بضغطة «تحديث» · `callback`/`logout` يمسحان جلسة المنتج بما فيها `bhd_sso_profile` |
+| جلسة المنتج | [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) (4 أكتوبر 2026): كوكيز `accessToken`/`refreshToken`/`bhd_session` و JWT `exp` = 40 يوماً ثم دخول جديد · Host-only · `SameSite=Lax` · حُذف `SessionKeepAlive` ومسار keepalive · لا إعادة جلب `/me` عند عودة التبويب · فشل `/me` لا يُخرج المستخدم · انتهاء جلسة المنتج → `start` صامت · لا تسخين `/auth/login` · Service Worker لا يعيد التحميل إلا بضغطة «تحديث» · `callback`/`logout` يمسحان جلسة المنتج بما فيها `bhd_sso_profile` |
 | الفوتر | صف برامجنا + رابط «دخول الإدارة» → `/api/auth/admin-entry` |
 | تاريخ قلب `mode` إلى `sso` | 19 أغسطس 2026 |
 | أسرار (أسماء فقط) | `BHD_IDENTITY_ISSUER`, `BHD_OAUTH_CLIENT_ID`, `BHD_OAUTH_CLIENT_SECRET`, `BACKEND_URL` |
@@ -674,7 +674,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | كيف يعمل الدخول | `start` → `id.bhd-om.com/oauth/authorize` → `callback` upsert على `bhdSub` (يحفظ ADMIN) → كوكي NextAuth Host-only بعد مسح الجلسة السابقة |
 | التنقل الصامت | كوكي `bhd_id` على مضيف الهوية فقط؛ المكتب لا يقرأ كوكي البوابة |
 | المشغّل | تسع نقاط بعد الجلسة؛ الحساب → `https://id.bhd-om.com/account` |
-| جلسة المنتج | يجب تطبيق [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) في مستودع `bhd-om`: 400 يوم حتى «خروج»، بلا KeepAlive، `/me` قراءة فقط |
+| جلسة المنتج | يجب تطبيق [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) في مستودع `bhd-om`: 40 يوماً ثم دخول جديد، بلا KeepAlive، `/me` قراءة فقط |
 | الإدارة | `/api/auth/admin-entry` → SSO → `/{locale}/admin`؛ الدور من جدول `User` المحلي فقط (ليس من الهوية). أدمن المنصة `BHD_PLATFORM_ADMIN_EMAILS` يخص هوية فقط |
 | ملفات `start` / `callback` | `app/api/auth/bhd/start|callback|logout` · `app/api/auth/admin-entry/route.ts` |
 | عمود `bhd_sub` | `User.bhdSub` |
@@ -711,7 +711,7 @@ authorize وtoken دائماً على https://id.bhd-om.com وليس أصل ال
 | الأصل و`redirect_uri` | `https://bhd-hr.vercel.app/api/auth/bhd/callback` (الإنتاج الحالي على Vercel)، `https://hr.bhd-om.com/api/auth/bhd/callback` (نطاق مستقبلي)، `http://localhost:3000/api/auth/bhd/callback`، `http://127.0.0.1:3000/api/auth/bhd/callback` |
 | ملفات `start` / `callback` | `src/app/api/auth/bhd/{start,callback,logout}/route.ts`، `src/app/api/auth/admin-entry/route.ts`، المنطق `src/lib/bhd/identity.ts` |
 | عمود `bhd_sub` في أي جدول | `User.bhdSub` (فريد) — Prisma/PostgreSQL (Neon) |
-| كيف يعمل الدخول والتنقل الصامت هنا | `/login` غلاف إلى `start` (طوارئ `?local=1`). `callback`: `state` ← تبديل الرمز من الخادم ← JWKS ثم `userinfo` مع فحص `iss/aud/exp/nonce` و`email_verified`. الربط `bhdSub` ← البريد الموثّق ← حساب جديد، ثم ربط الدعوات المعلّقة بالبريد، وإن لم تكن له عضوية تُنشأ له منشأة خاصة وهو مسؤولها (§0.7: مستخدم + شركة، أدمن تلك الشركة فقط) — بلا تفعيل يدوي. بيانات كل منشأة معزولة بجدول `Membership`. جلسة `hr_session` 400 يوم بلا خمول ولا `Set-Cookie` عند القراءة. تحقق: `/login` ← 307 `start` ← 302 `authorize` ← شاشة الهوية؛ الخروج ← `end-session` ← العودة إلى المنتج |
+| كيف يعمل الدخول والتنقل الصامت هنا | `/login` غلاف إلى `start` (طوارئ `?local=1`). `callback`: `state` ← تبديل الرمز من الخادم ← JWKS ثم `userinfo` مع فحص `iss/aud/exp/nonce` و`email_verified`. الربط `bhdSub` ← البريد الموثّق ← حساب جديد، ثم ربط الدعوات المعلّقة بالبريد، وإن لم تكن له عضوية تُنشأ له منشأة خاصة وهو مسؤولها (§0.7: مستخدم + شركة، أدمن تلك الشركة فقط) — بلا تفعيل يدوي. بيانات كل منشأة معزولة بجدول `Membership`. جلسة `hr_session` 40 يوماً بلا خمول ولا `Set-Cookie` عند القراءة. تحقق: `/login` ← 307 `start` ← 302 `authorize` ← شاشة الهوية؛ الخروج ← `end-session` ← العودة إلى المنتج |
 | أين رُكِّب المشغّل | رأس `src/app/(app)/layout.tsx`؛ `apps.ts` و`BhdAppIcon` و`BhdAppSwitcher` منسوخة حرفياً؛ فوتر §0.5 في `src/components/bhd/site-footer.tsx` |
 | تاريخ قلب `mode` إلى `sso` في ONE-BHD | 20 أكتوبر 2026 — أُضيف إلى الكتالوج والمشغّل والحساب والفوتر على `https://hr.bhd-om.com` |
 | أسرار البيئة (أسماء فقط) | `AUTH_SECRET`، `BHD_IDENTITY_ISSUER`، `BHD_OAUTH_CLIENT_ID`، `BHD_OAUTH_CLIENT_SECRET`، `BHD_OAUTH_REDIRECT_URI`، `BHD_ADMIN_EMAILS`، `APP_ORIGIN`، `DATABASE_URL`، `DATABASE_URL_UNPOOLED` |

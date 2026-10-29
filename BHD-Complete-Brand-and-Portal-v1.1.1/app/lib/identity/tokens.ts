@@ -1,11 +1,12 @@
 import { SignJWT, jwtVerify } from "jose";
+import { SESSION_MAX_AGE_SEC } from "../auth/config";
 import { signingKey } from "./crypto";
 import { identityIssuer } from "./issuer";
 
 const ACCESS_TTL_SEC = 10 * 60;
 const ID_TTL_SEC = 10 * 60;
-/** Align with identity cookie: product stays signed in until explicit logout. */
-const REFRESH_TTL_SEC = 60 * 60 * 24 * 400;
+/** Align with identity cookie: 40 days then sign-in again. */
+const REFRESH_TTL_SEC = SESSION_MAX_AGE_SEC;
 
 export type IdentityClaims = {
   sub: string;

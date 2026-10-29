@@ -5,7 +5,7 @@
 | الملف | الغرض |
 |---|---|
 | [CONTINUE-FROM-OTHER-PC.md](CONTINUE-FROM-OTHER-PC.md) | **نقطة الدخول** لسحب العمل ومتابعة هذه الجلسة على كمبيوتر آخر |
-| [BHD-COPY-TO-PRODUCTS.md](BHD-COPY-TO-PRODUCTS.md) | **وثيقة النسخ الكاملة** لباقي المواقع: نوافذ متعددة، 400 يوم، حماية، الكتالوج لا يُحدَّث تلقائياً |
+| [BHD-COPY-TO-PRODUCTS.md](BHD-COPY-TO-PRODUCTS.md) | **وثيقة النسخ الكاملة** لباقي المواقع: نوافذ متعددة، 40 يوماً ثم دخول، حماية، الكتالوج لا يُحدَّث تلقائياً |
 | [BHD-SECURITY-PROTECTION.md](BHD-SECURITY-PROTECTION.md) | حماية الاحتيال: سجل IP/الدولة، حظر العنوان، قفل الحساب، `/recover` |
 | [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) | **سياسة الجلسة:** البقاء حتى الخروج الصريح — بلا خمول وبلا تحديث تلقائي وبلا جوجل إلا على `/login` |
 | [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) | **الدليل المرجعي** للدخول الموحّد ومشغّل التطبيقات والتنقل الصامت، وتقنيات كل موقع بعد التثبيت |

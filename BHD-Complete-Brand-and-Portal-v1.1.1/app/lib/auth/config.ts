@@ -1,11 +1,10 @@
 export const SESSION_COOKIE = "bhd_portal";
 export const IDENTITY_SESSION_COOKIE = "bhd_id";
 /**
- * Persistent browser session: stays until the user signs out.
- * 400 days is the practical cookie cap in Chromium; JWT exp matches the cookie.
- * There is no idle timeout and no keep-alive ping.
+ * Browser session lasts 40 days then the user must sign in again.
+ * JWT exp matches the cookie. No idle timeout and no keep-alive ping.
  */
-export const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 400;
+export const SESSION_MAX_AGE_SEC = 60 * 60 * 24 * 40;
 export const SESSION_ISSUER = "bhd-portal";
 
 /** Public One BHD Web Client ID (same as HISAB / WAZEN). Safe to expose in the browser. */
