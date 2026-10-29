@@ -20,6 +20,7 @@ export type AdminUserRow = {
   hasPassword: boolean;
   emailVerified: boolean;
   isActive: boolean;
+  securityHold: boolean;
   lockedUntil: string | null;
   lastLoginAt: string | null;
   lastLoginIp: string | null;
@@ -81,6 +82,7 @@ function toAdminUser(user: BhdUser, linkedApps = 0): AdminUserRow {
     hasPassword: Boolean(user.passwordHash),
     emailVerified: user.emailVerified,
     isActive: user.isActive,
+    securityHold: Boolean(user.securityHold),
     lockedUntil: user.lockedUntil ? user.lockedUntil.toISOString() : null,
     lastLoginAt: user.lastLoginAt ? user.lastLoginAt.toISOString() : null,
     lastLoginIp: user.lastLoginIp,
@@ -193,7 +195,7 @@ export async function setUserActive(userId: string, isActive: boolean): Promise<
     .update(users)
     .set({
       isActive,
-      ...(isActive ? { loginAttempts: 0, lockedUntil: null } : {}),
+      ...(isActive ? { loginAttempts: 0, lockedUntil: null, securityHold: false, securityHoldAt: null } : {}),
       updatedAt: new Date(),
     })
     .where(eq(users.id, userId))

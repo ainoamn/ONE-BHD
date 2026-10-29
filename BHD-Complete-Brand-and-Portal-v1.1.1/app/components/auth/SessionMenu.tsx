@@ -5,6 +5,7 @@ import { BhdAppSwitcher } from "../bhd/BhdAppSwitcher";
 import type { UiLocale } from "../../lib/ui-locale";
 import { readStoredUiLocale } from "../../lib/ui-locale";
 import { addAccountUrl, applyAccountIsolation, identityFetch } from "../../lib/identity/client";
+import { captureWindowToken, signOutThisWindow } from "../../lib/identity/window-session";
 import { useCallback, useEffect, useState } from "react";
 
 export const BHD_ACCOUNT_CHANGED = "bhd-account-changed";
@@ -54,8 +55,9 @@ export function SessionMenu({ signInLabel, locale }: Props) {
     let cancelled = false;
     identityFetch("/api/auth/me")
       .then((response) => response.json())
-      .then((data: MeResponse) => {
+      .then((data: MeResponse & { token?: string }) => {
         if (cancelled) return;
+        captureWindowToken(data.token);
         setUser(data.user ?? null);
         setAccounts(data.accounts || (data.user ? [data.user] : []));
         setPlatformAdmin(Boolean(data.platformAdmin));
@@ -75,8 +77,9 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ all }),
     });
-    const data = (await response.json().catch(() => ({}))) as MeResponse;
-    if (all || !data.user) {
+    const data = (await response.json().catch(() => ({}))) as MeResponse & { token?: string };
+    if (all) {
+      signOutThisWindow();
       const post = `${window.location.origin}/`;
       const end = new URL("/oauth/end-session", "https://id.bhd-om.com");
       if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
@@ -85,10 +88,16 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       }
       end.searchParams.set("client_id", "bhd-portal");
       end.searchParams.set("post_logout_redirect_uri", post);
-      if (all) end.searchParams.set("all", "1");
+      end.searchParams.set("all", "1");
       window.location.assign(end.toString());
       return;
     }
+    if (!data.user) {
+      signOutThisWindow();
+      window.location.assign("/login");
+      return;
+    }
+    captureWindowToken(data.token);
     applyAccountIsolation();
   }, []);
 
@@ -99,6 +108,8 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       body: JSON.stringify({ sub }),
     });
     if (!response.ok) return;
+    const data = (await response.json().catch(() => ({}))) as { token?: string };
+    captureWindowToken(data.token);
     applyAccountIsolation();
   }, []);
 

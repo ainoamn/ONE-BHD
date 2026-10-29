@@ -31,10 +31,10 @@ export async function ensurePlatformAdminEmailVerified(user: {
   return true;
 }
 
-export async function requirePlatformAdmin(): Promise<
+export async function requirePlatformAdmin(request?: Request): Promise<
   { ok: true; session: PortalSession } | { ok: false; status: 401 | 403 }
 > {
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
   if (!session) return { ok: false, status: 401 };
   if (!isPlatformAdminEmail(session.email)) return { ok: false, status: 403 };
   return { ok: true, session };

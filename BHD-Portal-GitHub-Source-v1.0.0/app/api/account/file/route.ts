@@ -7,7 +7,7 @@ import { isDatabaseConfigured } from "../../../../db";
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
   if (!session) return NextResponse.json({ message: "يجب تسجيل الدخول." }, { status: 401 });
   const kind = new URL(request.url).searchParams.get("kind") || "";
   if (!isAccountFileKind(kind)) return NextResponse.json({ message: "نوع المرفق غير صالح." }, { status: 400 });
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
   if (!session) return NextResponse.json({ message: "يجب تسجيل الدخول." }, { status: 401 });
   if (!isDatabaseConfigured()) return NextResponse.json({ message: "قاعدة البيانات غير مربوطة." }, { status: 503 });
   if (!allowRequest(`upload:${clientKey(request)}:${session.sub}`, 8, 60_000)) {

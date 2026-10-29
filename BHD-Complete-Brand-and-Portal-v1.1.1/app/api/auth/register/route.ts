@@ -53,16 +53,29 @@ export async function POST(request: Request) {
 
     const next = portalSessionFromUser(user, "password");
     const roster = await readSessionRoster();
+    const accounts = upsertRoster(roster, next);
     const response = NextResponse.json({
       user,
-      accounts: upsertRoster(roster, next),
+      accounts,
+      token: "",
       verificationEmailSent,
       message: verificationEmailSent
         ? "تم إنشاء الحساب. راجع بريدك لتأكيد العنوان."
         : "تم إنشاء الحساب. أكّد بريدك لاحقاً من صفحة الحساب.",
     });
-    await applyIdentityLogin(response.cookies, next, roster);
-    return response;
+    const { token } = await applyIdentityLogin(response.cookies, next, roster);
+    return NextResponse.json(
+      {
+        user,
+        accounts,
+        token,
+        verificationEmailSent,
+        message: verificationEmailSent
+          ? "تم إنشاء الحساب. راجع بريدك لتأكيد العنوان."
+          : "تم إنشاء الحساب. أكّد بريدك لاحقاً من صفحة الحساب.",
+      },
+      { headers: response.headers },
+    );
   } catch (error) {
     const code = error instanceof Error ? error.message : "UNKNOWN";
     const status = code === "EMAIL_OR_USERNAME_TAKEN" ? 409 : 400;

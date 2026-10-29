@@ -66,6 +66,45 @@ export async function ensureIdentitySchema(): Promise<void> {
       await getSql().unsafe(
         `CREATE UNIQUE INDEX IF NOT EXISTS bhd_user_files_user_kind ON bhd_user_files (user_id, kind)`,
       );
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS security_hold boolean NOT NULL DEFAULT false`);
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS security_hold_at timestamptz`);
+      await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_login_events (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id uuid,
+          email text,
+          ip text,
+          country text,
+          user_agent text,
+          ok boolean NOT NULL DEFAULT false,
+          reason text,
+          created_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
+      await getSql().unsafe(`CREATE INDEX IF NOT EXISTS bhd_login_events_created ON bhd_login_events (created_at DESC)`);
+      await getSql().unsafe(`CREATE INDEX IF NOT EXISTS bhd_login_events_ip ON bhd_login_events (ip, created_at DESC)`);
+      await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_ip_blocks (
+          ip text PRIMARY KEY,
+          until timestamptz NOT NULL,
+          reason text NOT NULL,
+          created_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
+      await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_recovery_challenges (
+          id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+          user_id uuid NOT NULL REFERENCES bhd_users(id) ON DELETE CASCADE,
+          email_code_hash text NOT NULL,
+          whatsapp_code_hash text,
+          expires_at timestamptz NOT NULL,
+          email_verified boolean NOT NULL DEFAULT false,
+          whatsapp_verified boolean NOT NULL DEFAULT false,
+          whatsapp_pending boolean NOT NULL DEFAULT true,
+          consumed_at timestamptz,
+          created_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
       await getSql().unsafe(`
         CREATE TABLE IF NOT EXISTS bhd_oauth_clients (
           client_id text PRIMARY KEY,

@@ -49,6 +49,8 @@ export const users = pgTable("bhd_users", {
   signupIp: text("signup_ip"),
   loginAttempts: integer("login_attempts").notNull().default(0),
   lockedUntil: timestamp("locked_until", { withTimezone: true }),
+  securityHold: boolean("security_hold").notNull().default(false),
+  securityHoldAt: timestamp("security_hold_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -127,6 +129,40 @@ export const userFiles = pgTable("bhd_user_files", {
   filename: text("filename").notNull(),
   mime: text("mime").notNull(),
   content: text("content").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const loginEvents = pgTable("bhd_login_events", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id"),
+  email: text("email"),
+  ip: text("ip"),
+  country: text("country"),
+  userAgent: text("user_agent"),
+  ok: boolean("ok").notNull().default(false),
+  reason: text("reason"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const ipBlocks = pgTable("bhd_ip_blocks", {
+  ip: text("ip").primaryKey(),
+  until: timestamp("until", { withTimezone: true }).notNull(),
+  reason: text("reason").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const recoveryChallenges = pgTable("bhd_recovery_challenges", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  emailCodeHash: text("email_code_hash").notNull(),
+  whatsappCodeHash: text("whatsapp_code_hash"),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  emailVerified: boolean("email_verified").notNull().default(false),
+  whatsappVerified: boolean("whatsapp_verified").notNull().default(false),
+  whatsappPending: boolean("whatsapp_pending").notNull().default(true),
+  consumedAt: timestamp("consumed_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

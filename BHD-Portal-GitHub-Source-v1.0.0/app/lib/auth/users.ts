@@ -6,8 +6,7 @@ import { isPlatformAdminEmail } from "./platform-admin";
 import { listAccountFileMeta } from "./account-files";
 import { translatePersonName } from "./translate-name";
 
-const MAX_ATTEMPTS = 5;
-const LOCK_MINUTES = 15;
+import { applyFailedPassword, recordLoginEvent } from "./security";
 
 export type PublicUser = {
   id: string;
@@ -61,6 +60,8 @@ export type RegisterInput = {
 
 export type LoginMeta = {
   ip?: string | null;
+  country?: string | null;
+  userAgent?: string | null;
 };
 
 export function requireDatabase() {
@@ -110,6 +111,9 @@ function normalizeUsername(username?: string) {
 }
 
 function assertUnlocked(user: BhdUser) {
+  if (user.securityHold) {
+    throw new Error("ACCOUNT_SECURITY_HOLD");
+  }
   if (user.lockedUntil && user.lockedUntil > new Date()) {
     throw new Error("ACCOUNT_LOCKED");
   }
@@ -309,7 +313,15 @@ export async function loginWithPassword(
 
   const db = getDb();
   const user = await findUserByEmailOrUsername(raw);
+  const eventBase = {
+    userId: user?.id || null,
+    email: user?.email || raw,
+    ip: meta?.ip || null,
+    country: meta?.country || null,
+    userAgent: meta?.userAgent || null,
+  };
   if (!user || !user.passwordHash) {
+    await recordLoginEvent({ ...eventBase, ok: false, reason: "invalid_credentials" });
     throw new Error("INVALID_CREDENTIALS");
   }
 
@@ -317,18 +329,14 @@ export async function loginWithPassword(
 
   const ok = await verifyPassword(password, user.passwordHash);
   if (!ok) {
-    const attempts = user.loginAttempts + 1;
-    const lockedUntil =
-      attempts >= MAX_ATTEMPTS ? new Date(Date.now() + LOCK_MINUTES * 60_000) : null;
-    await db
-      .update(users)
-      .set({
-        loginAttempts: attempts,
-        lockedUntil,
-        updatedAt: new Date(),
-      })
-      .where(eq(users.id, user.id));
-    throw new Error(lockedUntil ? "ACCOUNT_LOCKED" : "INVALID_CREDENTIALS");
+    const result = await applyFailedPassword(user);
+    await recordLoginEvent({
+      ...eventBase,
+      ok: false,
+      reason: result.hold ? "security_hold" : result.locked ? "temp_lock" : "invalid_credentials",
+    });
+    if (result.hold) throw new Error("ACCOUNT_SECURITY_HOLD");
+    throw new Error(result.locked ? "ACCOUNT_LOCKED" : "INVALID_CREDENTIALS");
   }
 
   const ip = meta?.ip?.trim() || null;
@@ -347,6 +355,7 @@ export async function loginWithPassword(
 
   const publicUser = toPublicUser(updated);
   void fillMissingNameTranslations(updated.id, updated.name);
+  await recordLoginEvent({ ...eventBase, userId: updated.id, email: updated.email, ok: true, reason: "password" });
   return publicUser;
 }
 

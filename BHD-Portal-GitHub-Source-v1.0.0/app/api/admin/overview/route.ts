@@ -7,7 +7,7 @@ import { googleClientId, isFacebookAuthConfigured, authSecret } from "../../../l
 export const runtime = "nodejs";
 
 export async function GET(request: Request) {
-  const gate = await requirePlatformAdmin();
+  const gate = await requirePlatformAdmin(request);
   if (!gate.ok) {
     return NextResponse.json(
       { message: gate.status === 401 ? "يلزم تسجيل الدخول." : "ليست لديك صلاحية الإدارة." },

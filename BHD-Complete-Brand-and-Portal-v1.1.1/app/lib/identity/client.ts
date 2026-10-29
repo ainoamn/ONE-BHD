@@ -1,5 +1,6 @@
 import { BHD_APPS } from "../bhd/apps";
 import { DEFAULT_IDENTITY_ISSUER } from "./issuer";
+import { windowFetchHeaders } from "./window-session";
 
 export function pageOrigin() {
   return typeof window === "undefined" ? "" : window.location.origin.replace(/\/$/, "");
@@ -27,10 +28,12 @@ export function identityApiUrl(path: string) {
 }
 
 export function identityFetch(path: string, init?: RequestInit) {
+  const headers = windowFetchHeaders(init?.headers);
   return fetch(identityApiUrl(path), {
     cache: "no-store",
     credentials: "include",
     ...init,
+    headers,
   });
 }
 

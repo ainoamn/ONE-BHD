@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { applyIdentitySwitch, publicAccount, readSessionRoster } from "../../../lib/auth/session";
+import {
+  applyIdentitySwitch,
+  publicAccount,
+  readBearerToken,
+  readSessionRoster,
+} from "../../../lib/auth/session";
 import { productCorsHeaders, productCorsPreflight } from "../../../lib/auth/product-cors";
 
 export const runtime = "nodejs";
@@ -21,20 +26,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "الحساب مطلوب." }, { status: 400, headers });
   }
 
-  const roster = await readSessionRoster();
+  const roster = await readSessionRoster(request);
   const target = roster.find((item) => item.sub === sub || item.email === sub);
   if (!target) {
     return NextResponse.json({ message: "هذا الحساب غير محفوظ في هذه الجلسة." }, { status: 404, headers });
   }
 
-  const response = NextResponse.json(
-    {
-      ok: true,
-      user: publicAccount(target),
-      accounts: roster.map(publicAccount),
-    },
-    { headers },
-  );
-  await applyIdentitySwitch(response.cookies, target.sub, roster);
+  const response = NextResponse.json({ ok: true, user: publicAccount(target), accounts: roster.map(publicAccount) }, { headers });
+  const persistCookie = !readBearerToken(request);
+  const switched = await applyIdentitySwitch(response.cookies, target.sub, roster, persistCookie);
+  if (switched) {
+    return NextResponse.json(
+      {
+        ok: true,
+        user: publicAccount(switched.session),
+        accounts: roster.map(publicAccount),
+        token: switched.token,
+      },
+      { headers: response.headers },
+    );
+  }
   return response;
 }

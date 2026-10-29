@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans_Arabic, Inter } from "next/font/google";
 import { headers } from "next/headers";
 import { NavigationWarmup } from "./components/NavigationWarmup";
+import { WindowSession } from "./components/auth/WindowSession";
 import { BhdSilentSso } from "./components/bhd/BhdSilentSso";
 import "./globals.css";
 
@@ -130,6 +131,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className={plexArabic.className}>
         <a className="skip-link" href="#main-content">انتقل إلى المحتوى الرئيسي</a>
         <NavigationWarmup />
+        <WindowSession />
         <BhdSilentSso />
         {children}
         <script

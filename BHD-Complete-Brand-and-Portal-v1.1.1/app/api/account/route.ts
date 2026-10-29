@@ -32,8 +32,8 @@ function linkedSites(linkedClientIds: string[]) {
   });
 }
 
-export async function GET() {
-  const session = await getCurrentSession();
+export async function GET(request: Request) {
+  const session = await getCurrentSession(request);
   if (!session) return noStore({ message: "يجب تسجيل الدخول." }, 401);
   if (!isDatabaseConfigured()) {
     return noStore({
@@ -87,7 +87,7 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
   if (!session) return noStore({ message: "يجب تسجيل الدخول." }, 401);
   if (!authSecret() || !isDatabaseConfigured()) {
     return noStore({ message: "تعذّر حفظ البيانات الآن." }, 503);

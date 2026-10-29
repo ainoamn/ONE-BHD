@@ -101,6 +101,10 @@ function secretKey() {
   return new TextEncoder().encode(secret);
 }
 
+export function sessionExpiresAt() {
+  return new Date(Date.now() + SESSION_MAX_AGE_SEC * 1000);
+}
+
 export async function createSessionToken(session: PortalSession): Promise<string> {
   return new SignJWT({
     email: session.email,
@@ -115,7 +119,7 @@ export async function createSessionToken(session: PortalSession): Promise<string
     .setIssuer(SESSION_ISSUER)
     .setAudience(SESSION_ISSUER)
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE_SEC}s`)
+    .setExpirationTime(sessionExpiresAt())
     .sign(secretKey());
 }
 
@@ -154,14 +158,34 @@ export function sessionCookieOptions() {
     sameSite: "lax" as const,
     path: "/",
     maxAge: SESSION_MAX_AGE_SEC,
+    expires: sessionExpiresAt(),
   };
 }
 
-export async function getCurrentSession(): Promise<PortalSession | null> {
+export function readBearerToken(request?: Request | null): string | null {
+  const header = request?.headers.get("authorization") || "";
+  const match = /^Bearer\s+(\S+)/i.exec(header);
+  return match?.[1] || null;
+}
+
+export async function getCurrentSession(request?: Request | null): Promise<PortalSession | null> {
+  if (request?.headers.get("x-bhd-window-signed-out") === "1") {
+    return null;
+  }
+  const bearer = readBearerToken(request);
+  if (bearer) {
+    const fromHeader = await readSessionToken(bearer);
+    if (fromHeader) return fromHeader;
+  }
   const jar = await cookies();
   const token = jar.get(IDENTITY_SESSION_COOKIE)?.value || jar.get(SESSION_COOKIE)?.value;
   if (!token) return null;
   return readSessionToken(token);
+}
+
+export async function cookieSessionToken(): Promise<string | null> {
+  const jar = await cookies();
+  return jar.get(IDENTITY_SESSION_COOKIE)?.value || jar.get(SESSION_COOKIE)?.value || null;
 }
 
 export function mergePortalSession(prev: PortalSession | undefined, next: PortalSession): PortalSession {
@@ -188,7 +212,7 @@ async function signRoster(accounts: PortalSession[]): Promise<string> {
     .setProtectedHeader({ alg: "HS256", typ: "JWT" })
     .setIssuer(ROSTER_ISSUER)
     .setIssuedAt()
-    .setExpirationTime(`${SESSION_MAX_AGE_SEC}s`)
+    .setExpirationTime(sessionExpiresAt())
     .sign(secretKey());
 }
 
@@ -224,10 +248,10 @@ export async function readRosterToken(token: string | undefined): Promise<Portal
   }
 }
 
-export async function readSessionRoster(): Promise<PortalSession[]> {
+export async function readSessionRoster(request?: Request | null): Promise<PortalSession[]> {
   const jar = await cookies();
   const roster = await readRosterToken(jar.get(ROSTER_COOKIE)?.value);
-  const current = await getCurrentSession();
+  const current = await getCurrentSession(request);
   if (!current) return roster;
   return upsertRoster(roster, current);
 }
@@ -245,23 +269,27 @@ export async function applyIdentityLogin(
   store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
   next: PortalSession,
   roster: PortalSession[],
-) {
+): Promise<{ accounts: PortalSession[]; token: string }> {
   const merged = upsertRoster(roster, next);
   const token = await createSessionToken(merged[0] || next);
   applySessionCookies(store, token);
   store.set(ROSTER_COOKIE, await signRoster(merged), sessionCookieOptions());
-  return merged;
+  return { accounts: merged, token };
 }
 
 export async function applyIdentitySwitch(
   store: { set: (name: string, value: string, options: ReturnType<typeof sessionCookieOptions>) => void },
   targetSub: string,
   roster: PortalSession[],
-): Promise<PortalSession | null> {
+  persistCookie = true,
+): Promise<{ session: PortalSession; token: string } | null> {
   const next = roster.find((item) => item.sub === targetSub);
   if (!next) return null;
-  await applyIdentityLogin(store, next, roster);
-  return next;
+  const token = await createSessionToken(next);
+  if (persistCookie) {
+    await applyIdentityLogin(store, next, roster);
+  }
+  return { session: next, token };
 }
 
 export async function applyIdentityLogout(

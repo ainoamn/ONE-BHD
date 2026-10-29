@@ -3,6 +3,7 @@
 import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from "@react-oauth/google";
 import { useCallback, useEffect, useState } from "react";
 import { BHD_GOOGLE_WEB_CLIENT_ID } from "../../lib/auth/config";
+import { captureWindowToken } from "../../lib/identity/window-session";
 
 type Props = {
   onSuccess?: () => void;
@@ -40,11 +41,12 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ idToken: credentialResponse.credential }),
         });
-        const data = (await response.json()) as { message?: string };
+        const data = (await response.json()) as { message?: string; token?: string };
         if (!response.ok) {
           setError(data.message || (locale === "en" ? "Google sign-in failed." : "تعذّر تسجيل الدخول عبر Google."));
           return;
         }
+        captureWindowToken(data.token);
         onSuccess?.();
       } catch {
         setError(locale === "en" ? "Could not reach the sign-in server." : "تعذّر الاتصال بخادم الدخول.");

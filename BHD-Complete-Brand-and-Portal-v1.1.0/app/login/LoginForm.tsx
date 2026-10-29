@@ -8,6 +8,7 @@ import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { BHD_APPS } from "../lib/bhd/apps";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { captureWindowToken } from "../lib/identity/window-session";
 
 type Mode = "login" | "register" | "forgot";
 type Lang = "ar" | "en";
@@ -203,6 +204,7 @@ export function LoginForm() {
   const [mode, setMode] = useState<Mode>("login");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [recoverUrl, setRecoverUrl] = useState("");
   const [notice, setNotice] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
   const [cooldownSec, setCooldownSec] = useState(0);
@@ -310,6 +312,7 @@ export function LoginForm() {
     event.preventDefault();
     setLoading(true);
     setError("");
+    setRecoverUrl("");
     setNotice("");
     try {
       if (mode === "forgot") {
@@ -363,12 +366,16 @@ export function LoginForm() {
       const data = (await response.json()) as {
         message?: string;
         code?: string;
+        token?: string;
+        recoverUrl?: string;
         activeSession?: { name?: string; email?: string } | null;
       };
       if (!response.ok) {
         setError(data.message || t.fail);
+        if (data.recoverUrl) setRecoverUrl(data.recoverUrl);
         return;
       }
+      captureWindowToken(data.token);
       finishOk();
       if (isOauthContinue(nextSafe)) return;
     } catch {
@@ -628,6 +635,12 @@ export function LoginForm() {
                   {error || facebookMessage ? (
                     <p className="login-error" role="alert">
                       {error || facebookMessage}
+                      {recoverUrl ? (
+                        <>
+                          {" "}
+                          <InstantLink href={recoverUrl}>استعادة الحساب</InstantLink>
+                        </>
+                      ) : null}
                     </p>
                   ) : null}
                   {notice && mode !== "forgot" ? (

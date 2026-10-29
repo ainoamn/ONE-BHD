@@ -7,6 +7,7 @@ import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
 import { NATIONALITIES } from "../lib/auth/nationalities";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { identityFetch } from "../lib/identity/client";
 
 type AccountUser = {
   id: string;
@@ -161,7 +162,7 @@ export function AccountConsole() {
   useEffect(() => {
     let cancelled = false;
     function load() {
-      fetch("/api/account", { cache: "no-store" })
+      identityFetch("/api/account")
         .then(async (response) => {
           const payload = (await response.json()) as AccountPayload;
           if (!response.ok) throw new Error(payload.message || "تعذّر تحميل الحساب.");
@@ -206,7 +207,7 @@ export function AccountConsole() {
     setTranslating(true);
     if (!silent) setError("");
     try {
-      const response = await fetch("/api/account/translate-name", {
+      const response = await identityFetch("/api/account/translate-name", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: seed }),
@@ -241,7 +242,7 @@ export function AccountConsole() {
       const form = new FormData();
       form.set("kind", kind);
       form.set("file", file);
-      const response = await fetch("/api/account/file", { method: "POST", body: form });
+      const response = await identityFetch("/api/account/file", { method: "POST", body: form });
       const payload = (await response.json()) as AccountFileMeta & { message?: string };
       if (!response.ok) throw new Error(payload.message || "تعذّر رفع المرفق.");
       if (kind === "civil_id") setCivilIdFile(payload);
@@ -304,7 +305,7 @@ export function AccountConsole() {
       return;
     }
     try {
-      const response = await fetch("/api/account", {
+      const response = await identityFetch("/api/account", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -6,7 +6,8 @@ import {
 } from "../../../lib/auth/config";
 import { verifyGoogleIdToken } from "../../../lib/auth/google";
 import { allowRequest, clientKey } from "../../../lib/auth/rate-limit";
-import { getRequestIp } from "../../../lib/auth/request-ip";
+import { getRequestCountry, getRequestIp, getRequestUserAgent } from "../../../lib/auth/request-ip";
+import { recordLoginEvent } from "../../../lib/auth/security";
 import { applyIdentityLogin, getCurrentSession, portalSessionFromUser, readSessionRoster, upsertRoster } from "../../../lib/auth/session";
 import { loginOrRegisterWithGoogle } from "../../../lib/auth/users";
 import { isDatabaseConfigured } from "../../../../db";
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const session = await getCurrentSession();
+  const session = await getCurrentSession(request);
   if (!session && !allowRequest(`google:${clientKey(request)}`, 8, 60_000)) {
     return NextResponse.json({ message: "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة." }, { status: 429 });
   }
@@ -53,11 +54,21 @@ export async function POST(request: Request) {
       picture: google.picture,
       ip: getRequestIp(request),
     });
+    await recordLoginEvent({
+      userId: user.id,
+      email: user.email,
+      ip: getRequestIp(request),
+      country: getRequestCountry(request),
+      userAgent: getRequestUserAgent(request),
+      ok: true,
+      reason: "google",
+    });
     const next = portalSessionFromUser(user, "google");
-    const roster = await readSessionRoster();
-    const response = NextResponse.json({ user, accounts: upsertRoster(roster, next) });
-    await applyIdentityLogin(response.cookies, next, roster);
-    return response;
+    const roster = await readSessionRoster(request);
+    const accounts = upsertRoster(roster, next);
+    const response = NextResponse.json({ user, accounts, token: "" });
+    const { token } = await applyIdentityLogin(response.cookies, next, roster);
+    return NextResponse.json({ user, accounts, token }, { headers: response.headers });
   } catch (error) {
     const code = error instanceof Error ? error.message : "";
     if (code === "ACCOUNT_LOCKED" || code === "ACCOUNT_DISABLED") {

@@ -5458,6 +5458,26 @@ a.login-submit {
   background: #174b70;
 }
 
+.admin-audit-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-audit-list li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+.admin-security {
+  display: grid;
+  gap: 18px;
+}
+
 .admin-action-danger {
   background: #8b2e2e;
 }

@@ -4,6 +4,7 @@ import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { SessionMenu } from "../components/auth/SessionMenu";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { AdminSecurityPanel } from "./AdminSecurityPanel";
 
 type Overview = {
   spec: string;
@@ -66,7 +67,7 @@ type AdminUserDetail = AdminUser & {
   }>;
 };
 
-type TabId = "users" | "system" | "clients" | "emails";
+type TabId = "users" | "system" | "clients" | "emails" | "security";
 
 type RegistryClient = {
   clientId: string;
@@ -461,6 +462,7 @@ export function AdminConsole({
           {(
             [
               ["users", "المستخدمون"],
+              ["security", "الحماية والتدقيق"],
               ["emails", "قوالب البريد"],
               ["system", "النظام"],
               ["clients", "العملاء والربط"],
@@ -488,6 +490,8 @@ export function AdminConsole({
             </article>
           ))}
         </section>
+
+        {tab === "security" ? <AdminSecurityPanel /> : null}
 
         {tab === "emails" ? (
           <div className="admin-emails-layout">
