@@ -12,3 +12,17 @@
 | حالة المنتجات | `docs/BHD-PRODUCTS-WIRE-STATUS.md` |
 
 **نشر Vercel (بوابة):** من جذر ONE-BHD — `npx vercel --prod --yes` (مجلد `BHD-Complete-Brand-and-Portal-v1.1.0`).
+
+## 94. ربط كل منتجات BHD بالهوية الحيّة (2026-10-29)
+
+**المطلوب:** توثيق جاد لأعمال العزل/الكتالوج، وتطبيق السلك (تسجيل، أيقونات، ربط، rebind) على كل المستودعات المدرجة.
+
+| # | ما نُفّذ |
+|---|---|
+| 1 | وثائق مركزية: ACCOUNT-ISOLATION، CURSOR-WIRE، PRODUCTS-WIRE-STATUS |
+| 2 | تحديث BHD-HR كمرجع (§93) + خريطة ملفات PRODUCT-WIRE |
+| 3 | دفع السلك إلى WAZEN، hisaby، BHD-STOR، BHD-R، Nasab، bhd-om، ain-oman-web، nextjs-boilerplate |
+| 4 | بوابة ONE-BHD: logout + rebind؛ مزامنة الأشجار الثلاث |
+
+**الخطوات:** commit، push main، `npx vercel --prod --yes`.
+
