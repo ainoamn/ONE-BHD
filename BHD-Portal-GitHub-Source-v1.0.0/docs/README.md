@@ -6,6 +6,7 @@
 |---|---|
 | [CONTINUE-FROM-OTHER-PC.md](CONTINUE-FROM-OTHER-PC.md) | **نقطة الدخول** لسحب العمل ومتابعة هذه الجلسة على كمبيوتر آخر |
 | [BHD-IDENTITY-RUNTIME.md](BHD-IDENTITY-RUNTIME.md) | **API الحي + شاشة الأيقونات** من [`/admin#apps`](https://id.bhd-om.com/admin#apps) و[`/admin#connect`](https://id.bhd-om.com/admin#connect) |
+| [BHD-CURSOR-PRODUCT-WIRE.md](BHD-CURSOR-PRODUCT-WIRE.md) | **أمر جاهز لكورسر** لربط أي منتج: العزل، الكتالوج، الرأس/الفوتر/الرئيسية |
 | [BHD-COPY-TO-PRODUCTS.md](BHD-COPY-TO-PRODUCTS.md) | وثيقة الربط لباقي المواقع |
 | [BHD-SECURITY-PROTECTION.md](BHD-SECURITY-PROTECTION.md) | حماية الاحتيال: سجل IP/الدولة، حظر العنوان، قفل الحساب، `/recover` |
 | [BHD-SESSION-POLICY.md](BHD-SESSION-POLICY.md) | **سياسة الجلسة:** البقاء حتى الخروج الصريح — بلا خمول وبلا تحديث تلقائي وبلا جوجل إلا على `/login` |

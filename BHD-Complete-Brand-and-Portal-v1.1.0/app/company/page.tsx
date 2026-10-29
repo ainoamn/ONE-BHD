@@ -8,7 +8,9 @@ import { InstantLink } from "../components/InstantLink";
 import { SessionMenu } from "../components/auth/SessionMenu";
 import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
-import { isExternalProductHref, products } from "../lib/products";
+import { publicProgramApps } from "../lib/bhd/public-apps";
+import { useLiveCatalog } from "../lib/bhd/use-live-catalog";
+import { isExternalProductHref } from "../lib/products";
 import type { UiLocale } from "../lib/ui-locale";
 import {
   applyDocumentLocale,
@@ -167,6 +169,9 @@ const copy = {
 
 export default function CompanyPortal() {
   const [language, setLanguage] = useState<Language>("ar");
+  const [origin, setOrigin] = useState("");
+  const catalog = useLiveCatalog();
+  const programs = publicProgramApps(catalog, origin || undefined);
   const [ready, setReady] = useState(false);
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -176,6 +181,7 @@ export default function CompanyPortal() {
   const isArabic = language === "ar";
 
   useEffect(() => {
+    setOrigin(window.location.origin);
     const stored = readStoredUiLocale();
     if (stored) setLanguage(stored);
     setReady(true);
@@ -262,16 +268,24 @@ export default function CompanyPortal() {
                   <small>BHD ECOSYSTEM</small>
                 </div>
                 <div className="launcher-grid">
-                  {products.slice(0, 5).map((product) => (
+                  {programs.slice(0, 5).map((product) => (
                     <a
-                      key={product.name}
+                      key={product.id}
                       href={product.href}
                       role="menuitem"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <BhdAppIcon id={product.appId} title={isArabic ? product.nameAr : product.name} className="launcher-mark" />
-                      <span>{isArabic ? product.nameAr : product.name}</span>
+                      <BhdAppIcon
+                        id={product.id}
+                        title={isArabic ? product.nameAr : product.nameEn}
+                        logoUrl={product.logoUrl}
+                        mark={product.mark}
+                        accent={product.accent}
+                        soft={product.soft}
+                        className="launcher-mark"
+                      />
+                      <span>{isArabic ? product.nameAr : product.nameEn}</span>
                     </a>
                   ))}
                 </div>
@@ -442,11 +456,11 @@ export default function CompanyPortal() {
         </div>
 
         <div className="products-grid">
-          {products.map((product, index) => {
+          {programs.map((product, index) => {
             const isLive = product.statusEn !== "In development" && product.statusEn !== "Internal system";
             return (
               <article
-                key={product.name}
+                key={product.id}
                 className={`product-card ${product.featured ? "product-featured" : ""}`}
                 style={{
                   "--accent": product.accent,
@@ -454,12 +468,20 @@ export default function CompanyPortal() {
                 } as React.CSSProperties}
               >
                 <div className="product-card-head">
-                  <BhdAppIcon id={product.appId} title={isArabic ? product.nameAr : product.name} className="product-mark" />
+                  <BhdAppIcon
+                    id={product.id}
+                    title={isArabic ? product.nameAr : product.nameEn}
+                    logoUrl={product.logoUrl}
+                    mark={product.mark}
+                    accent={product.accent}
+                    soft={product.soft}
+                    className="product-mark"
+                  />
                   <span className="product-status"><i />{isArabic ? product.statusAr : product.statusEn}</span>
                 </div>
                 <div className="product-number">0{index + 1}</div>
                 <p className="product-category">{isArabic ? product.categoryAr : product.categoryEn}</p>
-                <h3>{isArabic ? product.nameAr : product.name}</h3>
+                <h3>{isArabic ? product.nameAr : product.nameEn}</h3>
                 <p className="product-description">
                   {isArabic ? product.descriptionAr : product.descriptionEn}
                 </p>
@@ -499,11 +521,15 @@ export default function CompanyPortal() {
             <div className="map-apps">
               <small>{t.appLayer}</small>
               <div>
-                {products.slice(0, 5).map((product) => (
+                {programs.slice(0, 5).map((product) => (
                   <BhdAppIcon
-                    key={product.name}
-                    id={product.appId}
-                    title={isArabic ? product.nameAr : product.name}
+                    key={product.id}
+                    id={product.id}
+                    title={isArabic ? product.nameAr : product.nameEn}
+                    logoUrl={product.logoUrl}
+                    mark={product.mark}
+                    accent={product.accent}
+                    soft={product.soft}
                     className="map-app-icon"
                   />
                 ))}
@@ -528,8 +554,16 @@ export default function CompanyPortal() {
             <strong>{t.demoName}</strong>
             <small>{t.demoAccount}</small>
             <div className="phone-apps">
-              {products.slice(0, 4).map((product) => (
-                <BhdAppIcon key={product.name} id={product.appId} className="phone-app-icon" />
+              {programs.slice(0, 4).map((product) => (
+                <BhdAppIcon
+                  key={product.id}
+                  id={product.id}
+                  logoUrl={product.logoUrl}
+                  mark={product.mark}
+                  accent={product.accent}
+                  soft={product.soft}
+                  className="phone-app-icon"
+                />
               ))}
             </div>
             <div className="phone-secure"><i /> {t.secureSession}</div>

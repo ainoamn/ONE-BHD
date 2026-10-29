@@ -3,7 +3,8 @@
 import { BrandLogo } from "./BrandLogo";
 import { InstantLink } from "./InstantLink";
 import { BhdAppIcon } from "./bhd/BhdAppIcon";
-import { isExternalProductHref, products } from "../lib/products";
+import { publicUrlForApp } from "../lib/bhd/apps";
+import { useLiveCatalog } from "../lib/bhd/use-live-catalog";
 import type { UiLocale } from "../lib/ui-locale";
 import { readStoredUiLocale } from "../lib/ui-locale";
 import { useEffect, useState } from "react";
@@ -54,8 +55,11 @@ export function SiteFooter({
   locale,
 }: SiteFooterProps) {
   const [resolved, setResolved] = useState<UiLocale>(locale || "ar");
+  const [origin, setOrigin] = useState("");
+  const catalog = useLiveCatalog();
 
   useEffect(() => {
+    setOrigin(window.location.origin);
     if (locale) {
       setResolved(locale);
       return;
@@ -67,6 +71,7 @@ export function SiteFooter({
   const isArabic = resolved === "ar";
   const promiseText = promise ?? t.defaultPromise;
   const rightsText = rights ?? t.defaultRights;
+  const programs = catalog.filter((app) => app.enabled && app.id !== "account");
 
   return (
     <footer className="site-footer" lang={resolved} dir={isArabic ? "rtl" : "ltr"}>
@@ -77,21 +82,32 @@ export function SiteFooter({
             <InstantLink href="/apps">{t.allApps}</InstantLink>
           </div>
           <div className="footer-programs-grid">
-            {products.map((product) => {
-              const label = isArabic ? product.nameAr : product.name;
-              return isExternalProductHref(product.href) ? (
-                <a key={product.slug} href={product.href} className="footer-program" title={label}>
-                  <BhdAppIcon id={product.appId} title={label} />
+            {programs.map((app) => {
+              const label = isArabic ? app.nameAr : app.nameEn;
+              const href = publicUrlForApp(app, origin || undefined);
+              const external = href.startsWith("http");
+              return external ? (
+                <a key={app.id} href={href} className="footer-program" title={label}>
+                  <BhdAppIcon
+                    id={app.id}
+                    title={label}
+                    logoUrl={app.logoUrl}
+                    mark={app.mark}
+                    accent={app.accent}
+                    soft={app.soft}
+                  />
                   <span>{label}</span>
                 </a>
               ) : (
-                <InstantLink
-                  key={product.slug}
-                  href={product.href}
-                  className="footer-program"
-                  title={label}
-                >
-                  <BhdAppIcon id={product.appId} title={label} />
+                <InstantLink key={app.id} href={href} className="footer-program" title={label}>
+                  <BhdAppIcon
+                    id={app.id}
+                    title={label}
+                    logoUrl={app.logoUrl}
+                    mark={app.mark}
+                    accent={app.accent}
+                    soft={app.soft}
+                  />
                   <span>{label}</span>
                 </InstantLink>
               );

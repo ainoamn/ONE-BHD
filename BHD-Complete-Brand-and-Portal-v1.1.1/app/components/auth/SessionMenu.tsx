@@ -109,8 +109,16 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       body: JSON.stringify({ sub }),
     });
     if (!response.ok) return;
-    const data = (await response.json().catch(() => ({}))) as { token?: string };
+    const data = (await response.json().catch(() => ({}))) as MeResponse & { token?: string };
     captureWindowToken(data.token);
+    setUser(null);
+    setAccounts([]);
+    setPlatformAdmin(false);
+    if (data.user) {
+      setUser(data.user);
+      setAccounts(data.accounts || [data.user]);
+      setPlatformAdmin(Boolean(data.platformAdmin));
+    }
     window.dispatchEvent(new Event(BHD_ACCOUNT_CHANGED));
     await applyAccountIsolation();
   }, []);

@@ -16,6 +16,7 @@
 | `GET https://id.bhd-om.com/api/bhd/catalog` | شاشة الأيقونات الحية: الاسم، الرابط، الشعار |
 | `GET https://id.bhd-om.com/api/bhd/icons/{id}` | ملف الشعار المرفوع من الإدارة |
 | [https://id.bhd-om.com/admin#apps](https://id.bhd-om.com/admin#apps) | لوحة التحكم بالشعار والمسمّى والرابط |
+| نفس الكتالوج | رأس المستخدم + فوتر «برامجنا» + شبكة الرئيسية/الشركة |
 | `https://id.bhd-om.com/bhd-identity.js` | جلسة النافذة، `/me`، تبديل الحساب، الخروج |
 | `GET/POST /api/auth/me` `switch` `logout` | الجلسة الحقيقية (كوكي Host-only + Bearer للنافذة) |
 | OIDC `/oauth/authorize` | تعرّف المنتج بعد الدخول دون كلمة مرور ثانية |

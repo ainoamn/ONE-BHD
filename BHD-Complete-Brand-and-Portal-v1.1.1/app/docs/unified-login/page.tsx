@@ -58,6 +58,11 @@ const DOWNLOADS = [
     note: "البرمجة على id.bhd-om.com — المواقع تقرأ الجلسة والنوافذ والكتالوج مباشرة.",
   },
   {
+    file: "BHD-CURSOR-PRODUCT-WIRE.md",
+    title: "أمر كورسر لربط المنتج",
+    note: "الصقه في وكيل كورسر على وازن/حسابي/…: عزل الحسابات + نفس الأيقونات في الرأس والفوتر والرئيسية.",
+  },
+  {
     file: "BHD-WAZEN-INTEGRATION.md",
     title: "مثال تكامل وازن",
     note: "مرجع حي لمسار مكتمل يمكنك مقارنته أثناء التنفيذ.",
@@ -389,7 +394,7 @@ PATCH https://id.bhd-om.com/api/admin/clients
               <h3>الفوتر — للزائر والعامة</h3>
               <ul>
                 <li>
-                  شبكة «برامجنا» عبر <code>SiteFooter</code> و<code>BhdAppIcon</code>.
+                  شبكة «برامجنا» عبر <code>SiteFooter</code> من نفس <code>/api/bhd/catalog</code> كالرأس والرئيسية.
                 </li>
                 <li>عرض تسويقي/اكتشاف؛ ليست بديلاً عن مشغّل الحساب.</li>
                 <li>

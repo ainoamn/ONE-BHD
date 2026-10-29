@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { InnerPageShell } from "../components/InnerPageShell";
 import { InstantLink } from "../components/InstantLink";
-import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
-import { isExternalProductHref, products } from "../lib/products";
+import { LiveProgramsGuide } from "../components/bhd/LiveProgramsGuide";
 
 export const metadata: Metadata = {
   title: "برامجنا",
@@ -26,41 +25,7 @@ export default function AppsPage() {
         </p>
       </section>
 
-      <section className="programs-guide" aria-label="شرح برامج BHD">
-        {products.map((product) => (
-          <article
-            key={product.slug}
-            className="program-card"
-            style={{ "--accent": product.accent, "--soft": product.soft } as React.CSSProperties}
-          >
-            <header>
-              <BhdAppIcon id={product.appId} title={product.nameAr} />
-              <div>
-                <small>{product.categoryAr} · {product.statusAr}</small>
-                <h2>{product.nameAr}</h2>
-              </div>
-            </header>
-            <p>{product.descriptionAr}</p>
-            <div>
-              <p className="program-label">الفوائد</p>
-              <ul>
-                {product.capabilitiesAr.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="program-label">كيف يعمل</p>
-              <p>{product.howAr}</p>
-            </div>
-            {isExternalProductHref(product.href) ? (
-              <a href={product.href} target="_blank" rel="noopener noreferrer">فتح البرنامج</a>
-            ) : (
-              <InstantLink href={product.href}>تعرّف على البرنامج</InstantLink>
-            )}
-          </article>
-        ))}
-      </section>
+      <LiveProgramsGuide />
     </InnerPageShell>
   );
 }

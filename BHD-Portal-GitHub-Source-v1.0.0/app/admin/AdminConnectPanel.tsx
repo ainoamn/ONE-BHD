@@ -119,7 +119,7 @@ export function AdminConnectPanel() {
           <li>
             <strong>شاشة الأيقونات</strong>
             <code>{issuer}/admin#apps</code>
-            <span>التحكم بالشعار والمسمّى والرابط — ينعكس عبر الكتالوج</span>
+            <span>الشعار والمسمّى والرابط — نفس المصدر لرأس المستخدم والفوتر والرئيسية</span>
           </li>
           <li>
             <strong>الكتالوج</strong>

@@ -13,6 +13,7 @@
 | `docs/BHD-PRODUCT-SSO-ADMIN.md` | SSO صامت + أدمن محلي |
 | `docs/BHD-UNIFIED-LOGIN-AND-APPS.md` | الدليل المرجعي |
 | `docs/BHD-IDENTITY-RUNTIME.md` | **الربط الحي:** API + `bhd-identity.js` بدل نسخ الجلسة في كل موقع |
+| `docs/BHD-CURSOR-PRODUCT-WIRE.md` | أمر جاهز للصقه في كورسر على مستودع المنتج |
 | `app/lib/bhd/apps.ts` | احتياطي إن لم يُقرأ الكتالوج من الهوية بعد |
 | أيقونات `BhdAppIcon` إن تغيّرت العلامات | نفس المسار في المنتج |
 
