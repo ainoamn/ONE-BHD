@@ -4710,6 +4710,33 @@ a.login-submit {
   background: #eef2f0;
 }
 
+.account-fields label.is-missing input,
+.account-fields label.is-missing select {
+  border-color: #c0392b;
+  background: #fdecea;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.12);
+}
+
+.account-fields label.is-ok input,
+.account-fields label.is-ok select {
+  border-color: #1e7a4a;
+  background: #eef8f2;
+}
+
+.account-missing {
+  margin: 0 0 18px;
+  padding: 14px 16px;
+  border: 1px solid #f0b4ad;
+  border-radius: 14px;
+  background: #fdecea;
+  color: #8a1f16;
+}
+
+.account-missing ul {
+  margin: 8px 0 0;
+  padding-inline-start: 18px;
+}
+
 .account-panel .primary-button {
   margin-top: 18px;
 }

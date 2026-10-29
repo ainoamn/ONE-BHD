@@ -133,8 +133,6 @@ export async function PATCH(request: Request) {
       NATIONALITY_REQUIRED: ["الجنسية إلزامية.", 400],
       GENDER_REQUIRED: ["الجنس إلزامي.", 400],
       BIRTHDATE_REQUIRED: ["تاريخ الميلاد إلزامي.", 400],
-      CIVIL_ID_REQUIRED: ["الرقم المدني وتاريخ الانتهاء وصورة البطاقة إلزامية.", 400],
-      PASSPORT_REQUIRED: ["رقم الجواز وتاريخ الانتهاء وصورة الجواز إلزامية.", 400],
       INVALID_USERNAME: ["اسم المستخدم من 3 إلى 32 حرفًا إنجليزيًا أو رقمًا.", 400],
       EMAIL_OR_USERNAME_TAKEN: ["اسم المستخدم مستخدم مسبقًا.", 409],
       INVALID_CREDENTIALS: ["كلمة المرور الحالية غير صحيحة.", 401],

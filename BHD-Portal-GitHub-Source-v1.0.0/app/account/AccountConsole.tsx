@@ -5,8 +5,9 @@ import { InstantLink } from "../components/InstantLink";
 import { BHD_ACCOUNT_CHANGED, SessionMenu } from "../components/auth/SessionMenu";
 import { SiteFooter } from "../components/SiteFooter";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
+import { localNamePair } from "../lib/auth/name-transliterate";
 import { NATIONALITIES } from "../lib/auth/nationalities";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
 type AccountUser = {
   id: string;
@@ -99,6 +100,7 @@ export function AccountConsole() {
   const [passportExpires, setPassportExpires] = useState("");
   const [civilIdFile, setCivilIdFile] = useState<AccountFileMeta | null>(null);
   const [passportFile, setPassportFile] = useState<AccountFileMeta | null>(null);
+  const [attempted, setAttempted] = useState(false);
   const [translating, setTranslating] = useState(false);
   const [uploading, setUploading] = useState("");
   const [phone2, setPhone2] = useState("");
@@ -135,9 +137,6 @@ export function AccountConsole() {
     setHometown(payload.contact?.hometown || "");
     setCountry(payload.contact?.country || "OM");
     setZipCode(payload.contact?.zipCode || "");
-    if (!payload.user.nameAr || !payload.user.nameEn) {
-      void translateName(payload.user.nameAr || payload.user.nameEn || payload.user.name, true);
-    }
   }
 
   useEffect(() => {
@@ -164,22 +163,42 @@ export function AccountConsole() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!data?.user) return;
+    if (nameAr && nameEn) return;
+    const seed = nameAr || nameEn || name || data.user.name;
+    if (seed) void translateName(seed, true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data?.user?.id]);
+
   async function translateName(source?: string, silent = false) {
+    const seed = (source || nameAr || nameEn || name).trim();
+    if (!seed) {
+      if (!silent) setError("اكتب الاسم بالعربية أو الإنجليزية ثم اضغط ترجمة.");
+      return;
+    }
     setTranslating(true);
     if (!silent) setError("");
+    const fallback = localNamePair(seed);
     try {
       const response = await fetch("/api/account/translate-name", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: source || nameAr || nameEn || name }),
+        body: JSON.stringify({ name: seed }),
       });
       const payload = (await response.json()) as { ar?: string; en?: string; message?: string };
-      if (!response.ok) throw new Error(payload.message || "تعذّرت الترجمة.");
-      if (payload.ar) setNameAr(payload.ar);
-      if (payload.en) setNameEn(payload.en);
-      if (payload.ar) setName(payload.ar);
-    } catch (err) {
-      if (!silent) setError(err instanceof Error ? err.message : "تعذّرت الترجمة. اكتبه يدوياً.");
+      const ar = payload.ar?.trim() || fallback.ar;
+      const en = payload.en?.trim() || fallback.en;
+      setNameAr(ar);
+      setNameEn(en);
+      setName(ar);
+      if (!response.ok && !silent && (!payload.ar || !payload.en)) {
+        setError(payload.message || "استُخدمت ترجمة احتياطية. يمكنك تصحيحها.");
+      }
+    } catch {
+      setNameAr(fallback.ar);
+      setNameEn(fallback.en);
+      setName(fallback.ar);
     } finally {
       setTranslating(false);
     }
@@ -206,11 +225,35 @@ export function AccountConsole() {
     }
   }
 
+  const missing = useMemo(
+    () =>
+      [
+        { key: "nameAr", label: "الاسم بالعربية", value: nameAr },
+        { key: "nameEn", label: "الاسم بالإنجليزية", value: nameEn },
+        { key: "phone", label: "رقم الهاتف", value: phone },
+        { key: "nationality", label: "الجنسية", value: nationality },
+        { key: "gender", label: "الجنس", value: gender },
+        { key: "birthDate", label: "تاريخ الميلاد", value: birthDate },
+      ].filter((item) => !item.value.trim()),
+    [nameAr, nameEn, phone, nationality, gender, birthDate],
+  );
+
+  function fieldTone(value: string) {
+    if (value.trim()) return attempted ? "is-ok" : "";
+    return attempted ? "is-missing" : "";
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
+    setAttempted(true);
     setSaving(true);
     setError("");
     setSaved("");
+    if (missing.length) {
+      setError(`نواقص يجب تعبئتها: ${missing.map((item) => item.label).join("، ")}`);
+      setSaving(false);
+      return;
+    }
     if (newPassword && newPassword !== confirmPassword) {
       setError("تأكيد كلمة المرور غير مطابق.");
       setSaving(false);
@@ -284,12 +327,22 @@ export function AccountConsole() {
         <p className="section-kicker">حساب BHD الموحّد</p>
         <h1>بياناتك. مواقعك. اشتراكاتك.</h1>
         <p className="account-lead">
-          عدّل ملفك هنا مرة واحدة. الاسم بالعربية والإنجليزية والهاتف والجنسية وبيانات الهوية تنتقل إلى وازن وحسابي وبقية المواقع عبر هوية BHD، دون مشاركة قواعد بياناتها.
+          عدّل ملفك هنا مرة واحدة. الاسم بالعربية والإنجليزية والهاتف والجنسية تنتقل إلى وازن وحسابي وبقية المواقع عبر هوية BHD، دون مشاركة قواعد بياناتها.
         </p>
 
         {loading ? <p className="account-status">جاري تحميل الحساب…</p> : null}
         {error ? <p className="account-status is-error">{error}</p> : null}
         {saved ? <p className="account-status is-ok">{saved}</p> : null}
+        {attempted && missing.length ? (
+          <div className="account-missing" role="alert">
+            <strong>هذه الحقول ناقصة:</strong>
+            <ul>
+              {missing.map((item) => (
+                <li key={item.key}>{item.label}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
         {user ? (
           <>
@@ -371,10 +424,10 @@ export function AccountConsole() {
               <form className="account-panel" onSubmit={onSubmit}>
                 <div className="account-panel-head">
                   <h2>تعديل البيانات</h2>
-                  <p>الاسم بالعربية والإنجليزية إلزامي (ترجمة ذكاء اصطناعي أو يدوي). الدخول بالبريد أو فيسبوك أو جوجل يترجم الاسم تلقائياً. الرقم المدني والجواز ومرفقاهما والهاتف إلزامية.</p>
+                  <p>الاسم بالعربية والإنجليزية والهاتف والجنسية والجنس وتاريخ الميلاد إلزامية. البطاقة والجواز ومرفقاتهما اختيارية.</p>
                 </div>
                 <div className="account-fields">
-                  <label>
+                  <label className={fieldTone(nameAr)}>
                     الاسم بالعربية *
                     <input
                       value={nameAr}
@@ -382,12 +435,11 @@ export function AccountConsole() {
                         setNameAr(event.target.value);
                         setName(event.target.value);
                       }}
-                      required
                     />
                   </label>
-                  <label>
+                  <label className={fieldTone(nameEn)}>
                     الاسم بالإنجليزية *
-                    <input dir="ltr" value={nameEn} onChange={(event) => setNameEn(event.target.value)} required />
+                    <input dir="ltr" value={nameEn} onChange={(event) => setNameEn(event.target.value)} />
                   </label>
                   <div className="account-translate is-wide">
                     <button type="button" className="outline-button" disabled={translating} onClick={() => void translateName()}>
@@ -403,17 +455,17 @@ export function AccountConsole() {
                     البريد
                     <input value={user.email} readOnly />
                   </label>
-                  <label>
+                  <label className={fieldTone(phone)}>
                     رقم الهاتف *
-                    <input value={phone} onChange={(event) => setPhone(event.target.value)} required placeholder="مثال: 9689xxxxxxx" />
+                    <input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="مثال: 9689xxxxxxx" />
                   </label>
                   <label>
                     رقم هاتف بديل
                     <input value={phone2} onChange={(event) => setPhone2(event.target.value)} />
                   </label>
-                  <label>
+                  <label className={fieldTone(nationality)}>
                     الجنسية *
-                    <select value={nationality} onChange={(event) => setNationality(event.target.value)} required>
+                    <select value={nationality} onChange={(event) => setNationality(event.target.value)}>
                       {NATIONALITIES.map((item) => (
                         <option key={item.code} value={item.code}>
                           {item.ar}
@@ -421,28 +473,28 @@ export function AccountConsole() {
                       ))}
                     </select>
                   </label>
-                  <label>
+                  <label className={fieldTone(gender)}>
                     الجنس *
-                    <select value={gender} onChange={(event) => setGender(event.target.value)} required>
+                    <select value={gender} onChange={(event) => setGender(event.target.value)}>
                       <option value="">اختر</option>
                       <option value="male">ذكر</option>
                       <option value="female">أنثى</option>
                     </select>
                   </label>
-                  <label>
+                  <label className={fieldTone(birthDate)}>
                     تاريخ الميلاد *
-                    <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} required />
+                    <input type="date" value={birthDate} onChange={(event) => setBirthDate(event.target.value)} />
                   </label>
                   <label>
-                    الرقم المدني *
-                    <input value={civilId} onChange={(event) => setCivilId(event.target.value)} required />
+                    الرقم المدني
+                    <input value={civilId} onChange={(event) => setCivilId(event.target.value)} placeholder="اختياري" />
                   </label>
                   <label>
-                    تاريخ انتهاء البطاقة *
-                    <input type="date" value={civilIdExpires} onChange={(event) => setCivilIdExpires(event.target.value)} required />
+                    تاريخ انتهاء البطاقة
+                    <input type="date" value={civilIdExpires} onChange={(event) => setCivilIdExpires(event.target.value)} />
                   </label>
                   <div className="account-upload is-wide">
-                    <span>مرفق نسخة البطاقة المدنية *</span>
+                    <span>مرفق نسخة البطاقة المدنية</span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,application/pdf"
@@ -458,15 +510,15 @@ export function AccountConsole() {
                     )}
                   </div>
                   <label>
-                    رقم جواز السفر *
-                    <input value={passportNumber} onChange={(event) => setPassportNumber(event.target.value)} required />
+                    رقم جواز السفر
+                    <input value={passportNumber} onChange={(event) => setPassportNumber(event.target.value)} placeholder="اختياري" />
                   </label>
                   <label>
-                    تاريخ انتهاء الجواز *
-                    <input type="date" value={passportExpires} onChange={(event) => setPassportExpires(event.target.value)} required />
+                    تاريخ انتهاء الجواز
+                    <input type="date" value={passportExpires} onChange={(event) => setPassportExpires(event.target.value)} />
                   </label>
                   <div className="account-upload is-wide">
-                    <span>مرفق نسخة الجواز *</span>
+                    <span>مرفق نسخة الجواز</span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,application/pdf"

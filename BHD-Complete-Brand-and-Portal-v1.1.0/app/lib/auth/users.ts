@@ -642,14 +642,11 @@ export async function updateOwnProfile(
   const civilIdExpires = input.civilIdExpires !== undefined ? input.civilIdExpires?.trim() || null : user.civilIdExpires;
   const passportNumber = input.passportNumber !== undefined ? input.passportNumber?.trim() || null : user.passportNumber;
   const passportExpires = input.passportExpires !== undefined ? input.passportExpires?.trim() || null : user.passportExpires;
-  const files = await listAccountFileMeta(user.id);
   if (!phone) throw new Error("PHONE_REQUIRED");
   if (!nameAr || !nameEn) throw new Error("NAME_TRANSLATION_REQUIRED");
   if (!nationality) throw new Error("NATIONALITY_REQUIRED");
   if (!gender) throw new Error("GENDER_REQUIRED");
   if (!birthDate) throw new Error("BIRTHDATE_REQUIRED");
-  if (!civilId || !civilIdExpires || !files.civilIdFile) throw new Error("CIVIL_ID_REQUIRED");
-  if (!passportNumber || !passportExpires || !files.passportFile) throw new Error("PASSPORT_REQUIRED");
 
   const [updated] = await db
     .update(users)
