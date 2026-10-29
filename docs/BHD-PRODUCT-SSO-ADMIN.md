@@ -3,6 +3,7 @@
 > **الحالة:** معتمد للتطبيق في كل مستودع منتج.  
 > **المصدر:** [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) القسم **0.7** و**4.9**  
 > **Issuer:** `https://id.bhd-om.com`  
+> **الربط الحي:** [https://id.bhd-om.com/admin#connect](https://id.bhd-om.com/admin#connect) و[`BHD-IDENTITY-RUNTIME.md`](BHD-IDENTITY-RUNTIME.md) — مدة الجلسة والنوافذ من API لا من نسخة محلية.  
 > **لا تغيّر هذه القواعد محلياً.**
 
 انسخ هذا الملف إلى `docs/BHD-PRODUCT-SSO-ADMIN.md` داخل مستودع المنتج ونفّذه حرفياً.
@@ -85,7 +86,7 @@
 انسخ [`BHD-SESSION-POLICY.md`](BHD-SESSION-POLICY.md) ونفّذه:
 
 - [ ] لا خمول 48 ساعة ولا `SessionKeepAlive`
-- [ ] كوكي الجلسة المحلية 400 يوم، تُمسح عند «خروج» فقط
+- [ ] كوكي الجلسة المحلية 40 يوماً ثم دخول جديد، أو تُمسح عند «خروج»
 - [ ] `GET /api/auth/me` من الكوكي فقط، بلا قاعدة بيانات وبلا `Set-Cookie` — الرأس يظهر فوراً
 - [ ] لا جوجل محلي ولا One Tap؛ لا تحميل GIS إلا بعد ضغطة
 - [ ] لا `router.refresh()` عند عودة التبويب

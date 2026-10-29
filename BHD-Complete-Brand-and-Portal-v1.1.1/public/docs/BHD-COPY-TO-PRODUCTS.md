@@ -16,7 +16,7 @@
 | `app/lib/bhd/apps.ts` | احتياطي إن لم يُقرأ الكتالوج من الهوية بعد |
 | أيقونات `BhdAppIcon` إن تغيّرت العلامات | نفس المسار في المنتج |
 
-الهوية: `https://id.bhd-om.com` — الإدارة: `https://id.bhd-om.com/admin`
+الهوية: `https://id.bhd-om.com` — الإدارة: [`https://id.bhd-om.com/admin#connect`](https://id.bhd-om.com/admin#connect) (تفاصيل الربط الحي) ثم [`#clients`](https://id.bhd-om.com/admin#clients) لتسجيل OAuth.
 
 ---
 

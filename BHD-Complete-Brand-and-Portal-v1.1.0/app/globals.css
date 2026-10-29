@@ -5902,3 +5902,102 @@ a.login-submit {
   }
 }
 
+.admin-docs-cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.admin-inline-link {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #174b70;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.admin-connect {
+  display: grid;
+  gap: 16px;
+}
+
+.admin-connect-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0 0;
+}
+
+.admin-connect-stats dt {
+  color: #6b7d75;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.admin-connect-stats dd {
+  margin: 4px 0 0;
+  font-size: 14px;
+  font-weight: 700;
+  word-break: break-word;
+}
+
+.admin-connect-endpoints,
+.admin-connect-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 12px;
+}
+
+.admin-connect-steps {
+  list-style: decimal;
+  padding-inline-start: 1.4rem;
+}
+
+.admin-connect-endpoints li,
+.admin-connect-steps li {
+  display: grid;
+  gap: 4px;
+  color: #24352f;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.admin-connect-endpoints strong {
+  font-size: 13px;
+}
+
+.admin-connect-endpoints code,
+.admin-connect-code {
+  font-size: 12px;
+  word-break: break-all;
+}
+
+.admin-connect-copy-row {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.admin-connect-code {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #10241d;
+  color: #e8f4f1;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 800px) {
+  .admin-connect-stats {
+    grid-template-columns: 1fr;
+  }
+}
+

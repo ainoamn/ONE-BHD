@@ -67,7 +67,7 @@ const DOWNLOADS = [
 const TOC = [
   ["#what", "ما هذه المنظومة؟"],
   ["#two-phases", "مرحلتان: تنفيذ المنتج ثم التسجيل"],
-  ["#runtime", "الربط الحي من الهوية (API)"],
+  ["#runtime", "الربط الحي من الهوية (API و /admin)"],
   ["#session", "الجلسة 40 يوماً والنوافذ المتعددة"],
   ["#security", "الحماية والتدقيق"],
   ["#downloads", "تنزيل الملفات"],
@@ -189,7 +189,9 @@ export default function UnifiedLoginDocsPage() {
   const { body } = await BhdIdentity.me();
 </script>`}</pre>
           <p>
-            الدليل:{" "}
+            التفاصيل التشغيلية ونسخ العناوين:{" "}
+            <InstantLink href="/admin#connect">/admin → ربط المواقع</InstantLink>
+            . الدليل:{" "}
             <a href="/docs/BHD-IDENTITY-RUNTIME.md" download="BHD-IDENTITY-RUNTIME.md">
               BHD-IDENTITY-RUNTIME.md
             </a>

@@ -4,6 +4,7 @@ import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { SessionMenu } from "../components/auth/SessionMenu";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { AdminConnectPanel } from "./AdminConnectPanel";
 import { AdminSecurityPanel } from "./AdminSecurityPanel";
 
 type Overview = {
@@ -67,7 +68,22 @@ type AdminUserDetail = AdminUser & {
   }>;
 };
 
-type TabId = "users" | "system" | "clients" | "emails" | "security";
+type TabId = "users" | "system" | "clients" | "emails" | "security" | "connect";
+
+const ADMIN_TABS: Array<[TabId, string]> = [
+  ["users", "المستخدمون"],
+  ["security", "الحماية والتدقيق"],
+  ["emails", "قوالب البريد"],
+  ["system", "النظام"],
+  ["connect", "ربط المواقع"],
+  ["clients", "العملاء OAuth"],
+];
+
+function tabFromHash(): TabId {
+  if (typeof window === "undefined") return "users";
+  const id = window.location.hash.replace(/^#/, "") as TabId;
+  return ADMIN_TABS.some(([tab]) => tab === id) ? id : "users";
+}
 
 type RegistryClient = {
   clientId: string;
@@ -206,6 +222,20 @@ export function AdminConsole({
       setDetailLoading(false);
     }
   }, []);
+
+  useEffect(() => {
+    setTab(tabFromHash());
+    const onHash = () => setTab(tabFromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  function openTab(id: TabId) {
+    setTab(id);
+    if (typeof window !== "undefined") {
+      window.history.replaceState(null, "", `#${id}`);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -434,6 +464,7 @@ export function AdminConsole({
             <InstantLink href="/account">الحساب</InstantLink>
             <InstantLink href="/apps">البرامج</InstantLink>
             <InstantLink href="/docs/unified-login">التوثيق</InstantLink>
+            <a href="#connect">ربط المواقع</a>
             <button type="button" className="admin-signout" onClick={() => void signOutAdmin()}>
               خروج
             </button>
@@ -459,21 +490,13 @@ export function AdminConsole({
         ) : null}
 
         <nav className="admin-tabs" aria-label="أقسام اللوحة">
-          {(
-            [
-              ["users", "المستخدمون"],
-              ["security", "الحماية والتدقيق"],
-              ["emails", "قوالب البريد"],
-              ["system", "النظام"],
-              ["clients", "العملاء والربط"],
-            ] as const
-          ).map(([id, label]) => (
+          {ADMIN_TABS.map(([id, label]) => (
             <button
               key={id}
               type="button"
               className={tab === id ? "is-active" : undefined}
               onClick={() => {
-                setTab(id);
+                openTab(id);
                 if (id === "emails") void loadEmails(mailKind).catch(() => undefined);
               }}
             >
@@ -659,12 +682,19 @@ export function AdminConsole({
                   تنزيل مواصفات SSO والمشغّل، ظهور الأيقونات في الهيدر/الفوتر، واعتماد الدخول والتنقّل بين المواقع.
                 </span>
               </div>
-              <InstantLink className="admin-action" href="/docs/unified-login">
-                فتح التوثيق
-              </InstantLink>
+              <div className="admin-docs-cta-actions">
+                <button type="button" className="admin-action" onClick={() => openTab("connect")}>
+                  تفاصيل الربط
+                </button>
+                <InstantLink className="admin-action admin-action-secondary" href="/docs/unified-login">
+                  فتح التوثيق
+                </InstantLink>
+              </div>
             </div>
           </section>
         ) : null}
+
+        {tab === "connect" ? <AdminConnectPanel /> : null}
 
         {tab === "clients" ? (
           <div className="admin-users-layout">
@@ -676,8 +706,11 @@ export function AdminConsole({
                 </div>
               </div>
               <p className="admin-footnote">
-                بعد أن ينفّذ المنتج مسارات <code>start/callback</code> من الدليل، سجّله هنا بدل تعديل الكود. ثم اختبر{" "}
-                <code>start → id.bhd-om.com</code> وفعّل <code>sso</code>.
+                بعد أن ينفّذ المنتج مسارات <code>start/callback</code> وسكربت الهوية من تبويب{" "}
+                <button type="button" className="admin-inline-link" onClick={() => openTab("connect")}>
+                  ربط المواقع
+                </button>
+                ، سجّله هنا ثم اختبر <code>start → id.bhd-om.com</code> وفعّل <code>sso</code>.
               </p>
               <form className="admin-register-form" onSubmit={(event) => void registerClient(event)}>
                 <label>

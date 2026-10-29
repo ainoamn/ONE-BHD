@@ -3,6 +3,7 @@
 > **الحالة:** معتمد للتطبيق في كل مستودع منتج.  
 > **المصدر:** [BHD-UNIFIED-LOGIN-AND-APPS.md](BHD-UNIFIED-LOGIN-AND-APPS.md) القسم **0.7** و**4.9**  
 > **Issuer:** `https://id.bhd-om.com`  
+> **الربط الحي:** [https://id.bhd-om.com/admin#connect](https://id.bhd-om.com/admin#connect) و[`BHD-IDENTITY-RUNTIME.md`](BHD-IDENTITY-RUNTIME.md) — مدة الجلسة والنوافذ من API لا من نسخة محلية.  
 > **لا تغيّر هذه القواعد محلياً.**
 
 انسخ هذا الملف إلى `docs/BHD-PRODUCT-SSO-ADMIN.md` داخل مستودع المنتج ونفّذه حرفياً.
