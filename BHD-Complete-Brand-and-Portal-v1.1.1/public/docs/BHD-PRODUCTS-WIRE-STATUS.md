@@ -1,33 +1,33 @@
 ﻿# حالة ربط منتجات BHD بالهوية الحيّة
 
-> **آخر تحديث:** 29 أكتوبر 2026 (بعد §97 — نموذج جوجل ?au= على BHD-HR)  
+> **آخر تحديث:** 29 أكتوبر 2026 (بعد §98–§99 — عزل صامت موحّد على كل المواقع)  
 > **الهوية:** https://id.bhd-om.com  
-> **مرجع العزل:** `BHD-ACCOUNT-ISOLATION.md`
+> **مرجع العزل:** `BHD-ACCOUNT-ISOLATION.md` + `BHD-SILENT-ISOLATION-ROLLOUT.md`
 
 ## أين يعيش الإصلاح؟
 
 | الطبقة | ماذا؟ |
 |---|---|
-| **ONE-BHD / id.bhd-om.com** | `/api/auth/switch` يعيد كتابة `bhd_id` دائماً + `me` يعيد `token` — ينعكس على **كل** المواقع فور النشر |
-| **كل منتج** | `POST /api/auth/bhd/rebind` من Bearer النافذة بعد التبديل + كتالوج حي + سكربت الهوية |
+| **ONE-BHD / id.bhd-om.com** | `/api/auth/switch` + `me` + `rebind` JSON + `?au=` |
+| **كل منتج** | `silentRebind` / `BhdPrivacyGate` / `BhdSilentSso` من Bearer النافذة |
 
 ## المستودعات
 
-| المستودع | سلك المنتج (rebind/كتالوج) | وثائق العزل المحدَّثة |
+| المستودع | سلك العزل الصامت | من أين الربط |
 |---|---|---|
-| ONE-BHD | مصدر الهوية | نعم (§95) |
-| BHD-HR | نعم (§97 Google au) | نعم |
-| WAZEN | نعم | نعم |
-| hisaby | نعم | نعم |
-| BHD-STOR | نعم | نعم |
-| BHD-R | نعم | نعم |
-| Nasab | نعم | نعم |
-| bhd-om | نعم | نعم |
-| ainoamn-ain-oman-web | نعم (حد أدنى) | نعم |
-| nextjs-boilerplate | قالب | نعم |
+| ONE-BHD | نعم (§99) | هوية أم — id.bhd-om.com |
+| BHD-HR | نعم (§97–98) | rebind محلي + id.bhd-om.com |
+| WAZEN | نعم | نفس الأسلوب |
+| hisaby | نعم | frontend + API proxy |
+| BHD-STOR | نعم | frontend |
+| BHD-R | نعم | apps/web |
+| Nasab | نعم | Express rebind |
+| bhd-om | نعم | Next app |
+| ainoamn-ain-oman-web | نعم | Pages/_app إن وُجد |
+| nextjs-boilerplate | نعم | قالب |
 
 ## تحقق
 
-1. على https://id.bhd-om.com/account بدّل حسابين → بيانات الحساب الجديد فقط.
-2. على أي منتج: نفس التبديل → `rebind` ثم بيانات الحساب الجديد.
-
+1. F5 → لا رسالة عزل.
+2. تبديل حساب → بيانات الحساب الجديد فقط.
+3. `?au=` يبقى مربوطاً بالتبويب.

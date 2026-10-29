@@ -76,3 +76,14 @@
 | 3 | إزالة `_bhd` من الرابط بعد الاستقرار |
 | 4 | `SilentSso` كل 20ث بدل 4ث — لا حجاب |
 
+
+## 99. عزل صامت موحّد لكل مواقع BHD (2026-10-29)
+
+**المطلوب:** نفس أسلوب HR (§98) على كل المستودعات المدرجة مع توثيق الربط من id.bhd-om.com.
+
+| # | ما نُفّذ |
+|---|---|
+| 1 | ONE-BHD: window tokens لكل حساب + SessionMenu + rebind JSON + `?au=` |
+| 2 | وثيقة `BHD-SILENT-ISOLATION-ROLLOUT.md` |
+| 3 | نشر متوازي لـ WAZEN / bhd-om / hisaby / STOR / BHD-R / Nasab / ain-oman / boilerplate |
+

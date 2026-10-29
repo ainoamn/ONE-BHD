@@ -33,11 +33,29 @@ async function profileFromWindowToken(token: string, request: Request) {
   });
 }
 
+function bindReturnPath(returnTo: string, sub: string) {
+  const safe = isSafeNextPath(returnTo) ? returnTo : "/";
+  try {
+    const url = new URL(safe, "https://bhd.local");
+    url.searchParams.set("au", sub);
+    url.searchParams.set("_bhd", String(Date.now()));
+    return `${url.pathname}${url.search}`;
+  } catch {
+    return safe;
+  }
+}
+
+function wantsJson(request: Request) {
+  return (request.headers.get("accept") || "").includes("application/json");
+}
+
 async function rebind(request: Request) {
   const url = new URL(request.url);
   const origin = url.origin;
+  const json = wantsJson(request);
 
   if (!authSecret()) {
+    if (json) return NextResponse.json({ ok: false, error: "secret" }, { status: 503 });
     return NextResponse.json({ message: "AUTH_SECRET غير مُعدّ." }, { status: 503 });
   }
 
@@ -45,9 +63,9 @@ async function rebind(request: Request) {
   let returnTo = "/";
   const contentType = request.headers.get("content-type") || "";
   if (request.method === "POST" && contentType.includes("application/json")) {
-    const json = (await request.json().catch(() => ({}))) as { token?: string; returnTo?: string };
-    token = typeof json.token === "string" ? json.token.trim() : "";
-    returnTo = isSafeNextPath(json.returnTo) ? json.returnTo : "/";
+    const body = (await request.json().catch(() => ({}))) as { token?: string; returnTo?: string };
+    token = typeof body.token === "string" ? body.token.trim() : "";
+    returnTo = isSafeNextPath(body.returnTo) ? body.returnTo! : "/";
   } else if (request.method === "POST") {
     const form = await request.formData().catch(() => null);
     token = String(form?.get("token") || "").trim();
@@ -61,6 +79,7 @@ async function rebind(request: Request) {
   if (!token && header?.toLowerCase().startsWith("bearer ")) token = header.slice(7).trim();
 
   if (!token || token.length < 20) {
+    if (json) return NextResponse.json({ ok: false, error: "token" }, { status: 401 });
     return NextResponse.redirect(
       new URL(`/api/auth/bhd/start?returnTo=${encodeURIComponent(returnTo)}`, origin),
       303,
@@ -70,17 +89,40 @@ async function rebind(request: Request) {
   try {
     const profile = await profileFromWindowToken(token, request);
     const current = await getCurrentSession(request);
+    const bound = bindReturnPath(returnTo, profile.sub);
+
     if (current?.sub === profile.sub) {
-      const response = NextResponse.redirect(new URL(returnTo, origin), 303);
+      if (json) {
+        return NextResponse.json(
+          {
+            ok: true,
+            unchanged: true,
+            user: { id: profile.sub, email: current.email, name: current.name },
+          },
+          { headers: { "Cache-Control": "no-store" } },
+        );
+      }
+      const response = NextResponse.redirect(new URL(bound, origin), 303);
       response.headers.set("Cache-Control", "no-store");
       return response;
     }
+
     const roster = await readSessionRoster(request);
-    const response = NextResponse.redirect(new URL(returnTo, origin), 303);
+    if (json) {
+      const response = NextResponse.json(
+        { ok: true, user: { id: profile.sub, email: profile.email, name: profile.name } },
+        { headers: { "Cache-Control": "no-store" } },
+      );
+      await applyIdentityLogin(response.cookies, profile, roster);
+      return response;
+    }
+
+    const response = NextResponse.redirect(new URL(bound, origin), 303);
     await applyIdentityLogin(response.cookies, profile, roster);
     response.headers.set("Cache-Control", "no-store");
     return response;
   } catch {
+    if (json) return NextResponse.json({ ok: false, error: "rebind" }, { status: 401 });
     return NextResponse.redirect(
       new URL(
         `/api/auth/bhd/logout?continue=${encodeURIComponent(`/api/auth/bhd/start?returnTo=${encodeURIComponent(returnTo)}`)}`,

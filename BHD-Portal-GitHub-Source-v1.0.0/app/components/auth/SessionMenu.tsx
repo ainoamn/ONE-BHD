@@ -4,8 +4,14 @@ import { InstantLink } from "../InstantLink";
 import { BhdAppSwitcher } from "../bhd/BhdAppSwitcher";
 import type { UiLocale } from "../../lib/ui-locale";
 import { readStoredUiLocale } from "../../lib/ui-locale";
-import { addAccountUrl, applyAccountIsolation, identityFetch } from "../../lib/identity/client";
-import { captureWindowToken, signOutThisWindow } from "../../lib/identity/window-session";
+import {
+  addAccountUrl,
+  applyAccountIsolation,
+  identityFetch,
+  paintPrivacyVeil,
+  switchWindowAccount,
+} from "../../lib/identity/client";
+import { captureAccountToken, captureWindowToken, setActiveAu, signOutThisWindow } from "../../lib/identity/window-session";
 import { useCallback, useEffect, useState } from "react";
 
 export const BHD_ACCOUNT_CHANGED = "bhd-account-changed";
@@ -97,38 +103,30 @@ export function SessionMenu({ signInLabel, locale }: Props) {
       window.location.assign("/login");
       return;
     }
-    captureWindowToken(data.token);
+    if (data.token && data.user?.id) captureAccountToken(data.user.id, data.token);
+    else captureWindowToken(data.token);
     window.dispatchEvent(new Event(BHD_ACCOUNT_CHANGED));
-    await applyAccountIsolation();
+    await applyAccountIsolation({ sub: data.user?.id });
   }, []);
 
   const switchAccount = useCallback(async (sub: string) => {
-    // Clear painted data immediately — never leave the previous account's profile visible.
-    setUser({ id: "", email: "…", name: "…", picture: null });
+    paintPrivacyVeil();
+    setUser({ id: "", email: "", name: "", picture: null });
     setAccounts([]);
-    const response = await identityFetch("/api/auth/switch", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // Same-tab identity UI must rewrite bhd_id so /account SSR matches.
-        // Product tabs omit this header to keep other windows on their Bearer.
-        "X-BHD-Persist-Cookie": "1",
-      },
-      body: JSON.stringify({ sub }),
-    });
-    if (!response.ok) {
-      // Restore via me() on failure.
-      const me = await identityFetch("/api/auth/me").then((r) => r.json()).catch(() => ({})) as MeResponse & { token?: string };
-      captureWindowToken(me.token);
+    const switched = await switchWindowAccount(sub);
+    if (!switched.ok) {
+      const me = (await identityFetch("/api/auth/me")
+        .then((r) => r.json())
+        .catch(() => ({}))) as MeResponse & { token?: string };
+      if (me.token && me.user?.id) captureAccountToken(me.user.id, me.token);
+      else captureWindowToken(me.token);
       setUser(me.user ?? null);
       setAccounts(me.accounts || (me.user ? [me.user] : []));
       return;
     }
-    const data = (await response.json().catch(() => ({}))) as MeResponse & { token?: string };
-    captureWindowToken(data.token);
+    if (switched.userId) setActiveAu(switched.userId);
     window.dispatchEvent(new Event(BHD_ACCOUNT_CHANGED));
-    // Cookie was rewritten by /switch — remount every server/client surface on the new account.
-    await applyAccountIsolation();
+    await applyAccountIsolation({ sub: switched.userId || sub });
   }, []);
 
   if (!ready) {
