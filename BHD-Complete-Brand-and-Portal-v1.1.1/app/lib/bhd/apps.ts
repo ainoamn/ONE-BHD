@@ -8,6 +8,8 @@ export type BhdApp = {
   origin: string;
   /** مسار نسبي داخل المنتج بعد SSO — مساحة عمل العميل وليس الصفحة التسويقية. */
   workspacePath: string;
+  /** الصفحة الرئيسية العلنية. من بوابة www تُفتح هذه لا لوحة التحكم. */
+  homePath: string;
   startUrl: string | null;
   mode: BhdAppMode;
   enabled: boolean;
@@ -25,8 +27,8 @@ function ssoStart(origin: string, workspacePath: string) {
 
 /**
  * كتالوج مجمد — يُنسخ حرفياً إلى كل منتجات BHD.
- * workspacePath = لوحة العميل بعد التعرّف عبر الهوية (ليس /admin إلا للمكتب الداخلي).
- * النقر يفتح workspacePath مباشرة. start فقط إن لم توجد جلسة منتج (ميدلوير المنتج).
+ * workspacePath = لوحة العميل بعد SSO (ليس /admin إلا للمكتب الداخلي).
+ * من www.bhd-om.com تُفتح homePath (الصفحة الرئيسية). من الهوية/المنتج يُفتح workspacePath.
  * انظر docs/BHD-PRODUCT-SSO-ADMIN.md وdocs/BHD-APP-SWITCHER.md
  */
 export const BHD_APPS: BhdApp[] = [
@@ -37,6 +39,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "Account",
     origin: "https://id.bhd-om.com",
     workspacePath: "/account",
+    homePath: "/account",
     startUrl: null,
     mode: "identity",
     enabled: true,
@@ -51,6 +54,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "Bin Hamood Portal",
     origin: "https://www.bhd-om.com",
     workspacePath: "/company",
+    homePath: "/",
     startUrl: ssoStart("https://www.bhd-om.com", "/company"),
     mode: "sso",
     enabled: true,
@@ -65,6 +69,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "WAZEN",
     origin: "https://wazen.bhd-om.com",
     workspacePath: "/dashboard",
+    homePath: "/",
     startUrl: ssoStart("https://wazen.bhd-om.com", "/dashboard"),
     mode: "sso",
     enabled: true,
@@ -79,6 +84,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "HISAB",
     origin: "https://hisaby.bhd-om.com",
     workspacePath: "/dashboard",
+    homePath: "/",
     startUrl: ssoStart("https://hisaby.bhd-om.com", "/dashboard"),
     mode: "sso",
     enabled: true,
@@ -93,6 +99,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "NASAB",
     origin: "https://nasab.bhd-om.com",
     workspacePath: "/app",
+    homePath: "/",
     startUrl: ssoStart("https://nasab.bhd-om.com", "/app"),
     mode: "sso",
     enabled: true,
@@ -107,6 +114,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "BHD R",
     origin: "https://r.bhd-om.com",
     workspacePath: "/ar/portal",
+    homePath: "/ar",
     startUrl: ssoStart("https://r.bhd-om.com", "/ar/portal"),
     mode: "sso",
     enabled: true,
@@ -121,6 +129,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "BHD Store",
     origin: "https://bhdstor.bhd-om.com",
     workspacePath: "/dashboard",
+    homePath: "/",
     startUrl: ssoStart("https://bhdstor.bhd-om.com", "/dashboard"),
     mode: "sso",
     enabled: true,
@@ -135,6 +144,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "BHD Office",
     origin: "https://baitak.bhd-om.com",
     workspacePath: "/ar",
+    homePath: "/",
     startUrl: ssoStart("https://baitak.bhd-om.com", "/ar"),
     mode: "sso",
     enabled: true,
@@ -149,6 +159,7 @@ export const BHD_APPS: BhdApp[] = [
     nameEn: "BHD HR",
     origin: "https://hr.bhd-om.com",
     workspacePath: "/",
+    homePath: "/",
     startUrl: ssoStart("https://hr.bhd-om.com", "/"),
     mode: "sso",
     enabled: true,
@@ -173,22 +184,48 @@ function samePortalOrigin(pageOrigin?: string) {
   );
 }
 
-/** مساحة العمل مباشرة — بلا سلسلة start في كل نقرة. */
+function joinOriginPath(origin: string, path: string) {
+  const base = origin.replace(/\/$/, "");
+  const suffix = path.startsWith("/") ? path : `/${path}`;
+  if (suffix === "/") return `${base}/`;
+  return `${base}${suffix}`;
+}
+
+/** مساحة العمل بعد الدخول — ليست الصفحة التسويقية. */
 export function workspaceUrlForApp(app: BhdApp, pageOrigin?: string): string {
   if (app.mode === "identity") {
     if (pageOrigin?.replace(/\/$/, "") === "https://id.bhd-om.com") return app.workspacePath;
-    return `${app.origin.replace(/\/$/, "")}${app.workspacePath}`;
+    return joinOriginPath(app.origin, app.workspacePath);
   }
   if (app.id === "portal" && samePortalOrigin(pageOrigin)) {
     return app.workspacePath;
   }
   if (app.origin) {
-    return `${app.origin.replace(/\/$/, "")}${app.workspacePath || "/"}`;
+    return joinOriginPath(app.origin, app.workspacePath || "/");
   }
   return app.workspacePath || "/";
 }
 
+/** الصفحة الرئيسية العلنية للموقع. */
+export function publicUrlForApp(app: BhdApp, pageOrigin?: string): string {
+  const path = app.homePath || "/";
+  if (app.id === "portal" && samePortalOrigin(pageOrigin)) {
+    return path;
+  }
+  if (app.mode === "identity") {
+    return workspaceUrlForApp(app, pageOrigin);
+  }
+  return joinOriginPath(app.origin, path);
+}
+
+/**
+ * من بوابة www/bhd-om: الصفحة الرئيسية.
+ * من الهوية أو منتج آخر: مساحة العمل.
+ */
 export function launchUrlForApp(app: BhdApp, pageOrigin?: string): string {
+  if (samePortalOrigin(pageOrigin) && app.mode !== "identity") {
+    return publicUrlForApp(app, pageOrigin);
+  }
   return workspaceUrlForApp(app, pageOrigin);
 }
 

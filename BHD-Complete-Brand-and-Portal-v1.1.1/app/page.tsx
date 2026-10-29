@@ -21,7 +21,7 @@ const copy = {
     brand: "الهوية",
     appsGuide: "دليل البرامج",
     brandAria: "بن حمود للتطوير",
-    openWorkspace: "فتح مساحة العمل",
+    openSite: "فتح الموقع",
     companyHint: "الموقع التعريفي للشركة",
     footerLine: "ابنِ أحلامًا أكبر.",
     rights: "شركة بن حمود للتطوير. جميع الحقوق محفوظة.",
@@ -34,7 +34,7 @@ const copy = {
     brand: "Brand",
     appsGuide: "Apps guide",
     brandAria: "Bin Hamood Development",
-    openWorkspace: "Open workspace",
+    openSite: "Open site",
     companyHint: "Company introductory site",
     footerLine: "Build Higher Dreams.",
     rights: "Bin Hamood Development. All rights reserved.",
@@ -124,7 +124,7 @@ export default function Home() {
                 <BhdAppIcon id={app.id} title={label} className="gateway-tile-icon" />
                 <span className="gateway-tile-name">{label}</span>
                 <span className="gateway-tile-meta">
-                  {isPortal ? t.companyHint : t.openWorkspace}
+                  {isPortal ? t.companyHint : t.openSite}
                 </span>
               </TileTag>
             );

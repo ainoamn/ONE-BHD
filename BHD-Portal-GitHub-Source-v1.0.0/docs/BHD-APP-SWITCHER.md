@@ -112,29 +112,31 @@ sequenceDiagram
 |---|---|
 | `id` يساوي موقعك الحالي (`current`) | أغلق البطاقة. لا تنقل. إلا «الحساب»: افتح `/account` إن لم تكن عليها |
 | `enabled: false` | العنصر ظاهر باهتًا، `aria-disabled="true"`، لا نقر |
-| `mode: "sso"` | `launchUrlForApp` = `{origin}{workspacePath}` (نفس المنشأ: `router.push`) |
+| `mode: "sso"` من **www.bhd-om.com** | `launchUrlForApp` = `{origin}{homePath}` — الصفحة الرئيسية العلنية، ليست لوحة التحكم |
+| `mode: "sso"` من الهوية أو منتج آخر | `launchUrlForApp` = `{origin}{workspacePath}` (نفس المنشأ: `router.push`) |
 | `mode: "browse"` | `window.location.assign(app.origin + "/")` |
 | `mode: "identity"` | `window.location.assign` لصفحة الحساب (`/account` على البوابة، وإلا `https://id.bhd-om.com/account`) |
 
-مسار النقر = مساحة العمل. `startUrl` للميدلوير عند غياب الجلسة فقط:
+من بوابة `www.bhd-om.com` (البلاط والفوتر والمشغّل هناك) يُفتح `homePath` — الصفحة الرئيسية للموقع. مساحة العمل تبقى للمشغّل بعد الدخول على الهوية أو داخل منتج.
 
 ```
-{origin}{workspacePath}
-{origin}/api/auth/bhd/start?returnTo={workspacePath}   ← إن لم توجد جلسة منتج
+من www:     {origin}{homePath}          ← الرئيسية العلنية
+من الهوية:  {origin}{workspacePath}     ← لوحة العميل
+start فقط إن لم توجد جلسة منتج: {origin}/api/auth/bhd/start?returnTo={workspacePath}
 ```
 
-| التطبيق | `workspacePath` (مساحة عمل العميل) |
-|---|---|
-| بوابة بن حمود | `/company` |
-| وازن | `/dashboard` |
-| حسابي | `/dashboard` |
-| نَسَب | `/app` |
-| BHD R | `/ar/portal` |
-| المتجر | `/dashboard` |
-| المكتب | `/ar` |
-| الموارد البشرية | `/` |
+| التطبيق | `homePath` (من البوابة) | `workspacePath` (بعد الدخول) |
+|---|---|---|
+| بوابة بن حمود | `/` | `/company` |
+| وازن | `/` | `/dashboard` |
+| حسابي | `/` | `/dashboard` |
+| نَسَب | `/` | `/app` |
+| BHD R | `/ar` | `/ar/portal` |
+| المتجر | `/` | `/dashboard` |
+| المكتب | `/` | `/ar` |
+| الموارد البشرية | `/` | `/` |
 
-`returnTo` من الرئيسية ومن المشغّل = `workspacePath` فقط (مسار نسبي داخل نفس المنتج). كل منتج يسمح بهذه المسارات في تحقق `returnTo` بعد `callback`. لا تمرّر عنوان الصفحة الحالية إلى موقع آخر. `/admin` يبقى عبر `admin-entry` فقط.
+`returnTo` بعد SSO = `workspacePath` داخل المنتج. من البوابة لا تُرسل `start` إلى لوحة التحكم. `/admin` يبقى عبر `admin-entry` فقط.
 
 لا تستخدم `target="_blank"` في المشغّل بعد الدخول.
 
@@ -144,7 +146,7 @@ sequenceDiagram
 
 انسخ الملف المصدر حرفياً من  
 `BHD-Complete-Brand-and-Portal-v1.1.0/app/lib/bhd/apps.ts`  
-(يشمل الحقل `workspacePath` ودوال `gatewayApps` / `launchUrlForApp`).  
+(يشمل الحقلين `homePath` و`workspacePath` ودوال `gatewayApps` / `publicUrlForApp` / `launchUrlForApp`).  
 `current` يُحسب في المكوّن بمقارنة `window.location.origin` مع `origin` بعد إزالة الشرطة النهائية.
 
 > ملاحظة مجمّدة: الرئيسية `www.bhd-om.com/` بوابة تطبيقات. المحتوى التعريفي للشركة على `/company`. منتج العقار العام **BHD R**. نطاق `baitak.bhd-om.com` يخص **مكتب BHD**.

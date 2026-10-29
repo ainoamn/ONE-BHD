@@ -398,7 +398,7 @@ PATCH https://id.bhd-om.com/api/admin/clients
                 <td>مشغّل الهيدر</td>
                 <td>مستخدم داخل منتج</td>
                 <td>
-                  hop إلى مساحة العمل · <code>start</code> إن لم توجد جلسة منتج
+                  من www: الصفحة الرئيسية · من الهوية: مساحة العمل
                 </td>
               </tr>
               <tr>
@@ -427,7 +427,7 @@ PATCH https://id.bhd-om.com/api/admin/clients
             <li>□ callback يتحقق من id_token على الخادم فقط</li>
             <li>□ المستخدم يُحفظ بـ bhd_sub</li>
             <li>□ returnTo يفتح لوحة العميل وليس التسويق فقط</li>
-            <li>□ hops تفتح workspacePath إن وُجدت جلسة المنتج</li>
+            <li>□ من www.bhd-om.com البلاط يفتح الصفحة الرئيسية (homePath) لا لوحة التحكم</li>
             <li>□ identityFetch يرسل Bearer من sessionStorage (نوافذ متعددة)</li>
             <li>□ جلسة المنتج 400 يوم حتى خروج صريح</li>
             <li>□ العميل مسجّل في /admin أو ضمن القائمة الثابتة</li>
