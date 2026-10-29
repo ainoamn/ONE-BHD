@@ -149,30 +149,47 @@ export function BhdAppIcon({
   id,
   title,
   className = "",
+  logoUrl,
+  mark,
+  accent,
+  soft,
 }: {
   id: string;
   title?: string;
   className?: string;
+  logoUrl?: string | null;
+  mark?: string;
+  accent?: string;
+  soft?: string;
 }) {
   const icon = ICONS[appIconId(id)];
+  const known = Boolean(SLUG_TO_ICON[id]);
+  const background = soft || icon.soft;
+  const color = accent || icon.accent;
   return (
     <span
       className={`bhd-app-icon ${className}`.trim()}
-      style={{ background: icon.soft, color: icon.accent }}
+      style={{ background, color }}
       title={title || icon.label}
       aria-hidden="true"
     >
-      <svg viewBox="0 0 48 48" fill="none">
-        <g
-          stroke="currentColor"
-          strokeWidth="2.4"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          fill="none"
-        >
-          {icon.glyph}
-        </g>
-      </svg>
+      {logoUrl ? (
+        <img src={logoUrl} alt="" />
+      ) : known ? (
+        <svg viewBox="0 0 48 48" fill="none">
+          <g
+            stroke="currentColor"
+            strokeWidth="2.4"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            fill="none"
+          >
+            {icon.glyph}
+          </g>
+        </svg>
+      ) : (
+        <em>{mark || title?.slice(0, 1) || "B"}</em>
+      )}
     </span>
   );
 }

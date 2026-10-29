@@ -122,6 +122,27 @@ export async function ensureIdentitySchema(): Promise<void> {
         )
       `);
       await getSql().unsafe(`
+        CREATE TABLE IF NOT EXISTS bhd_app_catalog (
+          id text PRIMARY KEY,
+          client_id text,
+          name_ar text NOT NULL,
+          name_en text NOT NULL,
+          origin text NOT NULL,
+          workspace_path text NOT NULL DEFAULT '/',
+          home_path text NOT NULL DEFAULT '/',
+          start_url text,
+          mode text NOT NULL DEFAULT 'sso',
+          enabled boolean NOT NULL DEFAULT true,
+          mark text NOT NULL DEFAULT 'B',
+          accent text NOT NULL DEFAULT '#075c45',
+          soft text NOT NULL DEFAULT '#e6f1ec',
+          logo_mime text,
+          logo_content text,
+          sort_order integer NOT NULL DEFAULT 0,
+          updated_at timestamptz NOT NULL DEFAULT now()
+        )
+      `);
+      await getSql().unsafe(`
         CREATE TABLE IF NOT EXISTS bhd_email_templates (
           kind text PRIMARY KEY,
           subject text NOT NULL,

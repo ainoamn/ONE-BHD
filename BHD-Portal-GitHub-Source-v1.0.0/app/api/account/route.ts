@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { BHD_APPS } from "../../lib/bhd/apps";
+import { listLiveApps } from "../../lib/bhd/catalog-store";
 import { authSecret } from "../../lib/auth/config";
 import { allowRequest, clientKey } from "../../lib/auth/rate-limit";
 import { getCurrentSession } from "../../lib/auth/session";
@@ -12,9 +12,10 @@ function noStore(body: unknown, status = 200) {
   return NextResponse.json(body, { status, headers: { "Cache-Control": "no-store" } });
 }
 
-function linkedSites(linkedClientIds: string[]) {
+async function linkedSites(linkedClientIds: string[]) {
   const linked = new Set(linkedClientIds);
-  return BHD_APPS.map((app) => {
+  const apps = await listLiveApps();
+  return apps.map((app) => {
     const used = Boolean(app.clientId && linked.has(app.clientId));
     const status = !app.enabled
       ? "soon"
@@ -27,6 +28,7 @@ function linkedSites(linkedClientIds: string[]) {
       nameEn: app.nameEn,
       origin: app.origin,
       enabled: app.enabled,
+      logoUrl: app.logoUrl || null,
       status,
     };
   });
@@ -69,7 +71,7 @@ export async function GET(request: Request) {
       },
       contact: null,
       files: { civilIdFile: null, passportFile: null },
-      sites: linkedSites([]),
+      sites: await linkedSites([]),
       subscriptions: [],
     });
   }
@@ -81,7 +83,7 @@ export async function GET(request: Request) {
       user: profile.user,
       contact: profile.contact,
       files: profile.files,
-      sites: linkedSites(linkedClientIds),
+      sites: await linkedSites(linkedClientIds),
       subscriptions: [],
     });
 }
@@ -133,7 +135,7 @@ export async function PATCH(request: Request) {
       user: profile?.user || user,
       contact: profile?.contact || null,
       files: profile?.files || { civilIdFile: null, passportFile: null },
-      sites: linkedSites(linkedClientIds),
+      sites: await linkedSites(linkedClientIds),
       subscriptions: [],
     });
   } catch (error) {

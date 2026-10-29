@@ -57,6 +57,7 @@ type LinkedSite = {
   nameEn: string;
   origin: string;
   enabled: boolean;
+  logoUrl?: string | null;
   status: "linked" | "available" | "soon";
 };
 
@@ -699,7 +700,7 @@ export function AccountConsole() {
                   <ul className="account-sites">
                     {(data.sites || []).map((site) => (
                       <li key={site.id}>
-                        <BhdAppIcon id={site.id} title={site.nameAr} />
+                        <BhdAppIcon id={site.id} title={site.nameAr} logoUrl={site.logoUrl} />
                         <div>
                           <strong>{site.nameAr}</strong>
                           <small>{site.origin.replace(/^https:\/\//, "") || STATUS_LABEL[site.status]}</small>

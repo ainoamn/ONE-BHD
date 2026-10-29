@@ -6,7 +6,8 @@ import { InstantLink } from "./components/InstantLink";
 import { SessionMenu } from "./components/auth/SessionMenu";
 import { SiteFooter } from "./components/SiteFooter";
 import { BhdAppIcon } from "./components/bhd/BhdAppIcon";
-import { gatewayApps, launchUrlForApp } from "./lib/bhd/apps";
+import { launchUrlForApp } from "./lib/bhd/apps";
+import { useLiveCatalog } from "./lib/bhd/use-live-catalog";
 import type { UiLocale } from "./lib/ui-locale";
 import {
   applyDocumentLocale,
@@ -49,7 +50,8 @@ export default function Home() {
   const [ready, setReady] = useState(false);
   const t = copy[language];
   const isArabic = language === "ar";
-  const apps = gatewayApps();
+  const catalog = useLiveCatalog();
+  const apps = catalog.filter((app) => app.enabled && app.id !== "account");
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -121,7 +123,15 @@ export default function Home() {
                 className={`gateway-tile${isPortal ? " gateway-tile-portal" : ""}`}
                 style={{ "--tile-accent": app.accent, "--tile-soft": app.soft, "--tile-delay": `${index * 45}ms` } as React.CSSProperties}
               >
-                <BhdAppIcon id={app.id} title={label} className="gateway-tile-icon" />
+                <BhdAppIcon
+                  id={app.id}
+                  title={label}
+                  logoUrl={app.logoUrl}
+                  mark={app.mark}
+                  accent={app.accent}
+                  soft={app.soft}
+                  className="gateway-tile-icon"
+                />
                 <span className="gateway-tile-name">{label}</span>
                 <span className="gateway-tile-meta">
                   {isPortal ? t.companyHint : t.openSite}

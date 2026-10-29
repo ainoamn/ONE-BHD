@@ -4,6 +4,7 @@ import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { SessionMenu } from "../components/auth/SessionMenu";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { AdminAppsPanel } from "./AdminAppsPanel";
 import { AdminConnectPanel } from "./AdminConnectPanel";
 import { AdminSecurityPanel } from "./AdminSecurityPanel";
 
@@ -68,13 +69,14 @@ type AdminUserDetail = AdminUser & {
   }>;
 };
 
-type TabId = "users" | "system" | "clients" | "emails" | "security" | "connect";
+type TabId = "users" | "system" | "clients" | "emails" | "security" | "connect" | "apps";
 
 const ADMIN_TABS: Array<[TabId, string]> = [
   ["users", "المستخدمون"],
   ["security", "الحماية والتدقيق"],
   ["emails", "قوالب البريد"],
   ["system", "النظام"],
+  ["apps", "شاشة الأيقونات"],
   ["connect", "ربط المواقع"],
   ["clients", "العملاء OAuth"],
 ];
@@ -464,6 +466,7 @@ export function AdminConsole({
             <InstantLink href="/account">الحساب</InstantLink>
             <InstantLink href="/apps">البرامج</InstantLink>
             <InstantLink href="/docs/unified-login">التوثيق</InstantLink>
+            <a href="#apps">شاشة الأيقونات</a>
             <a href="#connect">ربط المواقع</a>
             <button type="button" className="admin-signout" onClick={() => void signOutAdmin()}>
               خروج
@@ -693,6 +696,8 @@ export function AdminConsole({
             </div>
           </section>
         ) : null}
+
+        {tab === "apps" ? <AdminAppsPanel /> : null}
 
         {tab === "connect" ? <AdminConnectPanel /> : null}
 

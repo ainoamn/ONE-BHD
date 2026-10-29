@@ -5,7 +5,7 @@ import { InstantLink } from "../components/InstantLink";
 import { FacebookSignInButton } from "../components/auth/FacebookSignInButton";
 import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 import { BhdAppIcon } from "../components/bhd/BhdAppIcon";
-import { BHD_APPS } from "../lib/bhd/apps";
+import { useLiveCatalog } from "../lib/bhd/use-live-catalog";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { captureWindowToken } from "../lib/identity/window-session";
@@ -291,7 +291,8 @@ export function LoginForm() {
     return () => window.clearTimeout(timer);
   }, [cooldownSec]);
 
-  const apps = useMemo(() => BHD_APPS.filter((app) => app.id !== "account"), []);
+  const catalog = useLiveCatalog();
+  const apps = catalog.filter((app) => app.id !== "account");
 
   function resetForgotUi() {
     setForgotSent(false);
@@ -732,7 +733,14 @@ export function LoginForm() {
           <ul>
             {apps.map((app) => (
               <li key={app.id} className={app.enabled ? "" : "is-soon"}>
-                <BhdAppIcon id={app.id} title={lang === "ar" ? app.nameAr : app.nameEn} />
+                <BhdAppIcon
+                  id={app.id}
+                  title={lang === "ar" ? app.nameAr : app.nameEn}
+                  logoUrl={app.logoUrl}
+                  mark={app.mark}
+                  accent={app.accent}
+                  soft={app.soft}
+                />
                 <span>{lang === "ar" ? app.nameAr : app.nameEn}</span>
               </li>
             ))}

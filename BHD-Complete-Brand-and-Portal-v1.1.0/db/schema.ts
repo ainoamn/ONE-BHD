@@ -166,6 +166,26 @@ export const recoveryChallenges = pgTable("bhd_recovery_challenges", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const appCatalog = pgTable("bhd_app_catalog", {
+  id: text("id").primaryKey(),
+  clientId: text("client_id"),
+  nameAr: text("name_ar").notNull(),
+  nameEn: text("name_en").notNull(),
+  origin: text("origin").notNull(),
+  workspacePath: text("workspace_path").notNull().default("/"),
+  homePath: text("home_path").notNull().default("/"),
+  startUrl: text("start_url"),
+  mode: text("mode").notNull().default("sso"),
+  enabled: boolean("enabled").notNull().default(true),
+  mark: text("mark").notNull().default("B"),
+  accent: text("accent").notNull().default("#075c45"),
+  soft: text("soft").notNull().default("#e6f1ec"),
+  logoMime: text("logo_mime"),
+  logoContent: text("logo_content"),
+  sortOrder: integer("sort_order").notNull().default(0),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const emailTemplates = pgTable("bhd_email_templates", {
   kind: text("kind").primaryKey(),
   subject: text("subject").notNull(),

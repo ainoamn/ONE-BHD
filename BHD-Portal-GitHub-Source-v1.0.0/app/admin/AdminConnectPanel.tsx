@@ -29,7 +29,8 @@ if (!body.user) {
 }`;
 
 const CSP_SNIPPET = `script-src 'self' https://id.bhd-om.com;
-connect-src 'self' https://id.bhd-om.com;`;
+connect-src 'self' https://id.bhd-om.com;
+img-src 'self' https://id.bhd-om.com data:;`;
 
 export function AdminConnectPanel() {
   const [runtime, setRuntime] = useState<Runtime | null>(null);
@@ -114,6 +115,11 @@ export function AdminConnectPanel() {
             <strong>تشغيل حي</strong>
             <code>{issuer}/api/bhd/runtime</code>
             <span>مدة الجلسة، ترويسات النافذة، الكتالوج مع homeUrl و workspaceUrl</span>
+          </li>
+          <li>
+            <strong>شاشة الأيقونات</strong>
+            <code>{issuer}/admin#apps</code>
+            <span>التحكم بالشعار والمسمّى والرابط — ينعكس عبر الكتالوج</span>
           </li>
           <li>
             <strong>الكتالوج</strong>

@@ -1,11 +1,20 @@
 import { SESSION_MAX_AGE_SEC } from "../auth/config";
 import { DEFAULT_IDENTITY_ISSUER } from "../identity/issuer";
-import { BHD_APP_SWITCHER_SPEC, BHD_APPS, hopUrls, publicUrlForApp, workspaceUrlForApp } from "./apps";
+import { BHD_APP_SWITCHER_SPEC, launchUrlForApp, publicUrlForApp, workspaceUrlForApp, type BhdApp } from "./apps";
+import { listLiveApps } from "./catalog-store";
 
 export const BHD_RUNTIME_SPEC = "bhd-identity-runtime.v1";
 
-export function bhdRuntimePayload() {
+export const runtimeCorsHeaders = {
+  "Cache-Control": "public, max-age=5, stale-while-revalidate=15",
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Cross-Origin-Resource-Policy": "cross-origin",
+} as const;
+
+export async function bhdRuntimePayload() {
   const issuer = DEFAULT_IDENTITY_ISSUER;
+  const apps = await listLiveApps();
   return {
     spec: BHD_RUNTIME_SPEC,
     live: true,
@@ -30,24 +39,20 @@ export function bhdRuntimePayload() {
       logout: `${issuer}/api/auth/logout`,
       catalog: `${issuer}/api/bhd/catalog`,
       runtime: `${issuer}/api/bhd/runtime`,
+      icons: `${issuer}/api/bhd/icons/{id}`,
       authorize: `${issuer}/oauth/authorize`,
       endSession: `${issuer}/oauth/end-session`,
+      adminCatalog: `${issuer}/admin#apps`,
     },
     catalog: {
       spec: BHD_APP_SWITCHER_SPEC,
-      apps: BHD_APPS.map((app) => ({
+      source: "admin",
+      apps: apps.map((app: BhdApp) => ({
         ...app,
         homeUrl: publicUrlForApp(app),
         workspaceUrl: workspaceUrlForApp(app),
       })),
-      hops: hopUrls(),
+      hops: apps.filter((app) => app.enabled).map((app) => launchUrlForApp(app)),
     },
   };
 }
-
-export const runtimeCorsHeaders = {
-  "Cache-Control": "public, max-age=60, stale-while-revalidate=300",
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, OPTIONS",
-  "Cross-Origin-Resource-Policy": "cross-origin",
-} as const;

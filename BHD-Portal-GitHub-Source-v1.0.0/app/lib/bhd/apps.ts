@@ -16,6 +16,8 @@ export type BhdApp = {
   mark: string;
   accent: string;
   soft: string;
+  logoUrl?: string | null;
+  sortOrder?: number;
 };
 
 export const BHD_APP_SWITCHER_SPEC = "bhd-appswitcher.v1";

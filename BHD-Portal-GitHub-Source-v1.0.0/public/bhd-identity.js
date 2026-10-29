@@ -52,7 +52,18 @@
     issuer: ISSUER,
     runtime: function () {
       return fetch(ISSUER + "/api/bhd/runtime", { cache: "no-store" }).then(function (response) {
-        return response.json();
+        return response.json().then(function (body) {
+          if (body && body.catalog && body.catalog.apps) emit("bhd-catalog", body.catalog.apps);
+          return body;
+        });
+      });
+    },
+    catalog: function () {
+      return fetch(ISSUER + "/api/bhd/catalog", { cache: "no-store" }).then(function (response) {
+        return response.json().then(function (body) {
+          if (body && body.apps) emit("bhd-catalog", body.apps);
+          return body;
+        });
       });
     },
     me: function () {
@@ -95,4 +106,10 @@
   };
 
   root.BhdIdentity = BhdIdentity;
+  if (typeof window !== "undefined") {
+    BhdIdentity.catalog();
+    window.setInterval(function () {
+      BhdIdentity.catalog();
+    }, 20000);
+  }
 })(typeof window !== "undefined" ? window : this);

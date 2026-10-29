@@ -189,7 +189,9 @@ export default function UnifiedLoginDocsPage() {
   const { body } = await BhdIdentity.me();
 </script>`}</pre>
           <p>
-            التفاصيل التشغيلية ونسخ العناوين:{" "}
+            التحكم بالشعار والمسمّى والرابط:{" "}
+            <InstantLink href="/admin#apps">/admin → شاشة الأيقونات</InstantLink>
+            . التفاصيل التشغيلية:{" "}
             <InstantLink href="/admin#connect">/admin → ربط المواقع</InstantLink>
             . الدليل:{" "}
             <a href="/docs/BHD-IDENTITY-RUNTIME.md" download="BHD-IDENTITY-RUNTIME.md">

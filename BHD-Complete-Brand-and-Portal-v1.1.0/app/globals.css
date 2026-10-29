@@ -842,6 +842,20 @@ h3 {
   height: 72%;
 }
 
+.bhd-app-icon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bhd-app-icon em {
+  font-style: normal;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+}
+
 .launcher-mark.bhd-app-icon {
   width: 44px;
   height: 44px;
@@ -5999,5 +6013,51 @@ a.login-submit {
   .admin-connect-stats {
     grid-template-columns: 1fr;
   }
+}
+
+.admin-apps-list {
+  display: grid;
+  gap: 8px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-apps-list button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d5e0da;
+  border-radius: 14px;
+  background: #fbfcfb;
+  text-align: start;
+  cursor: pointer;
+}
+
+.admin-apps-list button.is-active {
+  border-color: #174b70;
+  background: #eef4f8;
+}
+
+.admin-apps-list strong,
+.admin-apps-list small {
+  display: block;
+}
+
+.admin-apps-list small,
+.admin-apps-list em {
+  color: #5d7169;
+  font-size: 12px;
+  font-style: normal;
+}
+
+.admin-app-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 16px;
+  font-weight: 800;
 }
 

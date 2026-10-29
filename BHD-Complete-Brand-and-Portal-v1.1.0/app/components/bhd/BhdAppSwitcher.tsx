@@ -1,6 +1,7 @@
 "use client";
 
-import { BHD_APPS, hopOrigins, launchUrlForApp, type BhdApp } from "../../lib/bhd/apps";
+import { hopOrigins, launchUrlForApp, type BhdApp } from "../../lib/bhd/apps";
+import { useLiveCatalog } from "../../lib/bhd/use-live-catalog";
 import { DEFAULT_IDENTITY_ISSUER } from "../../lib/identity/issuer";
 import type { UiLocale } from "../../lib/ui-locale";
 import { BhdAppIcon } from "./BhdAppIcon";
@@ -240,10 +241,12 @@ export function BhdAppSwitcher({
   const router = useRouter();
   const t = COPY[locale];
   const isArabic = locale === "ar";
+  const apps = useLiveCatalog();
 
   useEffect(() => {
     setOrigin(window.location.origin);
     hopOrigins().forEach((item) => hintHop(item));
+    apps.filter((app) => app.enabled && app.origin).forEach((app) => hintHop(app.origin));
   }, []);
 
   useEffect(() => {
@@ -270,11 +273,11 @@ export function BhdAppSwitcher({
 
   useEffect(() => {
     if (panel !== "apps" || !origin) return;
-    BHD_APPS.forEach((app) => {
+    apps.forEach((app) => {
       if (!app.enabled) return;
       hintHop(app.mode === "identity" ? accountPageUrl(origin) : launchUrlForApp(app, origin));
     });
-  }, [panel, origin]);
+  }, [panel, origin, apps]);
 
   function onAppClick(app: BhdApp) {
     if (!app.enabled) return;
@@ -349,7 +352,7 @@ export function BhdAppSwitcher({
             <p>{t.appsTitle}</p>
           </div>
           <div className="bhd-switcher-grid-apps">
-            {BHD_APPS.map((app) => {
+            {apps.map((app) => {
               const current = origin ? isCurrentApp(app, origin) : false;
               const label = isArabic ? app.nameAr : app.nameEn;
               const href = app.mode === "identity" ? accountPageUrl(origin) : launchUrlForApp(app, origin);
@@ -381,6 +384,10 @@ export function BhdAppSwitcher({
                   <BhdAppIcon
                     id={app.id}
                     title={label}
+                    logoUrl={app.logoUrl}
+                    mark={app.mark}
+                    accent={app.accent}
+                    soft={app.soft}
                     className={current ? "bhd-switcher-mark is-current" : "bhd-switcher-mark"}
                   />
                   <span>{label}</span>
