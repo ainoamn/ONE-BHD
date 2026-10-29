@@ -61,7 +61,7 @@
 
 يُسمح بعدة حسابات في نفس المتصفح، **وحساب مختلف في كل نافذة**.
 
-الكوكي `bhd_id` مشتركة بين نوافذ نفس الملف؛ العزل يتم بـ `sessionStorage` (`bhd_window_token`) وترويسة `Authorization: Bearer`. التبديل مع Bearer **لا يغيّر** كوكي النوافذ الأخرى. انظر [`BHD-COPY-TO-PRODUCTS.md`](BHD-COPY-TO-PRODUCTS.md).
+الكوكي `bhd_id` مشتركة بين نوافذ نفس المتصفح وتمثّل الحساب النشط لـ SSR/OAuth. عزل استدعاءات API بين النوافذ يتم بـ `sessionStorage` (`bhd_window_token`) و`Authorization: Bearer`. التبديل **يعيد كتابة** `bhd_id` للحساب الجديد في هذه الجلسة (خصوصية إلزامية — انظر [`BHD-ACCOUNT-ISOLATION.md`](BHD-ACCOUNT-ISOLATION.md)).
 
 1. بطاقة الحساب: صورة دائرية نظيفة + البريد، وشارة المصدر بجانب البريد لا داخل الصورة. [`BHD-ACCOUNT-SWITCHER.md`](BHD-ACCOUNT-SWITCHER.md).
 2. التبديل: `POST https://id.bhd-om.com/api/auth/switch` مع Bearer النافذة، احفظ `token`، ثم **أفرغ صفحة الحساب السابق وأعد ربط المنتج** عبر `/api/auth/window-handoff` ثم `/auth/handoff` حتى يصدر OIDC كود الحساب الجديد لا كوكي النافذة الأخرى. ممنوع إبقاء بيانات المستخدم السابق في الصفحة. ممنوع `/login?add=1` هنا.

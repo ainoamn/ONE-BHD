@@ -1,6 +1,6 @@
 import { BHD_APPS } from "../bhd/apps";
 import { DEFAULT_IDENTITY_ISSUER } from "./issuer";
-import { windowFetchHeaders } from "./window-session";
+import { captureWindowToken, windowFetchHeaders } from "./window-session";
 
 export function pageOrigin() {
   return typeof window === "undefined" ? "" : window.location.origin.replace(/\/$/, "");
@@ -29,12 +29,19 @@ export function identityApiUrl(path: string) {
 
 export function identityFetch(path: string, init?: RequestInit) {
   const headers = windowFetchHeaders(init?.headers);
-  return fetch(identityApiUrl(path), {
+  const responsePromise = fetch(identityApiUrl(path), {
     cache: "no-store",
     credentials: "include",
     ...init,
     headers,
   });
+  void responsePromise
+    .then((response) => response.clone().json())
+    .then((data: { token?: unknown } | null) => {
+      if (data && typeof data.token === "string") captureWindowToken(data.token);
+    })
+    .catch(() => undefined);
+  return responsePromise;
 }
 
 export function currentReturnPath() {
@@ -72,7 +79,11 @@ export async function applyAccountIsolation() {
   if (typeof window === "undefined") return;
   const here = currentReturnPath();
   if (isIdentityOrigin()) {
-    window.location.reload();
+    // Hard navigation + cache bust so /account RSC and cookie-backed routes remount
+    // on the switched bhd_id (reload alone can keep a stale document).
+    const url = new URL(here, window.location.origin);
+    url.searchParams.set("_bhd", String(Date.now()));
+    window.location.assign(`${url.pathname}${url.search}`);
     return;
   }
   try {

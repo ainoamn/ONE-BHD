@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import {
-  cookieSessionToken,
+  createSessionToken,
   getCurrentSession,
   publicAccount,
-  readBearerToken,
   readSessionRoster,
 } from "../../../lib/auth/session";
 import { isPlatformAdminEmail } from "../../../lib/auth/platform-admin";
@@ -17,6 +16,7 @@ export function OPTIONS(request: Request) {
 
 export async function GET(request: Request) {
   const headers = productCorsHeaders(request);
+  headers.set("Cache-Control", "no-store");
   if (request.headers.get("x-bhd-window-signed-out") === "1") {
     const accounts = await readSessionRoster(request);
     return NextResponse.json({ user: null, accounts: accounts.map(publicAccount) }, { headers });
@@ -28,16 +28,16 @@ export async function GET(request: Request) {
   }
 
   const accounts = await readSessionRoster(request);
-  const bootstrap =
-    request.headers.get("x-bhd-window-bootstrap") === "1" && !readBearerToken(request);
-  const token = bootstrap ? await cookieSessionToken() : undefined;
+  // Always return a window token for the active session so sessionStorage cannot
+  // stay on a previous account after bhd_id was rewritten by /api/auth/switch.
+  const token = await createSessionToken(session);
   return NextResponse.json(
     {
       user: publicAccount(session),
       accounts: accounts.map(publicAccount),
       contact: null,
       platformAdmin: isPlatformAdminEmail(session.email),
-      ...(token ? { token } : {}),
+      token,
     },
     { headers },
   );

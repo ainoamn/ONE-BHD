@@ -103,23 +103,26 @@ export function SessionMenu({ signInLabel, locale }: Props) {
   }, []);
 
   const switchAccount = useCallback(async (sub: string) => {
+    // Clear painted data immediately — never leave the previous account's profile visible.
+    setUser({ id: "", email: "…", name: "…", picture: null });
+    setAccounts([]);
     const response = await identityFetch("/api/auth/switch", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sub }),
     });
-    if (!response.ok) return;
+    if (!response.ok) {
+      // Restore via me() on failure.
+      const me = await identityFetch("/api/auth/me").then((r) => r.json()).catch(() => ({})) as MeResponse & { token?: string };
+      captureWindowToken(me.token);
+      setUser(me.user ?? null);
+      setAccounts(me.accounts || (me.user ? [me.user] : []));
+      return;
+    }
     const data = (await response.json().catch(() => ({}))) as MeResponse & { token?: string };
     captureWindowToken(data.token);
-    setUser(null);
-    setAccounts([]);
-    setPlatformAdmin(false);
-    if (data.user) {
-      setUser(data.user);
-      setAccounts(data.accounts || [data.user]);
-      setPlatformAdmin(Boolean(data.platformAdmin));
-    }
     window.dispatchEvent(new Event(BHD_ACCOUNT_CHANGED));
+    // Cookie was rewritten by /switch — remount every server/client surface on the new account.
     await applyAccountIsolation();
   }, []);
 

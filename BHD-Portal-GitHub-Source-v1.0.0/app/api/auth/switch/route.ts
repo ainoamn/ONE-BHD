@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import {
   applyIdentitySwitch,
   publicAccount,
-  readBearerToken,
   readSessionRoster,
 } from "../../../lib/auth/session";
 import { productCorsHeaders, productCorsPreflight } from "../../../lib/auth/product-cors";
@@ -15,6 +14,7 @@ export function OPTIONS(request: Request) {
 
 export async function POST(request: Request) {
   const headers = new Headers(productCorsHeaders(request));
+  headers.set("Cache-Control", "no-store");
   let sub = "";
   try {
     const body = (await request.json()) as { sub?: string; email?: string };
@@ -32,9 +32,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "هذا الحساب غير محفوظ في هذه الجلسة." }, { status: 404, headers });
   }
 
+  // ALWAYS rewrite bhd_id (+ roster). Skipping the cookie when a Bearer was present
+  // left SSR, /account, and product OAuth stuck on the first signed-in email.
   const response = NextResponse.json({ ok: true, user: publicAccount(target), accounts: roster.map(publicAccount) }, { headers });
-  const persistCookie = !readBearerToken(request);
-  const switched = await applyIdentitySwitch(response.cookies, target.sub, roster, persistCookie);
+  const switched = await applyIdentitySwitch(response.cookies, target.sub, roster, true);
   if (switched) {
     return NextResponse.json(
       {
