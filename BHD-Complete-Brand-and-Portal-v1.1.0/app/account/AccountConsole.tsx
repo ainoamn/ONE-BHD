@@ -321,7 +321,7 @@ export function AccountConsole() {
 
   function fieldTone(value: string) {
     if (value.trim()) return attempted ? "is-ok" : "";
-    return attempted ? "is-missing" : "";
+    return "is-missing";
   }
 
   async function onSubmit(event: FormEvent) {
@@ -420,9 +420,11 @@ export function AccountConsole() {
         {loading ? <p className="account-status">جاري تحميل الحساب…</p> : null}
         {error ? <p className="account-status is-error">{error}</p> : null}
         {saved ? <p className="account-status is-ok">{saved}</p> : null}
-        {attempted && missing.length ? (
+        {missing.length ? (
           <div className="account-missing" role="alert">
-            <strong>هذه الحقول ناقصة:</strong>
+            <strong>
+              {missing.length} {missing.length === 1 ? "حقل ناقص" : "حقول ناقصة"} — أكملها ليظهر ملفك مكتملاً في مواقع BHD:
+            </strong>
             <ul>
               {missing.map((item) => (
                 <li key={item.key}>{item.label}</li>
@@ -610,7 +612,7 @@ export function AccountConsole() {
                         الرقم الضريبي
                         <input value={taxId} onChange={(event) => setTaxId(event.target.value)} />
                       </label>
-                      <div className={`account-upload is-wide ${attempted && !commercialRegisterFile ? "is-missing" : ""}`}>
+                      <div className={`account-upload is-wide ${!commercialRegisterFile ? "is-missing" : ""}`}>
                         <span>مرفق السجل التجاري *</span>
                         <input
                           type="file"
@@ -626,7 +628,7 @@ export function AccountConsole() {
                           <small>صورة أو PDF للسجل التجاري حتى 4 ميغابايت.</small>
                         )}
                       </div>
-                      <div className={`account-upload is-wide ${attempted && !authorizationFile ? "is-missing" : ""}`}>
+                      <div className={`account-upload is-wide ${!authorizationFile ? "is-missing" : ""}`}>
                         <span>مرفق تفويض المفوض *</span>
                         <input
                           type="file"
