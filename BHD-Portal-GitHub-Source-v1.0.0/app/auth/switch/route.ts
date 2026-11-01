@@ -17,9 +17,13 @@ export async function GET(request: Request) {
   }
   const roster = await readSessionRoster();
   const target = roster.find((item) => item.sub === sub || item.email === sub);
-  const response = NextResponse.redirect(new URL(dest, url.origin));
+  // Always land on the requested account — bind ?au= so /account SSR matches this tab.
+  const destUrl = new URL(dest, url.origin);
+  const boundSub = target?.sub || (sub && roster.some((item) => item.sub === sub) ? sub : "");
+  if (boundSub) destUrl.searchParams.set("au", boundSub);
+  const response = NextResponse.redirect(destUrl);
   if (target && target.sub !== session.sub) {
-    await applyIdentitySwitch(response.cookies, target.sub, roster);
+    await applyIdentitySwitch(response.cookies, target.sub, roster, true);
   }
   return response;
 }

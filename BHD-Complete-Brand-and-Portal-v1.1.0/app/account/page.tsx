@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getCurrentSession } from "../lib/auth/session";
+import { AccountAuGate } from "./AccountAuGate";
 import { AccountConsole } from "./AccountConsole";
 
 export const metadata: Metadata = {
@@ -8,10 +9,21 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default async function AccountPage() {
+export default async function AccountPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const session = await getCurrentSession();
   if (!session) {
-    redirect("/login?next=/account");
+    const query = searchParams ? await searchParams : {};
+    const au = typeof query.au === "string" ? query.au.trim() : "";
+    const next = au ? `/account?au=${encodeURIComponent(au)}` : "/account";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
   }
-  return <AccountConsole />;
+  return (
+    <AccountAuGate>
+      <AccountConsole />
+    </AccountAuGate>
+  );
 }
