@@ -56,6 +56,6 @@
 
 كل مشاريع Vercel المرتبطة بالعزل الصامت **Ready** بما فيها `ain-oman-web` بعد إصلاح بوابة البناء وCVE لـ Next.js. التفاصيل والشـHA في `BHD-PRODUCTS-WIRE-STATUS.md`.
 
-## استقرار تعدد التبويبات (29 أكتوبر 2026)
+## استقرار تعدد التبويبات (29 أكتوبر → 1 نوفمبر 2026)
 
-انظر `BHD-MULTI-TAB-STABILITY.md` — أُوقف `location.replace` بعد الإصلاح الصامت، والتبويب المركّز فقط يكتب كوكي المنتج.
+انظر `BHD-MULTI-TAB-STABILITY.md` و`BHD-MANAGE-ACCOUNT-AU.md` — لا `location.replace` صامت، التبويب المركّز فقط يكتب الكوكي، LiveSync يتجمّد عند كوكي معادٍ، و«إدارة الحساب» عبر `/auth/switch?sub=`.
