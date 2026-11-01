@@ -15,13 +15,19 @@ export function AccountAuGate({ children }: { children: React.ReactNode }) {
     let cancelled = false;
 
     async function bind() {
-      const au =
-        (typeof window !== "undefined"
-          ? new URL(window.location.href).searchParams.get("au")?.trim()
-          : "") || readActiveAu();
+      const urlAu =
+        typeof window !== "undefined"
+          ? new URL(window.location.href).searchParams.get("au")?.trim() || ""
+          : "";
+      const remembered = readActiveAu();
+      const au = urlAu || remembered;
       if (!au) {
         if (!cancelled) setReady(true);
         return;
+      }
+      // Cookie/session already bound to this au — paint immediately, verify in background.
+      if (remembered === au) {
+        if (!cancelled) setReady(true);
       }
       setActiveAu(au);
       try {
@@ -29,7 +35,7 @@ export function AccountAuGate({ children }: { children: React.ReactNode }) {
         const body = (await me.json().catch(() => ({}))) as { user?: { id?: string } | null };
         if (cancelled) return;
         if (body.user?.id && body.user.id === au) {
-          setReady(true);
+          if (!cancelled) setReady(true);
           return;
         }
         const switched = await switchWindowAccount(au);

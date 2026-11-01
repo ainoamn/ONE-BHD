@@ -1,5 +1,19 @@
 # BHD Identity — سجل النشر والربط
 
+## 100. تسريع صفحة الحساب `/account` (2026-11-01)
+
+**المشكلة:** `id.bhd-om.com/account?au=…` يستغرق أكثر من 5 ثوانٍ قبل عرض البيانات.
+
+| # | ما نُفّذ |
+|---|---|
+| 1 | `GET /api/account` يجلب profile + linked + apps بالتوازي (`Promise.all`) |
+| 2 | `getAccountProfile` يجلب contact + files بالتوازي |
+| 3 | `listLiveApps` بدون قراءة `logo_content` + كاش 45ث |
+| 4 | `AccountAuGate` يرسم فوراً إن كان `au` متطابقاً مع الذاكرة |
+| 5 | تجمّع اتصالات Neon `max: 3` + فهارس `bhd_oauth_tickets(user_id)` و`bhd_contacts(owner,type)` |
+
+**الخطوات:** push ONE-BHD، نشر Vercel من جذر `BHD-Complete-Brand-and-Portal-v1.1.0`.
+
 ## 2026-10-29 — Multi-product wire rollout
 
 | البند | التفاصيل |

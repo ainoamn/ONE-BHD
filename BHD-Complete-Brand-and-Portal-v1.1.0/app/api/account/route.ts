@@ -81,16 +81,37 @@ export async function GET(request: Request) {
     });
   }
 
-  const profile = await getAccountProfile(session.sub);
+  const [profile, linkedClientIds, apps] = await Promise.all([
+    getAccountProfile(session.sub),
+    listLinkedClientIds(session.sub),
+    listLiveApps(),
+  ]);
   if (!profile) return noStore({ message: "الحساب غير موجود." }, 404);
-  const linkedClientIds = await listLinkedClientIds(session.sub);
-    return noStore({
-      user: profile.user,
-      contact: profile.contact,
-      files: profile.files,
-      sites: await linkedSites(linkedClientIds),
-      subscriptions: [],
-    });
+  const linked = new Set(linkedClientIds);
+  const sites = apps.map((app) => {
+    const used = Boolean(app.clientId && linked.has(app.clientId));
+    const status = !app.enabled
+      ? "soon"
+      : app.id === "account" || app.id === "portal" || used
+        ? "linked"
+        : "available";
+    return {
+      id: app.id,
+      nameAr: app.nameAr,
+      nameEn: app.nameEn,
+      origin: app.origin,
+      enabled: app.enabled,
+      logoUrl: app.logoUrl || null,
+      status,
+    };
+  });
+  return noStore({
+    user: profile.user,
+    contact: profile.contact,
+    files: profile.files,
+    sites,
+    subscriptions: [],
+  });
 }
 
 export async function PATCH(request: Request) {

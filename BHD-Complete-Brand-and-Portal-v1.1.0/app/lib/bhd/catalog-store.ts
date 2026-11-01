@@ -1,4 +1,4 @@
-import { asc, eq } from "drizzle-orm";
+import { asc, eq, sql } from "drizzle-orm";
 import { getDb, isDatabaseConfigured, ensureIdentitySchema } from "../../../db";
 import { appCatalog } from "../../../db/schema";
 import { DEFAULT_IDENTITY_ISSUER } from "../identity/issuer";
@@ -6,6 +6,13 @@ import { BHD_APPS, type BhdApp, type BhdAppMode } from "./apps";
 
 const LOGO_MIME = new Set(["image/png", "image/jpeg", "image/webp", "image/svg+xml"]);
 const MAX_LOGO_BYTES = 512 * 1024;
+const CATALOG_TTL_MS = 45_000;
+
+let catalogCache: { at: number; apps: BhdApp[] } | null = null;
+
+function invalidateCatalogCache() {
+  catalogCache = null;
+}
 
 function ssoStart(origin: string, workspacePath: string) {
   const path = workspacePath.startsWith("/") ? workspacePath : `/${workspacePath}`;
@@ -65,12 +72,52 @@ async function seedIfNeeded() {
 
 export async function listLiveApps(): Promise<BhdApp[]> {
   if (!isDatabaseConfigured()) return BHD_APPS;
+  const now = Date.now();
+  if (catalogCache && now - catalogCache.at < CATALOG_TTL_MS) return catalogCache.apps;
   try {
     await ensureIdentitySchema();
     await seedIfNeeded();
-    const rows = await getDb().select().from(appCatalog).orderBy(asc(appCatalog.sortOrder), asc(appCatalog.nameAr));
+    // Skip logo_content blobs — only need whether a logo exists for logoUrl.
+    const rows = await getDb()
+      .select({
+        id: appCatalog.id,
+        clientId: appCatalog.clientId,
+        nameAr: appCatalog.nameAr,
+        nameEn: appCatalog.nameEn,
+        origin: appCatalog.origin,
+        workspacePath: appCatalog.workspacePath,
+        homePath: appCatalog.homePath,
+        startUrl: appCatalog.startUrl,
+        mode: appCatalog.mode,
+        enabled: appCatalog.enabled,
+        mark: appCatalog.mark,
+        accent: appCatalog.accent,
+        soft: appCatalog.soft,
+        sortOrder: appCatalog.sortOrder,
+        hasLogo: sql<boolean>`(${appCatalog.logoContent} is not null and ${appCatalog.logoMime} is not null)`,
+      })
+      .from(appCatalog)
+      .orderBy(asc(appCatalog.sortOrder), asc(appCatalog.nameAr));
     if (!rows.length) return BHD_APPS;
-    return rows.map(rowToApp);
+    const apps: BhdApp[] = rows.map((row) => ({
+      id: row.id,
+      clientId: row.clientId,
+      nameAr: row.nameAr,
+      nameEn: row.nameEn,
+      origin: row.origin,
+      workspacePath: row.workspacePath,
+      homePath: row.homePath,
+      startUrl: row.startUrl,
+      mode: (row.mode as BhdAppMode) || "sso",
+      enabled: row.enabled,
+      mark: row.mark,
+      accent: row.accent,
+      soft: row.soft,
+      logoUrl: logoPublicUrl(row.id, Boolean(row.hasLogo)),
+      sortOrder: row.sortOrder,
+    }));
+    catalogCache = { at: now, apps };
+    return apps;
   } catch {
     return BHD_APPS;
   }
@@ -151,6 +198,7 @@ export async function upsertLiveApp(input: CatalogPatch & { id: string; create?:
   } else {
     await db.insert(appCatalog).values(values);
   }
+  invalidateCatalogCache();
   const saved = (await db.select().from(appCatalog).where(eq(appCatalog.id, id)).limit(1))[0];
   return rowToApp(saved);
 }
@@ -171,6 +219,7 @@ export async function saveLiveAppLogo(id: string, file: { mime: string; bytes: B
       updatedAt: new Date(),
     })
     .where(eq(appCatalog.id, key));
+  invalidateCatalogCache();
   return listLiveApps().then((apps) => apps.find((app) => app.id === key)!);
 }
 
@@ -181,6 +230,7 @@ export async function clearLiveAppLogo(id: string) {
     .update(appCatalog)
     .set({ logoMime: null, logoContent: null, updatedAt: new Date() })
     .where(eq(appCatalog.id, key));
+  invalidateCatalogCache();
 }
 
 export async function readLiveAppLogo(id: string) {

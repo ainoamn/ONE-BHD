@@ -585,8 +585,10 @@ export async function getAccountProfile(id: string): Promise<{
   const rows = await db.select().from(users).where(eq(users.id, id)).limit(1);
   const user = rows[0];
   if (!user) return null;
-  const contact = await getSelfContact(user.id);
-  const files = await listAccountFileMeta(user.id);
+  const [contact, files] = await Promise.all([
+    getSelfContact(user.id),
+    listAccountFileMeta(user.id),
+  ]);
   return {
     user: {
       ...toPublicUser(user),

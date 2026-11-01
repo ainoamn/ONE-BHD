@@ -171,7 +171,7 @@ export function getDb(): Db {
 
   if (!globalThis.__bhdPortalSql) {
     globalThis.__bhdPortalSql = postgres(url, {
-      max: 1,
+      max: 3,
       prepare: false,
       connect_timeout: 8,
       idle_timeout: 20,
