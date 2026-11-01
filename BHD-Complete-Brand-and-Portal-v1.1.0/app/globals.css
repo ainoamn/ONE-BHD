@@ -4709,11 +4709,42 @@ a.login-submit {
 
 .account-fields .is-wide { grid-column: 1 / -1; }
 
+.account-kind-verify {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid #cfe0d6;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #f7fbf8 0%, #eef6f1 100%);
+}
+
+.account-kind-verify strong {
+  color: #1f3d32;
+  font-size: 14px;
+}
+
+.account-kind-verify small {
+  color: #5d7169;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.account-kind-verify .login-kind-tabs {
+  margin-top: 2px;
+}
+
 .account-translate,
 .account-upload {
   display: grid;
   gap: 8px;
   align-content: start;
+}
+
+.account-upload.is-missing {
+  padding: 10px 12px;
+  border: 1px solid #e8b4b4;
+  border-radius: 12px;
+  background: #fff7f7;
 }
 
 .account-translate small,

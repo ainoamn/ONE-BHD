@@ -2,7 +2,12 @@ import { and, eq } from "drizzle-orm";
 import { getDb, ensureIdentitySchema } from "../../../db";
 import { userFiles } from "../../../db/schema";
 
-export const ACCOUNT_FILE_KINDS = ["civil_id", "passport"] as const;
+export const ACCOUNT_FILE_KINDS = [
+  "civil_id",
+  "passport",
+  "commercial_register",
+  "authorization_letter",
+] as const;
 export type AccountFileKind = (typeof ACCOUNT_FILE_KINDS)[number];
 
 const ALLOWED_MIME = new Set(["image/jpeg", "image/png", "image/webp", "application/pdf"]);
@@ -27,6 +32,8 @@ export async function listAccountFileMeta(userId: string) {
   return {
     civilIdFile: rows.find((row) => row.kind === "civil_id") || null,
     passportFile: rows.find((row) => row.kind === "passport") || null,
+    commercialRegisterFile: rows.find((row) => row.kind === "commercial_register") || null,
+    authorizationFile: rows.find((row) => row.kind === "authorization_letter") || null,
   };
 }
 

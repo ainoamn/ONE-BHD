@@ -63,14 +63,23 @@ type LinkedSite = {
 
 type AccountFileMeta = { id: string; filename: string; kind: string };
 
+type AccountFiles = {
+  civilIdFile: AccountFileMeta | null;
+  passportFile: AccountFileMeta | null;
+  commercialRegisterFile: AccountFileMeta | null;
+  authorizationFile: AccountFileMeta | null;
+};
+
 type AccountPayload = {
   user: AccountUser;
   contact: AccountContact | null;
-  files?: { civilIdFile: AccountFileMeta | null; passportFile: AccountFileMeta | null };
+  files?: AccountFiles;
   sites: LinkedSite[];
   subscriptions: Array<{ id: string; nameAr: string; plan: string; status: string }>;
   message?: string;
 };
+
+type UploadKind = "civil_id" | "passport" | "commercial_register" | "authorization_letter";
 
 const STATUS_LABEL: Record<LinkedSite["status"], string> = {
   linked: "مرتبط بحسابك",
@@ -109,6 +118,8 @@ export function AccountConsole() {
   const [passportExpires, setPassportExpires] = useState("");
   const [civilIdFile, setCivilIdFile] = useState<AccountFileMeta | null>(null);
   const [passportFile, setPassportFile] = useState<AccountFileMeta | null>(null);
+  const [commercialRegisterFile, setCommercialRegisterFile] = useState<AccountFileMeta | null>(null);
+  const [authorizationFile, setAuthorizationFile] = useState<AccountFileMeta | null>(null);
   const [accountKind, setAccountKind] = useState<"person" | "company">("person");
   const [companyNameAr, setCompanyNameAr] = useState("");
   const [companyNameEn, setCompanyNameEn] = useState("");
@@ -145,6 +156,8 @@ export function AccountConsole() {
     setPassportExpires(payload.user.passportExpires || "");
     setCivilIdFile(payload.files?.civilIdFile || null);
     setPassportFile(payload.files?.passportFile || null);
+    setCommercialRegisterFile(payload.files?.commercialRegisterFile || null);
+    setAuthorizationFile(payload.files?.authorizationFile || null);
     setAccountKind(payload.user.accountKind === "company" ? "company" : "person");
     setCompanyNameAr(payload.user.companyNameAr || "");
     setCompanyNameEn(payload.user.companyNameEn || "");
@@ -237,7 +250,7 @@ export function AccountConsole() {
     }
   }
 
-  async function uploadFile(kind: "civil_id" | "passport", file: File | undefined) {
+  async function uploadFile(kind: UploadKind, file: File | undefined) {
     if (!file) return;
     setUploading(kind);
     setError("");
@@ -249,7 +262,9 @@ export function AccountConsole() {
       const payload = (await response.json()) as AccountFileMeta & { message?: string };
       if (!response.ok) throw new Error(payload.message || "تعذّر رفع المرفق.");
       if (kind === "civil_id") setCivilIdFile(payload);
-      else setPassportFile(payload);
+      else if (kind === "passport") setPassportFile(payload);
+      else if (kind === "commercial_register") setCommercialRegisterFile(payload);
+      else setAuthorizationFile(payload);
       setSaved("تم رفع المرفق. احفظ بقية البيانات.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "تعذّر رفع المرفق.");
@@ -268,6 +283,16 @@ export function AccountConsole() {
             { key: "nameEn", label: "اسم المفوض بالإنجليزية", value: nameEn },
             { key: "crNumber", label: "السجل التجاري", value: crNumber },
             { key: "phone", label: "رقم الهاتف", value: phone },
+            {
+              key: "commercialRegisterFile",
+              label: "مرفق السجل التجاري",
+              value: commercialRegisterFile ? "ok" : "",
+            },
+            {
+              key: "authorizationFile",
+              label: "مرفق تفويض المفوض",
+              value: authorizationFile ? "ok" : "",
+            },
           ]
         : [
             { key: "nameAr", label: "الاسم بالعربية", value: nameAr },
@@ -278,7 +303,20 @@ export function AccountConsole() {
             { key: "birthDate", label: "تاريخ الميلاد", value: birthDate },
           ]
       ).filter((item) => !item.value.trim()),
-    [accountKind, companyNameAr, companyNameEn, crNumber, nameAr, nameEn, phone, nationality, gender, birthDate],
+    [
+      accountKind,
+      authorizationFile,
+      birthDate,
+      commercialRegisterFile,
+      companyNameAr,
+      companyNameEn,
+      crNumber,
+      gender,
+      nameAr,
+      nameEn,
+      nationality,
+      phone,
+    ],
   );
 
   function fieldTone(value: string) {
@@ -376,7 +414,7 @@ export function AccountConsole() {
         <p className="section-kicker">حساب BHD الموحّد</p>
         <h1>بياناتك. مواقعك. اشتراكاتك.</h1>
         <p className="account-lead">
-          عدّل ملفك هنا مرة واحدة. الاسم بالعربية والإنجليزية والهاتف والجنسية تنتقل إلى وازن وحسابي وبقية المواقع عبر هوية BHD، دون مشاركة قواعد بياناتها.
+          وثّق نوع حسابك (شخصي أو تجاري) وعدّل بياناتك مرة واحدة. تنتقل إلى وازن وحسابي وبقية مواقع BHD عبر الهوية الموحّدة، دون مشاركة قواعد بياناتها.
         </p>
 
         {loading ? <p className="account-status">جاري تحميل الحساب…</p> : null}
@@ -403,9 +441,9 @@ export function AccountConsole() {
               )}
               <div>
                 <strong>{user.companyNameAr || user.name}</strong>
-                {user.accountKind === "company" ? <small>حساب شركة</small> : null}
                 <small>{user.email}</small>
                 <div className="account-chips">
+                  <span>{user.accountKind === "company" ? "حساب تجاري" : "حساب شخصي"}</span>
                   {user.emailVerified ? <span>بريد موثّق</span> : <span>بريد غير موثّق</span>}
                   {user.googleLinked ? <span>مرتبط بجوجل</span> : null}
                   {user.facebookLinked ? <span>مرتبط بفيسبوك</span> : null}
@@ -476,11 +514,39 @@ export function AccountConsole() {
                   <h2>تعديل البيانات</h2>
                   <p>
                     {accountKind === "company"
-                      ? "حساب شركة: اسم الشركة بالعربي والإنجليزي والسجل التجاري والهاتف واسم المفوض إلزامية."
-                      : "حساب فرد: الاسم بالعربية والإنجليزية والهاتف والجنسية والجنس وتاريخ الميلاد إلزامية. البطاقة والجواز اختيارية."}
+                      ? "حساب تجاري: عبّئ بيانات الشركة والمفوض، وأرفق نسخة السجل التجاري وخطاب التفويض."
+                      : "حساب شخصي: الاسم بالعربية والإنجليزية والهاتف والجنسية والجنس وتاريخ الميلاد إلزامية. البطاقة والجواز اختيارية."}
                   </p>
                 </div>
                 <div className="account-fields">
+                  <div className="account-kind-verify is-wide">
+                    <strong>وثّق نوع حسابك</strong>
+                    <small>اختر شخصي أو تجاري. الحساب التجاري يُعامل كمستأجر ويتطلب البيانات والمرفقات التجارية.</small>
+                    <div className="login-kind-tabs" role="tablist" aria-label="نوع الحساب">
+                      <button
+                        type="button"
+                        className={accountKind === "person" ? "is-active" : ""}
+                        onClick={() => {
+                          setAccountKind("person");
+                          setAttempted(false);
+                          setError("");
+                        }}
+                      >
+                        شخصي
+                      </button>
+                      <button
+                        type="button"
+                        className={accountKind === "company" ? "is-active" : ""}
+                        onClick={() => {
+                          setAccountKind("company");
+                          setAttempted(false);
+                          setError("");
+                        }}
+                      >
+                        تجاري
+                      </button>
+                    </div>
+                  </div>
                   {accountKind === "company" ? (
                     <>
                       <label className={fieldTone(companyNameAr)}>
@@ -544,6 +610,38 @@ export function AccountConsole() {
                         الرقم الضريبي
                         <input value={taxId} onChange={(event) => setTaxId(event.target.value)} />
                       </label>
+                      <div className={`account-upload is-wide ${attempted && !commercialRegisterFile ? "is-missing" : ""}`}>
+                        <span>مرفق السجل التجاري *</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
+                          onChange={(event) => void uploadFile("commercial_register", event.target.files?.[0])}
+                        />
+                        {uploading === "commercial_register" ? <small>جاري الرفع…</small> : null}
+                        {commercialRegisterFile ? (
+                          <a href="/api/account/file?kind=commercial_register" target="_blank" rel="noreferrer">
+                            {commercialRegisterFile.filename}
+                          </a>
+                        ) : (
+                          <small>صورة أو PDF للسجل التجاري حتى 4 ميغابايت.</small>
+                        )}
+                      </div>
+                      <div className={`account-upload is-wide ${attempted && !authorizationFile ? "is-missing" : ""}`}>
+                        <span>مرفق تفويض المفوض *</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,application/pdf"
+                          onChange={(event) => void uploadFile("authorization_letter", event.target.files?.[0])}
+                        />
+                        {uploading === "authorization_letter" ? <small>جاري الرفع…</small> : null}
+                        {authorizationFile ? (
+                          <a href="/api/account/file?kind=authorization_letter" target="_blank" rel="noreferrer">
+                            {authorizationFile.filename}
+                          </a>
+                        ) : (
+                          <small>خطاب تفويض المفوض بالتوقيع (صورة أو PDF حتى 4 ميغابايت).</small>
+                        )}
+                      </div>
                     </>
                   ) : null}
                   <label>

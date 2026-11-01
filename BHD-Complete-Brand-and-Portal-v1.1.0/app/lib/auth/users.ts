@@ -572,7 +572,12 @@ export async function fillMissingNameTranslations(userId: string, sourceName: st
 export async function getAccountProfile(id: string): Promise<{
   user: AccountProfile;
   contact: AccountContact | null;
-  files: { civilIdFile: AccountFileMeta | null; passportFile: AccountFileMeta | null };
+  files: {
+    civilIdFile: AccountFileMeta | null;
+    passportFile: AccountFileMeta | null;
+    commercialRegisterFile: AccountFileMeta | null;
+    authorizationFile: AccountFileMeta | null;
+  };
 } | null> {
   if (!isDatabaseConfigured()) return null;
   await ensureIdentitySchema();
@@ -712,7 +717,12 @@ export async function updateOwnProfile(
   const civilIdExpires = input.civilIdExpires !== undefined ? input.civilIdExpires?.trim() || null : user.civilIdExpires;
   const passportNumber = input.passportNumber !== undefined ? input.passportNumber?.trim() || null : user.passportNumber;
   const passportExpires = input.passportExpires !== undefined ? input.passportExpires?.trim() || null : user.passportExpires;
-  const accountKind = input.accountKind === "company" || user.accountKind === "company" ? "company" : "person";
+  const accountKind =
+    input.accountKind === "company" || input.accountKind === "person"
+      ? input.accountKind
+      : user.accountKind === "company"
+        ? "company"
+        : "person";
   const companyNameAr = input.companyNameAr !== undefined ? input.companyNameAr?.trim() || null : user.companyNameAr;
   const companyNameEn = input.companyNameEn !== undefined ? input.companyNameEn?.trim() || null : user.companyNameEn;
   const crNumber = input.crNumber !== undefined ? input.crNumber?.trim() || null : user.crNumber;
@@ -722,6 +732,10 @@ export async function updateOwnProfile(
   if (!nameAr || !nameEn) throw new Error("NAME_TRANSLATION_REQUIRED");
   if (accountKind === "company") {
     if (!companyNameAr || !companyNameEn || !crNumber) throw new Error("COMPANY_REQUIRED");
+    const files = await listAccountFileMeta(user.id);
+    if (!files.commercialRegisterFile || !files.authorizationFile) {
+      throw new Error("COMPANY_FILES_REQUIRED");
+    }
   } else {
     if (!nationality) throw new Error("NATIONALITY_REQUIRED");
     if (!gender) throw new Error("GENDER_REQUIRED");
