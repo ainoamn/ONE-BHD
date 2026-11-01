@@ -2,6 +2,7 @@ import { and, desc, eq, ilike, or, sql } from "drizzle-orm";
 import { getDb, isDatabaseConfigured, ensureIdentitySchema } from "../../../db";
 import { contacts, oauthTickets, users, type BhdUser } from "../../../db/schema";
 import { IDENTITY_CLIENTS } from "../identity/clients";
+import { listAccountFileMeta, type AccountFileKind } from "./account-files";
 import { issueEmailVerification, isResendConfigured } from "./email-verification";
 import { issuePasswordReset } from "./password-reset";
 import { requireDatabase } from "./users";
@@ -40,6 +41,19 @@ export type AdminAppLink = {
 };
 
 export type AdminUserDetail = AdminUserRow & {
+  nationality: string | null;
+  nameAr: string | null;
+  nameEn: string | null;
+  civilId: string | null;
+  civilIdExpires: string | null;
+  passportNumber: string | null;
+  passportExpires: string | null;
+  accountKind: "person" | "company";
+  companyNameAr: string | null;
+  companyNameEn: string | null;
+  crNumber: string | null;
+  crExpires: string | null;
+  taxId: string | null;
   contact: {
     phone2: string | null;
     whatsapp: string | null;
@@ -48,7 +62,15 @@ export type AdminUserDetail = AdminUserRow & {
     hometown: string | null;
     country: string | null;
     zipCode: string | null;
+    crNumber: string | null;
+    taxId: string | null;
   } | null;
+  files: {
+    civilIdFile: { id: string; filename: string; kind: AccountFileKind | string } | null;
+    passportFile: { id: string; filename: string; kind: AccountFileKind | string } | null;
+    commercialRegisterFile: { id: string; filename: string; kind: AccountFileKind | string } | null;
+    authorizationFile: { id: string; filename: string; kind: AccountFileKind | string } | null;
+  };
   apps: AdminAppLink[];
 };
 
@@ -171,8 +193,23 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     };
   });
 
+  const files = await listAccountFileMeta(user.id);
+
   return {
     ...toAdminUser(user, apps.length),
+    nationality: user.nationality,
+    nameAr: user.nameAr,
+    nameEn: user.nameEn,
+    civilId: user.civilId,
+    civilIdExpires: user.civilIdExpires,
+    passportNumber: user.passportNumber,
+    passportExpires: user.passportExpires,
+    accountKind: user.accountKind === "company" ? "company" : "person",
+    companyNameAr: user.companyNameAr,
+    companyNameEn: user.companyNameEn,
+    crNumber: user.crNumber,
+    crExpires: user.crExpires,
+    taxId: user.taxId,
     contact: self
       ? {
           phone2: self.phone2,
@@ -182,8 +219,11 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
           hometown: self.hometown,
           country: self.country,
           zipCode: self.zipCode,
+          crNumber: self.crNumber,
+          taxId: self.taxId,
         }
       : null,
+    files,
     apps,
   };
 }
