@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountKindPicker } from "../components/AccountKindPicker";
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { FacebookSignInButton } from "../components/auth/FacebookSignInButton";
@@ -78,6 +79,11 @@ const COPY = {
     network: "تعذّر الاتصال بالخادم.",
     person: "فرد",
     company: "شركة",
+    chooseKind: "اختر نوع التسجيل",
+    kindRequired: "اختر فرد أو شركة للمتابعة.",
+    kindContinue: "متابعة",
+    kindSaving: "جاري الحفظ…",
+    kindSocialLead: "حساب جديد عبر جوجل أو فيسبوك: اختر فرد أو شركة للمتابعة.",
     companyNameAr: "اسم الشركة بالعربية",
     companyNameEn: "اسم الشركة بالإنجليزية",
     crNumber: "السجل التجاري",
@@ -149,6 +155,11 @@ const COPY = {
     network: "Could not reach the server.",
     person: "Individual",
     company: "Company",
+    chooseKind: "Choose registration type",
+    kindRequired: "Choose Individual or Company to continue.",
+    kindContinue: "Continue",
+    kindSaving: "Saving…",
+    kindSocialLead: "New Google or Facebook account: choose Individual or Company to continue.",
     companyNameAr: "Company name (Arabic)",
     companyNameEn: "Company name (English)",
     crNumber: "Commercial registration",
@@ -222,7 +233,10 @@ export function LoginForm() {
   const [city, setCity] = useState("");
   const [country, setCountry] = useState("OM");
   const [zipCode, setZipCode] = useState("");
-  const [accountKind, setAccountKind] = useState<"person" | "company">("person");
+  const [accountKind, setAccountKind] = useState<"person" | "company" | null>(null);
+  const [socialKindGate, setSocialKindGate] = useState(false);
+  const [socialKind, setSocialKind] = useState<"person" | "company" | null>(null);
+  const [savingSocialKind, setSavingSocialKind] = useState(false);
   const [companyNameAr, setCompanyNameAr] = useState("");
   const [companyNameEn, setCompanyNameEn] = useState("");
   const [crNumber, setCrNumber] = useState("");
@@ -281,9 +295,9 @@ export function LoginForm() {
   }, []);
 
   useEffect(() => {
-    if (!oauthContinue || !existing) return;
+    if (!oauthContinue || !existing || socialKindGate || searchParams.get("chooseKind") === "1") return;
     window.location.replace(nextSafe);
-  }, [oauthContinue, existing, nextSafe]);
+  }, [oauthContinue, existing, nextSafe, socialKindGate, searchParams]);
 
   useEffect(() => {
     if (cooldownSec <= 0) return;
@@ -309,6 +323,39 @@ export function LoginForm() {
     router.replace(nextSafe);
   }
 
+  useEffect(() => {
+    if (searchParams.get("chooseKind") === "1") {
+      setSocialKindGate(true);
+    }
+  }, [searchParams]);
+
+  async function confirmSocialKind() {
+    if (!socialKind) {
+      setError(t.kindRequired);
+      return;
+    }
+    setSavingSocialKind(true);
+    setError("");
+    try {
+      const response = await fetch("/api/account/kind", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accountKind: socialKind }),
+      });
+      const data = (await response.json()) as { message?: string };
+      if (!response.ok) {
+        setError(data.message || t.fail);
+        return;
+      }
+      setSocialKindGate(false);
+      finishOk();
+    } catch {
+      setError(t.network);
+    } finally {
+      setSavingSocialKind(false);
+    }
+  }
+
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
@@ -316,6 +363,11 @@ export function LoginForm() {
     setRecoverUrl("");
     setNotice("");
     try {
+      if (mode === "register" && !accountKind) {
+        setError(t.kindRequired);
+        setLoading(false);
+        return;
+      }
       if (mode === "forgot") {
         if (cooldownSec > 0) {
           setError(t.forgotCooldown.replace("{n}", String(cooldownSec)));
@@ -492,22 +544,12 @@ export function LoginForm() {
                 <form className="login-form" onSubmit={(event) => void onSubmit(event)}>
                   {mode === "register" ? (
                     <>
-                      <div className="login-kind-tabs" role="tablist" aria-label={lang === "ar" ? "نوع الحساب" : "Account type"}>
-                        <button
-                          type="button"
-                          className={accountKind === "person" ? "is-active" : ""}
-                          onClick={() => setAccountKind("person")}
-                        >
-                          {t.person}
-                        </button>
-                        <button
-                          type="button"
-                          className={accountKind === "company" ? "is-active" : ""}
-                          onClick={() => setAccountKind("company")}
-                        >
-                          {t.company}
-                        </button>
-                      </div>
+                      <AccountKindPicker
+                        lang={lang}
+                        title={t.chooseKind}
+                        value={accountKind}
+                        onChange={setAccountKind}
+                      />
                       {accountKind === "company" ? (
                         <>
                           <label>
@@ -705,7 +747,18 @@ export function LoginForm() {
                 </div>
 
                 <div className="login-social">
-                  <GoogleSignInButton onSuccess={() => void finishOk()} locale={lang} label={t.google} />
+                  <GoogleSignInButton
+                    locale={lang}
+                    label={t.google}
+                    onSuccess={(user) => {
+                      if (user?.mustChooseAccountKind) {
+                        setSocialKind(null);
+                        setSocialKindGate(true);
+                        return;
+                      }
+                      finishOk();
+                    }}
+                  />
                   <FacebookSignInButton label={t.facebook} />
                   <button type="button" className="login-provider-btn is-whatsapp" title={t.whatsappSoon} aria-label={t.whatsappSoon} disabled>
                     <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -747,6 +800,38 @@ export function LoginForm() {
           </ul>
         </nav>
       </div>
+
+      {socialKindGate ? (
+        <div className="account-kind-gate" role="dialog" aria-modal="true" aria-labelledby="social-kind-title">
+          <div className="account-kind-gate__panel">
+            <AccountKindPicker
+              lang={lang}
+              title={t.chooseKind}
+              value={socialKind}
+              onChange={setSocialKind}
+              name="social-account-kind"
+            />
+            <p className="account-kind-change-note" id="social-kind-title">
+              {t.kindSocialLead}
+            </p>
+            {error ? (
+              <p className="login-error" role="alert">
+                {error}
+              </p>
+            ) : null}
+            <div className="account-kind-gate__actions">
+              <button
+                type="button"
+                className="login-submit"
+                disabled={savingSocialKind || !socialKind}
+                onClick={() => void confirmSocialKind()}
+              >
+                {savingSocialKind ? t.kindSaving : t.kindContinue}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

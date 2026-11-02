@@ -9,6 +9,7 @@ import {
   setUserEmailVerified,
 } from "../../../lib/auth/admin-users";
 import { requirePlatformAdmin } from "../../../lib/auth/platform-admin";
+import { resolveAccountKindChange } from "../../../lib/auth/users";
 
 export const runtime = "nodejs";
 
@@ -46,10 +47,29 @@ export async function PATCH(request: Request) {
     id?: string;
     isActive?: boolean;
     emailVerified?: boolean;
+    accountKindDecision?: "approve" | "reject";
   } | null;
   const id = body?.id?.trim() || "";
   if (!id) {
     return NextResponse.json({ message: "طلب غير صالح." }, { status: 400 });
+  }
+
+  if (body?.accountKindDecision === "approve" || body?.accountKindDecision === "reject") {
+    const resolved = await resolveAccountKindChange(id, body.accountKindDecision);
+    if (!resolved) {
+      return NextResponse.json({ message: "لا يوجد طلب تحويل نوع حساب قيد المراجعة." }, { status: 404 });
+    }
+    const user = await getAdminUserDetail(id);
+    return NextResponse.json(
+      {
+        user,
+        message:
+          body.accountKindDecision === "approve"
+            ? "تم اعتماد تحويل نوع الحساب."
+            : "رُفض طلب تحويل نوع الحساب.",
+      },
+      { headers: { "Cache-Control": "no-store" } },
+    );
   }
 
   if (typeof body?.emailVerified === "boolean") {

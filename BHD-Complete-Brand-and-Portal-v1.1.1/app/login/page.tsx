@@ -19,12 +19,12 @@ function safeNext(nextPath: string | undefined) {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string; add?: string }>;
+  searchParams: Promise<{ next?: string; add?: string; chooseKind?: string }>;
 }) {
   const params = await searchParams;
   const next = safeNext(params.next);
   const session = await getCurrentSession();
-  if (session && params.add !== "1") {
+  if (session && params.add !== "1" && params.chooseKind !== "1") {
     if (next && isOauthContinue(next)) redirect(next);
     redirect(next || "/account");
   }

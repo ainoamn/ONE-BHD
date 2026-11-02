@@ -47,9 +47,17 @@ type AdminUser = {
   createdAt: string;
   updatedAt: string;
   linkedApps: number;
+  accountKind?: "person" | "company";
+  pendingAccountKind?: "person" | "company" | null;
+  accountKindChangeRequestedAt?: string | null;
 };
 
+type AdminFileMeta = { id: string; filename: string; kind: string } | null;
+
 type AdminUserDetail = AdminUser & {
+  companyNameAr?: string | null;
+  companyNameEn?: string | null;
+  crNumber?: string | null;
   contact: {
     phone2: string | null;
     whatsapp: string | null;
@@ -59,6 +67,12 @@ type AdminUserDetail = AdminUser & {
     country: string | null;
     zipCode: string | null;
   } | null;
+  files?: {
+    civilIdFile: AdminFileMeta;
+    passportFile: AdminFileMeta;
+    commercialRegisterFile: AdminFileMeta;
+    authorizationFile: AdminFileMeta;
+  };
   apps: Array<{
     clientId: string;
     name: string;
@@ -284,14 +298,21 @@ export function AdminConsole({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, ...body }),
       });
-      const data = (await response.json()) as { user?: AdminUser; message?: string };
+      const data = (await response.json()) as {
+        user?: AdminUser | AdminUserDetail;
+        message?: string;
+      };
       if (!response.ok) {
         setError(data.message || "تعذّر تحديث الحساب.");
         return;
       }
+      if (data.message) setNotice(data.message);
       if (data.user) {
         setUsers((current) => current.map((row) => (row.id === data.user!.id ? { ...row, ...data.user! } : row)));
-        if (selectedId === id) await loadDetail(id);
+        if (selectedId === id) {
+          if ("apps" in data.user) setDetail(data.user as AdminUserDetail);
+          else await loadDetail(id);
+        }
       }
     } catch {
       setError("تعذّر الاتصال بالخادم.");
@@ -911,6 +932,9 @@ export function AdminConsole({
                             <span className={user.isActive ? "admin-pill is-ok" : "admin-pill"}>
                               {user.isActive ? "نشط" : "موقوف"}
                             </span>
+                            {user.pendingAccountKind ? (
+                              <span className="admin-pill">طلب {user.pendingAccountKind === "company" ? "شركة" : "فرد"}</span>
+                            ) : null}
                           </td>
                         </tr>
                       ))
@@ -968,6 +992,18 @@ export function AdminConsole({
                       <dd>{loginMethods(detail)}</dd>
                     </div>
                     <div>
+                      <dt>نوع الحساب</dt>
+                      <dd>{detail.accountKind === "company" ? "شركة" : "فرد"}</dd>
+                    </div>
+                    <div>
+                      <dt>طلب تحويل</dt>
+                      <dd>
+                        {detail.pendingAccountKind
+                          ? `إلى ${detail.pendingAccountKind === "company" ? "شركة" : "فرد"} · ${formatDate(detail.accountKindChangeRequestedAt)}`
+                          : "—"}
+                      </dd>
+                    </div>
+                    <div>
                       <dt>تاريخ الانضمام</dt>
                       <dd>{formatDate(detail.createdAt)}</dd>
                     </div>
@@ -1023,6 +1059,68 @@ export function AdminConsole({
                       </ul>
                     )}
                   </div>
+
+                  {detail.pendingAccountKind ? (
+                    <div className="admin-detail-section">
+                      <h3>مراجعة تحويل نوع الحساب</h3>
+                      <p className="admin-footnote">
+                        الطلب: من {detail.accountKind === "company" ? "شركة" : "فرد"} إلى{" "}
+                        {detail.pendingAccountKind === "company" ? "شركة" : "فرد"}. راجع المستندات ثم اعتمد أو ارفض.
+                      </p>
+                      {detail.accountKind === "company" || detail.pendingAccountKind === "company" ? (
+                        <p className="admin-muted">
+                          شركة: {detail.companyNameAr || "—"} · س.ت {detail.crNumber || "—"}
+                        </p>
+                      ) : null}
+                      <ul className="admin-app-links">
+                        {(
+                          [
+                            ["civilIdFile", "البطاقة المدنية"],
+                            ["passportFile", "الجواز"],
+                            ["commercialRegisterFile", "السجل التجاري"],
+                            ["authorizationFile", "تفويض المفوض"],
+                          ] as const
+                        ).map(([key, label]) => {
+                          const file = detail.files?.[key];
+                          return (
+                            <li key={key}>
+                              <div>
+                                <strong>{label}</strong>
+                                <span>{file ? file.filename : "غير مرفوع"}</span>
+                              </div>
+                              {file ? (
+                                <a
+                                  href={`/api/admin/users/file?id=${encodeURIComponent(detail.id)}&kind=${encodeURIComponent(file.kind)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  فتح
+                                </a>
+                              ) : null}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                      <div className="admin-detail-actions">
+                        <button
+                          type="button"
+                          className="admin-action"
+                          disabled={busyId === detail.id}
+                          onClick={() => void patchUser(detail.id, { accountKindDecision: "approve" })}
+                        >
+                          اعتماد التحويل
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action admin-action-danger"
+                          disabled={busyId === detail.id}
+                          onClick={() => void patchUser(detail.id, { accountKindDecision: "reject" })}
+                        >
+                          رفض الطلب
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
 
                   <div className="admin-detail-actions">
                     {!detail.emailVerified ? (

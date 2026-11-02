@@ -29,6 +29,9 @@ export type AdminUserRow = {
   createdAt: string;
   updatedAt: string;
   linkedApps: number;
+  accountKind: "person" | "company";
+  pendingAccountKind: "person" | "company" | null;
+  accountKindChangeRequestedAt: string | null;
 };
 
 export type AdminAppLink = {
@@ -49,6 +52,8 @@ export type AdminUserDetail = AdminUserRow & {
   passportNumber: string | null;
   passportExpires: string | null;
   accountKind: "person" | "company";
+  pendingAccountKind: "person" | "company" | null;
+  accountKindChangeRequestedAt: string | null;
   companyNameAr: string | null;
   companyNameEn: string | null;
   crNumber: string | null;
@@ -112,6 +117,14 @@ function toAdminUser(user: BhdUser, linkedApps = 0): AdminUserRow {
     createdAt: user.createdAt.toISOString(),
     updatedAt: user.updatedAt.toISOString(),
     linkedApps,
+    accountKind: user.accountKind === "company" ? "company" : "person",
+    pendingAccountKind:
+      user.pendingAccountKind === "company" || user.pendingAccountKind === "person"
+        ? user.pendingAccountKind
+        : null,
+    accountKindChangeRequestedAt: user.accountKindChangeRequestedAt
+      ? user.accountKindChangeRequestedAt.toISOString()
+      : null,
   };
 }
 
@@ -205,6 +218,13 @@ export async function getAdminUserDetail(userId: string): Promise<AdminUserDetai
     passportNumber: user.passportNumber,
     passportExpires: user.passportExpires,
     accountKind: user.accountKind === "company" ? "company" : "person",
+    pendingAccountKind:
+      user.pendingAccountKind === "company" || user.pendingAccountKind === "person"
+        ? user.pendingAccountKind
+        : null,
+    accountKindChangeRequestedAt: user.accountKindChangeRequestedAt
+      ? user.accountKindChangeRequestedAt.toISOString()
+      : null,
     companyNameAr: user.companyNameAr,
     companyNameEn: user.companyNameEn,
     crNumber: user.crNumber,

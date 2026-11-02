@@ -154,6 +154,7 @@ export async function PATCH(request: Request) {
       BIRTHDATE_REQUIRED: ["تاريخ الميلاد إلزامي.", 400],
       COMPANY_REQUIRED: ["اسم الشركة بالعربي والإنجليزي والسجل التجاري إلزامية.", 400],
       COMPANY_FILES_REQUIRED: ["أرفق نسخة السجل التجاري وخطاب تفويض المفوض للحساب التجاري.", 400],
+      IDENTITY_PROOF_REQUIRED: ["أرفق البطاقة المدنية أو الجواز لإثبات الهوية عند طلب التحويل لحساب شخصي.", 400],
       INVALID_USERNAME: ["اسم المستخدم من 3 إلى 32 حرفًا إنجليزيًا أو رقمًا.", 400],
       EMAIL_OR_USERNAME_TAKEN: ["اسم المستخدم مستخدم مسبقًا.", 409],
       INVALID_CREDENTIALS: ["كلمة المرور الحالية غير صحيحة.", 401],

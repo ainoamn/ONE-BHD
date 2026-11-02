@@ -47,6 +47,13 @@ export async function ensureIdentitySchema(): Promise<void> {
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS passport_number text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS passport_expires text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS account_kind text`);
+      await getSql().unsafe(
+        `ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS must_choose_account_kind boolean NOT NULL DEFAULT false`,
+      );
+      await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS pending_account_kind text`);
+      await getSql().unsafe(
+        `ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS account_kind_change_requested_at timestamptz`,
+      );
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS company_name_ar text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS company_name_en text`);
       await getSql().unsafe(`ALTER TABLE bhd_users ADD COLUMN IF NOT EXISTS cr_number text`);

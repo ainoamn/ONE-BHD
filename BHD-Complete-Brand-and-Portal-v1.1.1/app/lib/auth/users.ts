@@ -24,6 +24,9 @@ export type PublicUser = {
   passportNumber: string | null;
   passportExpires: string | null;
   accountKind: "person" | "company";
+  mustChooseAccountKind: boolean;
+  pendingAccountKind: "person" | "company" | null;
+  accountKindChangeRequestedAt: string | null;
   companyNameAr: string | null;
   companyNameEn: string | null;
   crNumber: string | null;
@@ -87,6 +90,14 @@ export function toPublicUser(user: BhdUser): PublicUser {
     passportNumber: user.passportNumber,
     passportExpires: user.passportExpires,
     accountKind: user.accountKind === "company" ? "company" : "person",
+    mustChooseAccountKind: Boolean(user.mustChooseAccountKind),
+    pendingAccountKind:
+      user.pendingAccountKind === "company" || user.pendingAccountKind === "person"
+        ? user.pendingAccountKind
+        : null,
+    accountKindChangeRequestedAt: user.accountKindChangeRequestedAt
+      ? user.accountKindChangeRequestedAt.toISOString()
+      : null,
     companyNameAr: user.companyNameAr,
     companyNameEn: user.companyNameEn,
     crNumber: user.crNumber,
@@ -267,6 +278,7 @@ export async function registerWithPassword(input: RegisterInput): Promise<Public
       nameAr: accountKind === "company" ? name : null,
       nameEn: null,
       accountKind,
+      mustChooseAccountKind: false,
       companyNameAr,
       companyNameEn,
       crNumber,
@@ -367,6 +379,7 @@ export async function loginOrRegisterWithGoogle(input: {
   ip?: string | null;
 }): Promise<PublicUser> {
   requireDatabase();
+  await ensureIdentitySchema();
   const email = normalizeEmail(input.email);
   const db = getDb();
   const ip = input.ip?.trim() || null;
@@ -401,6 +414,7 @@ export async function loginOrRegisterWithGoogle(input: {
         avatar: input.picture,
         emailVerified: true,
         mustCompleteProfile: true,
+        mustChooseAccountKind: true,
         lastLoginAt: new Date(),
         lastLoginIp: ip,
         signupIp: ip,
@@ -472,6 +486,7 @@ export async function loginOrRegisterWithFacebook(input: {
         birthDate: input.birthDate,
         emailVerified: true,
         mustCompleteProfile: true,
+        mustChooseAccountKind: true,
         lastLoginAt: new Date(),
         lastLoginIp: ip,
         signupIp: ip,
@@ -717,12 +732,11 @@ export async function updateOwnProfile(
   const civilIdExpires = input.civilIdExpires !== undefined ? input.civilIdExpires?.trim() || null : user.civilIdExpires;
   const passportNumber = input.passportNumber !== undefined ? input.passportNumber?.trim() || null : user.passportNumber;
   const passportExpires = input.passportExpires !== undefined ? input.passportExpires?.trim() || null : user.passportExpires;
-  const accountKind =
+  const currentKind = user.accountKind === "company" ? "company" : "person";
+  const requestedKind =
     input.accountKind === "company" || input.accountKind === "person"
       ? input.accountKind
-      : user.accountKind === "company"
-        ? "company"
-        : "person";
+      : currentKind;
   const companyNameAr = input.companyNameAr !== undefined ? input.companyNameAr?.trim() || null : user.companyNameAr;
   const companyNameEn = input.companyNameEn !== undefined ? input.companyNameEn?.trim() || null : user.companyNameEn;
   const crNumber = input.crNumber !== undefined ? input.crNumber?.trim() || null : user.crNumber;
@@ -730,11 +744,40 @@ export async function updateOwnProfile(
   const taxId = input.taxId !== undefined ? input.taxId?.trim() || null : user.taxId;
   if (!phone) throw new Error("PHONE_REQUIRED");
   if (!nameAr || !nameEn) throw new Error("NAME_TRANSLATION_REQUIRED");
-  if (accountKind === "company") {
-    if (!companyNameAr || !companyNameEn || !crNumber) throw new Error("COMPANY_REQUIRED");
+
+  // First social choice: apply immediately. Later switches need admin approval + proof.
+  let accountKind = currentKind;
+  let pendingAccountKind = user.pendingAccountKind;
+  let accountKindChangeRequestedAt = user.accountKindChangeRequestedAt;
+  let mustChooseAccountKind = Boolean(user.mustChooseAccountKind);
+
+  if (user.mustChooseAccountKind) {
+    accountKind = requestedKind;
+    mustChooseAccountKind = false;
+    pendingAccountKind = null;
+    accountKindChangeRequestedAt = null;
+  } else if (requestedKind !== currentKind) {
     const files = await listAccountFileMeta(user.id);
-    if (!files.commercialRegisterFile || !files.authorizationFile) {
-      throw new Error("COMPANY_FILES_REQUIRED");
+    if (requestedKind === "company") {
+      if (!companyNameAr || !companyNameEn || !crNumber) throw new Error("COMPANY_REQUIRED");
+      if (!files.commercialRegisterFile || !files.authorizationFile) {
+        throw new Error("COMPANY_FILES_REQUIRED");
+      }
+    } else {
+      if (!files.civilIdFile && !files.passportFile) throw new Error("IDENTITY_PROOF_REQUIRED");
+    }
+    pendingAccountKind = requestedKind;
+    accountKindChangeRequestedAt = new Date();
+    accountKind = currentKind;
+  }
+
+  if (accountKind === "company" || pendingAccountKind === "company") {
+    if (!companyNameAr || !companyNameEn || !crNumber) throw new Error("COMPANY_REQUIRED");
+    if (accountKind === "company") {
+      const files = await listAccountFileMeta(user.id);
+      if (!files.commercialRegisterFile || !files.authorizationFile) {
+        throw new Error("COMPANY_FILES_REQUIRED");
+      }
     }
   } else {
     if (!nationality) throw new Error("NATIONALITY_REQUIRED");
@@ -749,6 +792,9 @@ export async function updateOwnProfile(
       nameAr,
       nameEn,
       accountKind,
+      mustChooseAccountKind,
+      pendingAccountKind,
+      accountKindChangeRequestedAt,
       companyNameAr,
       companyNameEn,
       crNumber,
@@ -807,4 +853,69 @@ export async function databaseHealth(): Promise<{ ok: boolean; users?: number }>
   } catch {
     return { ok: false };
   }
+}
+
+/** First-time individual/company choice after Google/Facebook signup. */
+export async function confirmAccountKindChoice(
+  userId: string,
+  kind: "person" | "company",
+): Promise<PublicUser> {
+  requireDatabase();
+  await ensureIdentitySchema();
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  const user = rows[0];
+  if (!user) throw new Error("NOT_FOUND");
+  if (!user.mustChooseAccountKind) {
+    return toPublicUser(user);
+  }
+  const accountKind = kind === "company" ? "company" : "person";
+  const [updated] = await db
+    .update(users)
+    .set({
+      accountKind,
+      mustChooseAccountKind: false,
+      pendingAccountKind: null,
+      accountKindChangeRequestedAt: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id))
+    .returning();
+  return toPublicUser(updated);
+}
+
+export async function resolveAccountKindChange(
+  userId: string,
+  decision: "approve" | "reject",
+): Promise<PublicUser | null> {
+  requireDatabase();
+  await ensureIdentitySchema();
+  const db = getDb();
+  const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+  const user = rows[0];
+  if (!user?.pendingAccountKind) return null;
+  if (decision === "reject") {
+    const [updated] = await db
+      .update(users)
+      .set({
+        pendingAccountKind: null,
+        accountKindChangeRequestedAt: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, user.id))
+      .returning();
+    return toPublicUser(updated);
+  }
+  const nextKind = user.pendingAccountKind === "company" ? "company" : "person";
+  const [updated] = await db
+    .update(users)
+    .set({
+      accountKind: nextKind,
+      pendingAccountKind: null,
+      accountKindChangeRequestedAt: null,
+      updatedAt: new Date(),
+    })
+    .where(eq(users.id, user.id))
+    .returning();
+  return toPublicUser(updated);
 }

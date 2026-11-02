@@ -36,6 +36,11 @@ export const users = pgTable("bhd_users", {
   passportNumber: text("passport_number"),
   passportExpires: text("passport_expires"),
   accountKind: text("account_kind").notNull().default("person"),
+  /** True until the user explicitly picks فرد/شركة (esp. social first login). */
+  mustChooseAccountKind: boolean("must_choose_account_kind").notNull().default(false),
+  /** Pending kind change awaiting platform admin approval. */
+  pendingAccountKind: text("pending_account_kind"),
+  accountKindChangeRequestedAt: timestamp("account_kind_change_requested_at", { withTimezone: true }),
   companyNameAr: text("company_name_ar"),
   companyNameEn: text("company_name_en"),
   crNumber: text("cr_number"),

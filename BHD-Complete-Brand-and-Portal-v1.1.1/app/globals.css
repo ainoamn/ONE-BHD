@@ -2567,6 +2567,95 @@ h3 {
   color: var(--ink);
 }
 
+.account-kind-picker {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.account-kind-picker__title {
+  margin: 0;
+  padding: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #1a2e28;
+}
+
+.account-kind-picker__list {
+  display: grid;
+  gap: 10px;
+}
+
+.account-kind-picker__card {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 56px;
+  padding: 12px 14px;
+  border: 1px solid #d9e2dd;
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.account-kind-picker__card:hover,
+.account-kind-picker__card.is-selected {
+  border-color: #c45b4a;
+  box-shadow: 0 0 0 1px rgba(196, 91, 74, 0.2);
+}
+
+.account-kind-picker__card input {
+  width: 18px;
+  height: 18px;
+  accent-color: #c45b4a;
+  margin: 0;
+}
+
+.account-kind-picker__label {
+  font-weight: 800;
+  color: #1a2e28;
+}
+
+.account-kind-picker__icon {
+  color: #c45b4a;
+  display: inline-flex;
+}
+
+.account-kind-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(12, 28, 24, 0.45);
+}
+
+.account-kind-gate__panel {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(9, 45, 36, 0.22);
+}
+
+.account-kind-gate__actions {
+  display: grid;
+}
+
+.account-kind-change-note {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #5a6f67;
+  line-height: 1.5;
+}
+
 .login-form {
   display: grid;
   gap: 14px;

@@ -5,8 +5,13 @@ import { useCallback, useEffect, useState } from "react";
 import { BHD_GOOGLE_WEB_CLIENT_ID } from "../../lib/auth/config";
 import { captureWindowToken } from "../../lib/identity/window-session";
 
+type GoogleAuthUser = {
+  mustChooseAccountKind?: boolean;
+  accountKind?: "person" | "company";
+};
+
 type Props = {
-  onSuccess?: () => void;
+  onSuccess?: (user?: GoogleAuthUser) => void;
   locale?: "ar" | "en";
   label: string;
 };
@@ -41,13 +46,17 @@ export function GoogleSignInButton({ onSuccess, locale = "ar", label }: Props) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ idToken: credentialResponse.credential }),
         });
-        const data = (await response.json()) as { message?: string; token?: string };
+        const data = (await response.json()) as {
+          message?: string;
+          token?: string;
+          user?: GoogleAuthUser;
+        };
         if (!response.ok) {
           setError(data.message || (locale === "en" ? "Google sign-in failed." : "تعذّر تسجيل الدخول عبر Google."));
           return;
         }
         captureWindowToken(data.token);
-        onSuccess?.();
+        onSuccess?.(data.user);
       } catch {
         setError(locale === "en" ? "Could not reach the sign-in server." : "تعذّر الاتصال بخادم الدخول.");
       } finally {

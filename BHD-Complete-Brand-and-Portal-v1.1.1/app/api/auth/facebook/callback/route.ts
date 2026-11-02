@@ -46,7 +46,11 @@ export async function GET(request: Request) {
     const facebook = await exchangeFacebookCode(code, oauth.redirectUri);
     const user = await loginOrRegisterWithFacebook({ ...facebook, ip: getRequestIp(request) });
     const next = isSafeNextPath(oauth.next) ? oauth.next : "/";
-    const response = NextResponse.redirect(new URL(next, origin));
+    const dest =
+      user.mustChooseAccountKind
+        ? `/login?chooseKind=1&next=${encodeURIComponent(next)}`
+        : next;
+    const response = NextResponse.redirect(new URL(dest, origin));
     await applyIdentityLogin(
       response.cookies,
       portalSessionFromUser(user, "facebook"),

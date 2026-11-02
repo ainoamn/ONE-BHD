@@ -1,5 +1,6 @@
 "use client";
 
+import { AccountKindPicker } from "../components/AccountKindPicker";
 import { BrandLogo } from "../components/BrandLogo";
 import { InstantLink } from "../components/InstantLink";
 import { BHD_ACCOUNT_CHANGED, SessionMenu } from "../components/auth/SessionMenu";
@@ -25,6 +26,9 @@ type AccountUser = {
   passportNumber: string | null;
   passportExpires: string | null;
   accountKind: "person" | "company";
+  mustChooseAccountKind?: boolean;
+  pendingAccountKind?: "person" | "company" | null;
+  accountKindChangeRequestedAt?: string | null;
   companyNameAr: string | null;
   companyNameEn: string | null;
   crNumber: string | null;
@@ -121,6 +125,8 @@ export function AccountConsole() {
   const [commercialRegisterFile, setCommercialRegisterFile] = useState<AccountFileMeta | null>(null);
   const [authorizationFile, setAuthorizationFile] = useState<AccountFileMeta | null>(null);
   const [accountKind, setAccountKind] = useState<"person" | "company">("person");
+  const [gateKind, setGateKind] = useState<"person" | "company" | null>(null);
+  const [confirmingKind, setConfirmingKind] = useState(false);
   const [companyNameAr, setCompanyNameAr] = useState("");
   const [companyNameEn, setCompanyNameEn] = useState("");
   const [crNumber, setCrNumber] = useState("");
@@ -159,6 +165,7 @@ export function AccountConsole() {
     setCommercialRegisterFile(payload.files?.commercialRegisterFile || null);
     setAuthorizationFile(payload.files?.authorizationFile || null);
     setAccountKind(payload.user.accountKind === "company" ? "company" : "person");
+    if (payload.user.mustChooseAccountKind) setGateKind(null);
     setCompanyNameAr(payload.user.companyNameAr || "");
     setCompanyNameEn(payload.user.companyNameEn || "");
     setCrNumber(payload.user.crNumber || payload.contact?.crNumber || "");
@@ -171,6 +178,46 @@ export function AccountConsole() {
     setHometown(payload.contact?.hometown || "");
     setCountry(payload.contact?.country || "OM");
     setZipCode(payload.contact?.zipCode || "");
+  }
+
+  async function confirmFirstKind() {
+    if (!gateKind) {
+      setError("اختر فرد أو شركة للمتابعة.");
+      return;
+    }
+    setConfirmingKind(true);
+    setError("");
+    try {
+      const response = await identityFetch("/api/account/kind", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ accountKind: gateKind }),
+      });
+      const payload = (await response.json()) as { user?: AccountUser; message?: string };
+      if (!response.ok || !payload.user) throw new Error(payload.message || "تعذّر حفظ نوع الحساب.");
+      setAccountKind(payload.user.accountKind === "company" ? "company" : "person");
+      setData((prev) =>
+        prev
+          ? {
+              ...prev,
+              user: {
+                ...prev.user,
+                ...payload.user!,
+                mustChooseAccountKind: false,
+              },
+            }
+          : prev,
+      );
+      setSaved(
+        payload.user.accountKind === "company"
+          ? "تم اختيار الحساب التجاري. أكمل بيانات الشركة والمرفقات أدناه."
+          : "تم اختيار الحساب الشخصي. يمكنك إكمال بياناتك أدناه.",
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "تعذّر حفظ نوع الحساب.");
+    } finally {
+      setConfirmingKind(false);
+    }
   }
 
   useEffect(() => {
@@ -273,6 +320,9 @@ export function AccountConsole() {
     }
   }
 
+  const savedKind = data?.user.accountKind === "company" ? "company" : "person";
+  const kindChanging = Boolean(data?.user && accountKind !== savedKind && !data.user.mustChooseAccountKind);
+
   const missing = useMemo(
     () =>
       (accountKind === "company"
@@ -301,20 +351,32 @@ export function AccountConsole() {
             { key: "nationality", label: "الجنسية", value: nationality },
             { key: "gender", label: "الجنس", value: gender },
             { key: "birthDate", label: "تاريخ الميلاد", value: birthDate },
+            ...(kindChanging
+              ? [
+                  {
+                    key: "identityProof",
+                    label: "مرفق البطاقة المدنية أو الجواز لإثبات الهوية",
+                    value: civilIdFile || passportFile ? "ok" : "",
+                  },
+                ]
+              : []),
           ]
       ).filter((item) => !item.value.trim()),
     [
       accountKind,
       authorizationFile,
       birthDate,
+      civilIdFile,
       commercialRegisterFile,
       companyNameAr,
       companyNameEn,
       crNumber,
       gender,
+      kindChanging,
       nameAr,
       nameEn,
       nationality,
+      passportFile,
       phone,
     ],
   );
@@ -385,10 +447,13 @@ export function AccountConsole() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
+      const pending = payload.user.pendingAccountKind;
       setSaved(
-        newPassword
-          ? "تم حفظ كلمة المرور. يمكنك الدخول لاحقاً بالبريد وكلمة المرور أو عبر فيسبوك/جوجل."
-          : "تم حفظ بياناتك. ستظهر في بقية مواقع BHD عند الدخول التالي.",
+        pending
+          ? `أُرسل طلب التحويل إلى ${pending === "company" ? "حساب تجاري" : "حساب شخصي"} لمراجعة الإدارة مع المستندات. يبقى النوع الحالي حتى الاعتماد.`
+          : newPassword
+            ? "تم حفظ كلمة المرور. يمكنك الدخول لاحقاً بالبريد وكلمة المرور أو عبر فيسبوك/جوجل."
+            : "تم حفظ بياناتك. ستظهر في بقية مواقع BHD عند الدخول التالي.",
       );
     } catch (err) {
       setError(err instanceof Error ? err.message : "تعذّر حفظ التعديلات.");
@@ -399,6 +464,8 @@ export function AccountConsole() {
 
   const user = data?.user;
   const initial = (user?.name || "B").trim().slice(0, 1);
+  const needsKindGate = Boolean(user?.mustChooseAccountKind);
+  const pendingKind = user?.pendingAccountKind === "company" || user?.pendingAccountKind === "person" ? user.pendingAccountKind : null;
 
   return (
     <div className="account-screen" dir="rtl">
@@ -410,6 +477,28 @@ export function AccountConsole() {
         <SessionMenu signInLabel="دخول" />
       </header>
 
+      {needsKindGate ? (
+        <div className="account-kind-gate" role="dialog" aria-modal="true" aria-labelledby="account-kind-gate-title">
+          <div className="account-kind-gate__panel">
+            <AccountKindPicker
+              title="اختر نوع التسجيل"
+              value={gateKind}
+              onChange={setGateKind}
+              name="first-account-kind"
+            />
+            <p className="account-kind-change-note" id="account-kind-gate-title">
+              حساب جديد عبر جوجل أو فيسبوك أو البريد يحتاج اختيار فرد أو شركة مرة واحدة قبل إكمال الملف.
+            </p>
+            {error ? <p className="account-status is-error">{error}</p> : null}
+            <div className="account-kind-gate__actions">
+              <button type="button" className="primary-button" disabled={confirmingKind || !gateKind} onClick={() => void confirmFirstKind()}>
+                {confirmingKind ? "جاري الحفظ…" : "متابعة"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <main className="account-main" id="main-content">
         <p className="section-kicker">حساب BHD الموحّد</p>
         <h1>بياناتك. مواقعك. اشتراكاتك.</h1>
@@ -418,8 +507,15 @@ export function AccountConsole() {
         </p>
 
         {loading ? <p className="account-status">جاري تحميل الحساب…</p> : null}
-        {error ? <p className="account-status is-error">{error}</p> : null}
+        {error && !needsKindGate ? <p className="account-status is-error">{error}</p> : null}
         {saved ? <p className="account-status is-ok">{saved}</p> : null}
+        {pendingKind ? (
+          <p className="account-status is-ok" role="status">
+            طلب تحويل إلى {pendingKind === "company" ? "حساب تجاري" : "حساب شخصي"} قيد مراجعة الإدارة
+            {user?.accountKindChangeRequestedAt ? ` منذ ${formatDate(user.accountKindChangeRequestedAt)}` : ""}.
+            يبقى النوع الحالي ({user?.accountKind === "company" ? "تجاري" : "شخصي"}) حتى الاعتماد.
+          </p>
+        ) : null}
         {attempted && missing.length ? (
           <div className="account-missing" role="alert">
             <strong>هذه الحقول ناقصة:</strong>
@@ -520,32 +616,29 @@ export function AccountConsole() {
                 </div>
                 <div className="account-fields">
                   <div className="account-kind-verify is-wide">
-                    <strong>وثّق نوع حسابك</strong>
-                    <small>اختر شخصي أو تجاري. الحساب التجاري يُعامل كمستأجر ويتطلب البيانات والمرفقات التجارية.</small>
-                    <div className="login-kind-tabs" role="tablist" aria-label="نوع الحساب">
-                      <button
-                        type="button"
-                        className={accountKind === "person" ? "is-active" : ""}
-                        onClick={() => {
-                          setAccountKind("person");
-                          setAttempted(false);
-                          setError("");
-                        }}
-                      >
-                        شخصي
-                      </button>
-                      <button
-                        type="button"
-                        className={accountKind === "company" ? "is-active" : ""}
-                        onClick={() => {
-                          setAccountKind("company");
-                          setAttempted(false);
-                          setError("");
-                        }}
-                      >
-                        تجاري
-                      </button>
-                    </div>
+                    <AccountKindPicker
+                      value={accountKind}
+                      name="account-kind-change"
+                      onChange={(next) => {
+                        if (pendingKind) {
+                          setError("لديك طلب تحويل قيد المراجعة. انتظر قرار الإدارة أو تواصل معهم.");
+                          return;
+                        }
+                        setAccountKind(next);
+                        setAttempted(false);
+                        setError("");
+                        setSaved("");
+                      }}
+                    />
+                    {kindChanging ? (
+                      <p className="account-kind-change-note">
+                        تغيير النوع بعد التسجيل يتطلب إثبات ملكية الحساب والمستندات الثبوتية، ثم مراجعة واعتماد من إدارة الموقع. لن يتغيّر النوع فوراً.
+                      </p>
+                    ) : (
+                      <p className="account-kind-change-note">
+                        الحساب التجاري يتطلب السجل التجاري وتفويض المفوض. التحويل لاحقاً يخضع لموافقة الإدارة.
+                      </p>
+                    )}
                   </div>
                   {accountKind === "company" ? (
                     <>
@@ -692,8 +785,12 @@ export function AccountConsole() {
                     تاريخ انتهاء البطاقة
                     <input type="date" value={civilIdExpires} onChange={(event) => setCivilIdExpires(event.target.value)} />
                   </label>
-                  <div className="account-upload is-wide">
-                    <span>مرفق نسخة البطاقة المدنية</span>
+                  <div
+                    className={`account-upload is-wide ${
+                      kindChanging && attempted && !civilIdFile && !passportFile ? "is-missing" : ""
+                    }`}
+                  >
+                    <span>مرفق نسخة البطاقة المدنية{kindChanging ? " *" : ""}</span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,application/pdf"
@@ -705,7 +802,11 @@ export function AccountConsole() {
                         {civilIdFile.filename}
                       </a>
                     ) : (
-                      <small>صورة أو PDF حتى 4 ميغابايت.</small>
+                      <small>
+                        {kindChanging
+                          ? "مطلوب لإثبات الهوية عند طلب التحويل (أو ارفع الجواز)."
+                          : "صورة أو PDF حتى 4 ميغابايت."}
+                      </small>
                     )}
                   </div>
                   <label>
@@ -716,8 +817,12 @@ export function AccountConsole() {
                     تاريخ انتهاء الجواز
                     <input type="date" value={passportExpires} onChange={(event) => setPassportExpires(event.target.value)} />
                   </label>
-                  <div className="account-upload is-wide">
-                    <span>مرفق نسخة الجواز</span>
+                  <div
+                    className={`account-upload is-wide ${
+                      kindChanging && attempted && !civilIdFile && !passportFile ? "is-missing" : ""
+                    }`}
+                  >
+                    <span>مرفق نسخة الجواز{kindChanging ? " *" : ""}</span>
                     <input
                       type="file"
                       accept="image/jpeg,image/png,image/webp,application/pdf"
@@ -729,7 +834,11 @@ export function AccountConsole() {
                         {passportFile.filename}
                       </a>
                     ) : (
-                      <small>صورة أو PDF حتى 4 ميغابايت.</small>
+                      <small>
+                        {kindChanging
+                          ? "بديل مقبول عن البطاقة المدنية لإثبات الهوية."
+                          : "صورة أو PDF حتى 4 ميغابايت."}
+                      </small>
                     )}
                   </div>
                   </>
