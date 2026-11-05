@@ -150,6 +150,25 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
       "http://127.0.0.1:3000/",
     ],
   },
+  {
+    clientId: "bhd-work",
+    name: "Work Management",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_WORK",
+    redirectUris: [
+      "https://business-management-sigma.vercel.app/api/auth/bhd/callback",
+      "https://business-management-bhdom89-8158s-projects.vercel.app/api/auth/bhd/callback",
+      "https://business-management-git-main-bhdom89-8158s-projects.vercel.app/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+      "http://127.0.0.1:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: [
+      "https://business-management-sigma.vercel.app/",
+      "https://business-management-bhdom89-8158s-projects.vercel.app/",
+      "https://business-management-git-main-bhdom89-8158s-projects.vercel.app/",
+      "http://localhost:3000/",
+      "http://127.0.0.1:3000/",
+    ],
+  },
 ];
 
 function parseJsonList(raw: string): string[] {
