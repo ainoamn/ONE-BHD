@@ -41,7 +41,9 @@
 | **Business-Management** | `f71fefb` — نفس مواصفة المحوّل في مساحة العمل — Ready |
 | **-BHD-Cars** | `1e71115` — `data-bhd-launcher` في الهيدر + سكربتات الهوية — Ready |
 | **hikaya** | `1da8bb3` — `data-bhd-launcher` في `header-actions` — Ready |
-| **بقية البرامج (وازن، حسابي، نسب، …)** | تستهلك الكتالوج الحي؛ يُفضَّل تركيب `data-bhd-launcher` أو `BhdAppSwitcher` بنفس المواصفة |
+| **hisaby** | صورة→شبكة، `googleAvatarSrc`، استبعاد الحساب من البلاطات — Ready |
+| **BHD-R** | نفس مواصفة المحوّل في `bhd-app-switcher` (`viewer`/`locale`) — Ready |
+| **بقية البرامج (وازن، نسب، …)** | تستهلك الكتالوج الحي؛ يُفضَّل تركيب `data-bhd-launcher` أو `BhdAppSwitcher` بنفس المواصفة |
 
 ## تحقق يدوي
 
