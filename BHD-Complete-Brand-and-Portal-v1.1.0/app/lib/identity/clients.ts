@@ -156,11 +156,13 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_LEGAL",
     redirectUris: [
       "https://legal.bhd-om.com/api/auth/bhd/callback",
+      "https://legal-office-web.vercel.app/api/auth/bhd/callback",
       "http://localhost:4310/api/auth/bhd/callback",
       "http://localhost:3000/api/auth/bhd/callback",
     ],
     postLogoutRedirectUris: [
       "https://legal.bhd-om.com/",
+      "https://legal-office-web.vercel.app/",
       "http://localhost:4310/",
       "http://localhost:3000/",
     ],
@@ -192,9 +194,14 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_CARS",
     redirectUris: [
       "https://cars.bhd-om.com/api/auth/bhd/callback",
+      "https://bhd-cars.vercel.app/api/auth/bhd/callback",
       "http://localhost:3000/api/auth/bhd/callback",
     ],
-    postLogoutRedirectUris: ["https://cars.bhd-om.com/", "http://localhost:3000/"],
+    postLogoutRedirectUris: [
+      "https://cars.bhd-om.com/",
+      "https://bhd-cars.vercel.app/",
+      "http://localhost:3000/",
+    ],
   },
   {
     clientId: "bhd-hikaya",
@@ -202,9 +209,14 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_HIKAYA",
     redirectUris: [
       "https://hikaya.bhd-om.com/api/auth/bhd/callback",
+      "https://hikaya-nine.vercel.app/api/auth/bhd/callback",
       "http://localhost:3000/api/auth/bhd/callback",
     ],
-    postLogoutRedirectUris: ["https://hikaya.bhd-om.com/", "http://localhost:3000/"],
+    postLogoutRedirectUris: [
+      "https://hikaya.bhd-om.com/",
+      "https://hikaya-nine.vercel.app/",
+      "http://localhost:3000/",
+    ],
   },
   {
     clientId: "bhd-ain",
