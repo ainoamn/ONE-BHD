@@ -14,13 +14,22 @@
 
 | المستودع | commit | نشر |
 |---|---|---|
-| ONE-BHD | `17e88e5` | Ready (id.bhd-om.com) |
-| Legal-Practice-Management | `ec6b300` | Ready (legal-office-web) |
-| Business-Management | `f71fefb` | Ready (business-management) |
-| -BHD-Cars | `1e71115` | Ready (bhd-cars) |
-| hikaya | `1da8bb3` | Ready (hikaya) |
+| ONE-BHD | `8a4ac4b`+ | Ready (id.bhd-om.com) |
+| Legal-Practice-Management | `ec6b300` | Ready |
+| Business-Management | `f71fefb` | Ready |
+| -BHD-Cars | `1e71115` | Ready |
+| hikaya | `1da8bb3` | Ready |
+| WAZEN | `b2cbd90` | Ready |
+| Nasab | `ff2bab1` | Ready (+ `.vercelignore` لأرشيف hikaya) |
+| hisaby | `c87279c` (`launch/phase-1-build`) | Ready |
+| BHD-R | `c757a939` | Ready |
+| BHD-STOR | `9c3c287` | كود مرفوع — ربط Vercel مفقود محلياً |
+| BHD-HR-live | `1464693` | Ready |
+| ain-oman-web | `6f6bbb3` | Ready |
+| nextjs-boilerplate | `23eb74c` | Ready |
+| bhd-om | `3e3635d` | Ready |
 
-## تثبيت سريع لأي موقع متبقٍ
+## تثبيت سريع
 
 ```html
 <link rel="stylesheet" href="https://id.bhd-om.com/bhd-launcher.css" />
