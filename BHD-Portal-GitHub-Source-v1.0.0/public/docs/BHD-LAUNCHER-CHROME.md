@@ -37,10 +37,10 @@
 | الموقع | التغيير |
 |---|---|
 | **ONE-BHD / id.bhd-om.com** | محوّل مرتّب (صورة→شبكة)، صورة جوجل مضغوطة، نشر `bhd-launcher.js/css`، توثيق الشكل |
-| **Legal-Practice-Management** | كان فيه `BhdAppSwitcher`؛ يُزامَن ترتيب الصورة/الشبكة + الأنماط مع المواصفة |
-| **Business-Management** | شريط رأس + فوتر كتالوج + `BhdAppSwitcher` في مساحة العمل؛ يُزامَن الشكل |
-| **-BHD-Cars** | إضافة نقطة تركيب `data-bhd-launcher` في الهيدر + سكربتات الهوية |
-| **hikaya** | إضافة نقطة تركيب في `header-actions` + سكربتات الهوية |
+| **Legal-Practice-Management** | `ec6b300` — صورة→شبكة، `googleAvatarSrc`، استبعاد الحساب من البلاطات — Ready |
+| **Business-Management** | `f71fefb` — نفس مواصفة المحوّل في مساحة العمل — Ready |
+| **-BHD-Cars** | `1e71115` — `data-bhd-launcher` في الهيدر + سكربتات الهوية — Ready |
+| **hikaya** | `1da8bb3` — `data-bhd-launcher` في `header-actions` — Ready |
 | **بقية البرامج (وازن، حسابي، نسب، …)** | تستهلك الكتالوج الحي؛ يُفضَّل تركيب `data-bhd-launcher` أو `BhdAppSwitcher` بنفس المواصفة |
 
 ## تحقق يدوي
