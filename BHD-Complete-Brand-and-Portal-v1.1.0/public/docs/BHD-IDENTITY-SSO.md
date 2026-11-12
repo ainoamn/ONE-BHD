@@ -77,8 +77,8 @@ sequenceDiagram
 | صلاحية كود التفويض | 60 ثانية، استخدام واحد |
 | صلاحية ID Token | 10 دقائق |
 | صلاحية Access Token | 10 دقائق |
-| صلاحية Refresh Token | 40 يوماً، تدوير عند كل استخدام |
-| صلاحية جلسة الهوية `bhd_id` | 40 يوماً أو حتى الخروج الصريح — **بلا مهلة خمول** (انظر `BHD-SESSION-POLICY.md`) |
+| صلاحية Refresh Token | 400 يوم، تدوير عند كل استخدام |
+| صلاحية جلسة الهوية `bhd_id` | 400 يوم أو حتى الخروج الصريح — **بلا مهلة خمول** (انظر `BHD-SESSION-POLICY.md`) |
 | PKCE | إلزامي، `S256` فقط |
 | scopes الافتراضية | `openid profile email` |
 | مطالبات ID Token الإلزامية | `iss`, `aud`, `sub`, `exp`, `iat`, `nonce`, `email`, `email_verified` |
@@ -98,6 +98,13 @@ sequenceDiagram
 | مكتب BHD | `bhd-office` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 | بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 | BHD R | `bhd-r` | `https://r.bhd-om.com` / `https://bhd-r-api-phi.vercel.app` | `{origin}/api/auth/bhd/callback` |
+| الموارد البشرية | `bhd-hr` | `https://hr.bhd-om.com` | `https://hr.bhd-om.com/api/auth/bhd/callback` |
+| المكتب القانوني | `bhd-legal` | `https://legal.bhd-om.com` | `https://legal.bhd-om.com/api/auth/bhd/callback` |
+| إدارة الأعمال | `bhd-work` | `https://work.bhd-om.com` | `https://work.bhd-om.com/api/auth/bhd/callback` |
+| BHD سيارات | `bhd-cars` | `https://cars.bhd-om.com` | `https://cars.bhd-om.com/api/auth/bhd/callback` |
+| حكاية | `bhd-hikaya` | `https://hikaya.bhd-om.com` | `https://hikaya.bhd-om.com/api/auth/bhd/callback` |
+| عين عُمان | `bhd-ain` | `https://ain.bhd-om.com` | `https://ain.bhd-om.com/api/auth/bhd/callback` |
+| قالب BHD | `bhd-boilerplate` | `https://boilerplate.bhd-om.com` | `https://boilerplate.bhd-om.com/api/auth/bhd/callback` |
 
 محلياً لكل منتج:
 
@@ -301,7 +308,7 @@ grant_type=refresh_token
 
 | الاسم | أين | Domain | HttpOnly | Secure | SameSite | الغرض |
 |---|---|---|---|---|---|---|
-| `bhd_id` | الهوية فقط | **Host-only** (لا `.bhd-om.com`) | نعم | نعم في الإنتاج | Lax | الحساب النشط 40 يوماً أو حتى الخروج |
+| `bhd_id` | الهوية فقط | **Host-only** (لا `.bhd-om.com`) | نعم | نعم في الإنتاج | Lax | الحساب النشط حتى الخروج (400 يوم سقف المتصفح) |
 | `bhd_id_roster` | الهوية فقط | Host-only | نعم | نعم في الإنتاج | Lax | قائمة حتى 8 حسابات للتبديل الفوري من الرأس |
 | `bhd_oauth_state` | المنتج، دقائق | Host-only | نعم | نعم في الإنتاج | Lax | `state` + `nonce` + `code_verifier` أثناء الـ redirect |
 | جلسة المنتج الحالية | المنتج | Host-only | نعم | نعم في الإنتاج | Lax | تبقى أسماء حسابي `bhd_access` ووازن كما هي وبوابة `bhd_portal` |

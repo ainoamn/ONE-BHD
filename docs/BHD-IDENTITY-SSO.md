@@ -98,6 +98,13 @@ sequenceDiagram
 | مكتب BHD | `bhd-office` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 | بيتك | `bhd-baitak` | `https://baitak.bhd-om.com` | `https://baitak.bhd-om.com/api/auth/bhd/callback` |
 | BHD R | `bhd-r` | `https://r.bhd-om.com` / `https://bhd-r-api-phi.vercel.app` | `{origin}/api/auth/bhd/callback` |
+| الموارد البشرية | `bhd-hr` | `https://hr.bhd-om.com` | `https://hr.bhd-om.com/api/auth/bhd/callback` |
+| المكتب القانوني | `bhd-legal` | `https://legal.bhd-om.com` | `https://legal.bhd-om.com/api/auth/bhd/callback` |
+| إدارة الأعمال | `bhd-work` | `https://work.bhd-om.com` | `https://work.bhd-om.com/api/auth/bhd/callback` |
+| BHD سيارات | `bhd-cars` | `https://cars.bhd-om.com` | `https://cars.bhd-om.com/api/auth/bhd/callback` |
+| حكاية | `bhd-hikaya` | `https://hikaya.bhd-om.com` | `https://hikaya.bhd-om.com/api/auth/bhd/callback` |
+| عين عُمان | `bhd-ain` | `https://ain.bhd-om.com` | `https://ain.bhd-om.com/api/auth/bhd/callback` |
+| قالب BHD | `bhd-boilerplate` | `https://boilerplate.bhd-om.com` | `https://boilerplate.bhd-om.com/api/auth/bhd/callback` |
 
 محلياً لكل منتج:
 

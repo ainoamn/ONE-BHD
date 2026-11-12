@@ -151,10 +151,26 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
     ],
   },
   {
+    clientId: "bhd-legal",
+    name: "Legal Practice",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_LEGAL",
+    redirectUris: [
+      "https://legal.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:4310/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: [
+      "https://legal.bhd-om.com/",
+      "http://localhost:4310/",
+      "http://localhost:3000/",
+    ],
+  },
+  {
     clientId: "bhd-work",
-    name: "Work Management",
+    name: "Business Management",
     secretEnv: "BHD_OAUTH_CLIENT_SECRET_WORK",
     redirectUris: [
+      "https://work.bhd-om.com/api/auth/bhd/callback",
       "https://business-management-sigma.vercel.app/api/auth/bhd/callback",
       "https://business-management-bhdom89-8158s-projects.vercel.app/api/auth/bhd/callback",
       "https://business-management-git-main-bhdom89-8158s-projects.vercel.app/api/auth/bhd/callback",
@@ -162,12 +178,53 @@ export const IDENTITY_CLIENTS: IdentityClient[] = [
       "http://127.0.0.1:3000/api/auth/bhd/callback",
     ],
     postLogoutRedirectUris: [
+      "https://work.bhd-om.com/",
       "https://business-management-sigma.vercel.app/",
       "https://business-management-bhdom89-8158s-projects.vercel.app/",
       "https://business-management-git-main-bhdom89-8158s-projects.vercel.app/",
       "http://localhost:3000/",
       "http://127.0.0.1:3000/",
     ],
+  },
+  {
+    clientId: "bhd-cars",
+    name: "BHD Cars",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_CARS",
+    redirectUris: [
+      "https://cars.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://cars.bhd-om.com/", "http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-hikaya",
+    name: "Hikaya",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_HIKAYA",
+    redirectUris: [
+      "https://hikaya.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://hikaya.bhd-om.com/", "http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-ain",
+    name: "Ain Oman",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_AIN",
+    redirectUris: [
+      "https://ain.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://ain.bhd-om.com/", "http://localhost:3000/"],
+  },
+  {
+    clientId: "bhd-boilerplate",
+    name: "BHD Boilerplate",
+    secretEnv: "BHD_OAUTH_CLIENT_SECRET_BOILERPLATE",
+    redirectUris: [
+      "https://boilerplate.bhd-om.com/api/auth/bhd/callback",
+      "http://localhost:3000/api/auth/bhd/callback",
+    ],
+    postLogoutRedirectUris: ["https://boilerplate.bhd-om.com/", "http://localhost:3000/"],
   },
 ];
 
