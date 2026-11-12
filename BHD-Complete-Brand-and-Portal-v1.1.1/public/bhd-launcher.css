@@ -1,0 +1,214 @@
+/**
+ * BHD Launcher chrome — نمط موحّد (شبكة 3×3 + صورة جوجل دائرية)
+ * المصدر: https://id.bhd-om.com/bhd-launcher.css
+ * المرجع البصري: محوّل تطبيقات حسوب/خمسات
+ */
+.bhd-launcher-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 60;
+  flex-shrink: 0;
+  color: inherit;
+}
+
+.bhd-launcher-avatar,
+.bhd-launcher-grid {
+  display: grid;
+  place-items: center;
+  min-width: 40px;
+  min-height: 40px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.bhd-launcher-avatar:hover,
+.bhd-launcher-grid:hover,
+.bhd-launcher-avatar:focus-visible,
+.bhd-launcher-grid:focus-visible {
+  background: rgba(127, 127, 127, 0.12);
+  outline: none;
+}
+
+.bhd-launcher-avatar img,
+.bhd-launcher-avatar span {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.bhd-launcher-avatar span {
+  background: #092d24;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.bhd-launcher-grid span {
+  display: grid;
+  grid-template-columns: repeat(3, 4px);
+  gap: 3px;
+}
+
+.bhd-launcher-grid i {
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.bhd-launcher-signin {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(127, 127, 127, 0.28);
+  color: inherit;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bhd-launcher-card {
+  position: absolute;
+  top: calc(100% + 10px);
+  inset-inline-end: 0;
+  z-index: 90;
+  width: min(320px, calc(100vw - 24px));
+  max-height: min(420px, calc(100svh - 88px));
+  overflow: auto;
+  padding: 14px;
+  border: 1px solid rgba(9, 45, 36, 0.12);
+  border-radius: 16px;
+  background: #fff;
+  color: #092d24;
+  box-shadow: 0 18px 40px rgba(9, 45, 36, 0.16);
+  animation: bhd-launcher-in 140ms ease-out;
+}
+
+@keyframes bhd-launcher-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.bhd-launcher-card-head {
+  margin: 0 4px 12px;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.bhd-launcher-apps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.bhd-launcher-app {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 4px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.bhd-launcher-app:hover,
+.bhd-launcher-app:focus-visible {
+  background: #f3f6f4;
+  outline: none;
+}
+
+.bhd-launcher-app span.label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bhd-launcher-mark {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.bhd-launcher-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bhd-launcher-account {
+  display: grid;
+  gap: 10px;
+}
+
+.bhd-launcher-account-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bhd-launcher-account-row strong {
+  display: block;
+  font-size: 13px;
+}
+
+.bhd-launcher-account-row small {
+  display: block;
+  color: #6b7a73;
+  font-size: 11px;
+  direction: ltr;
+  text-align: start;
+}
+
+.bhd-launcher-account a,
+.bhd-launcher-account button {
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 10px;
+  background: #f3f6f4;
+  color: #092d24;
+  text-align: start;
+  text-decoration: none;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bhd-launcher-account button.is-danger {
+  background: #f7ecec;
+  color: #8a2f2f;
+}
